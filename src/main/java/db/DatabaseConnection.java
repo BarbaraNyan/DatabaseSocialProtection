@@ -51,6 +51,7 @@ public class DatabaseConnection {
     }
 
     public static void main(String[] args) {
+        // ПРИВЕТ ВАРЯ!!!
         JFrame jFrame = new SocialProtectionForm();
         jFrame.setDefaultCloseOperation(jFrame.EXIT_ON_CLOSE);
         jFrame.setTitle("База данных");
