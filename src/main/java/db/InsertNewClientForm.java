@@ -139,7 +139,6 @@ public class InsertNewClientForm extends JFrame{
                 ","+quotate(snils)+","+quotate(telephone)+","+quotate(email)+","+
                 quotate(gender)+","+quotate(addressId)+")";
 
-
         try {
             mdbc=new DatabaseConnection();
             Connection conn=mdbc.getMyConnection();

@@ -4,14 +4,10 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseMotionAdapter;
 
 public class SocialProtectionForm extends JFrame{
     private JTabbedPane tabbedPane1;
@@ -33,28 +29,40 @@ public class SocialProtectionForm extends JFrame{
     private JTextField textSNILS;
     private JTextField textTelephone;
     private JTextField textEmail;
-    private JTextField textField15;
-    private JTextField textField16;
-    private JTextField textField17;
-    private JTextField textField18;
-    private JTextField textField19;
-    private JTextField textField20;
+    private JTextField textDistrict;
+    private JTextField textInhabitedLocality;
+    private JTextField textStreet;
+    private JTextField textHouse;
+    private JTextField textFlat;
+    private JTextField textIndex;
     private JButton updateButton;
     private JTable tableIdDocument;
+    private JTable tableAttDocument;
+    private JTextField textRegion;
+    private JTable tableAddress;
 
     private DefaultTableModel dtmSocialClient;
     private DefaultTableModel dtmIdDocument;
+    private DefaultTableModel dtmAttDocument;
+    private DefaultTableModel dtmAddress;
     private ListSelectionModel selModel = tableSocialClients.getSelectionModel();
+    private TableModelClients mdtmSocialClient = new TableModelClients();
 
     private int rowTableSC;
     private int rowTableIdDoc;
-    private int selRow;
+    private int rowTableAttDoc;
+    private int rowTableAddress;
+
+    private int selRowSC;
+//    private int selRowAddress;
+
 
     SocialProtectionForm(){
         super("CommonTable");
         setContentPane(rootPanel);
+        tableAddress.setVisible(false);
         initModelSocialClient();
-        initModelIdDocument();
+        //initModelIdDocument();
         glossaryJTree.setModel( new DefaultTreeModel(setGlossaryJTree()) );
         listenerRowTable();
 //        getRowTable();
@@ -63,8 +71,6 @@ public class SocialProtectionForm extends JFrame{
                 JFrame insertNewClientForm = new InsertNewClientForm();
                 insertNewClientForm.pack();
                 insertNewClientForm.setVisible(true);
-
-
             }
         });
         updateButton.addActionListener(new ActionListener() {
@@ -74,6 +80,13 @@ public class SocialProtectionForm extends JFrame{
                 selModel.setSelectionInterval(rowTableSC-1, rowTableSC-1);
             }
         });
+//        tabbedPane2.addChangeListener(new ChangeListener() {
+//            public void stateChanged(ChangeEvent e) {
+//                if(tabbedPane2.getSelectedIndex()==1)
+//                    initModelIdDocument(persNum);
+//            }
+//        });
+
     }
 
     private void listenerRowTable(){
@@ -93,74 +106,136 @@ public class SocialProtectionForm extends JFrame{
     String sqlQuery1="select * from social_client";
 
     public void initModelSocialClient(){
-        TableModelClients mdtmSocialClient = new TableModelClients();
-        mdtmSocialClient.columns=columnsSocialClient;
-        mdtmSocialClient.columnClass=columnClassSocialClient;
+        mdtmSocialClient.columnsSC=columnsSocialClient;
+        mdtmSocialClient.columnClassSC=columnClassSocialClient;
         mdtmSocialClient.sqlQuery=sqlQuery1;
-        dtmSocialClient=mdtmSocialClient.MyTableModel();
+        dtmSocialClient=mdtmSocialClient.MyTableModelClients(1);
         tableSocialClients.setModel(dtmSocialClient);
         dtmSocialClient.fireTableDataChanged();
         rowTableSC = tableSocialClients.getRowCount();
     }
 
     String[] columnsIdDocument = new String[]
-            {"Серия","Номер","Кем выдан","Дата выдачи","Статус"};
+            {"Тип документа","Серия","Номер","Кем выдан","Дата выдачи","Статус"};
     final Class[] columnClassIdDocument = new Class[]{
-            String.class,String.class,String.class,String.class,String.class};
-    //PreparedStatement сюда вставить
-    String sqlQuery2 = "select idDoc.docSeries, idDoc.docNumber, idDoc.givenBy, idDoc.dateStart, idDoc.status\n" +
-            "from identification_document idDoc, social_client sc\n" +
-            "where idDoc.social_client_personalNumber = sc.personalNumber;";
+            String.class,String.class,String.class,String.class,String.class,String.class};
+    String sqlQuery2 = "select typeDoc.name, idDoc.docSeries, idDoc.docNumber, idDoc.givenBy, idDoc.dateStart, idDoc.status\n" +
+            "from identification_document idDoc inner join social_client sc on idDoc.social_client_personalNumber = sc.personalNumber\n" +
+            "inner join type_identification_document typeDoc on idDoc.typeIdDocNum = typeDoc.number\n" +
+            "where sc.personalNumber=?";
 
-    public void initModelIdDocument(){
-        TableModelClients mdtmIdDocument = new TableModelClients();
-        mdtmIdDocument.columns=columnsIdDocument;
-        mdtmIdDocument.columnClass=columnClassIdDocument;
-        mdtmIdDocument.sqlQuery=sqlQuery2;
-        dtmIdDocument=mdtmIdDocument.MyTableModel();
+    public void initModelIdDocument(String persNum){
+        mdtmSocialClient.columnsIdDoc=columnsIdDocument;
+        mdtmSocialClient.columnClassIdDoc=columnClassIdDocument;
+        mdtmSocialClient.persNum = Integer.parseInt(persNum);
+        mdtmSocialClient.sqlPreparedStatement=sqlQuery2;
+        dtmIdDocument=mdtmSocialClient.MyTableModelDocument(1);
         tableIdDocument.setModel(dtmIdDocument);
         dtmIdDocument.fireTableDataChanged();
         rowTableIdDoc = tableIdDocument.getRowCount();
     }
 
-//    public void initModel(String [] columns, Class[] columnClass, String sqlQuery){
-//        TableModelClients mdtmIdDocument = new TableModelClients();
-//        mdtmIdDocument.columns=columns;
-//        mdtmIdDocument.columnClass=columnClass;
-//        mdtmIdDocument.sqlQuery=sqlQuery;
-//        dtmIdDocument=mdtmIdDocument.MyTableModel();
-//        tableIdDocument.setModel(dtmIdDocument);
-//        dtmIdDocument.fireTableDataChanged();
-//        rowTableIdDoc = tableIdDocument.getRowCount();
-//    }
+    String[] columnsAttDocument = new String[]
+            {"Тип документа","Номер","Название","Дата выдачи","Статус"};
+    final Class[] columnClassAttDocument = new Class[]{
+            String.class,String.class,String.class,String.class,String.class};
+    String sqlQuery3 = "select typeDoc.name, attDoc.number, attDoc.name, attDoc.dateStart, attDoc.status\n" +
+            "from attached_document attDoc inner join social_client sc on attDoc.socialClient = sc.personalNumber\n" +
+            "inner join type_attached_document typeDoc on attDoc.typeAttachedDocNum = typeDoc.number\n" +
+            "where sc.personalNumber=?";
+
+    public void initModelAttDocument(String persNum){
+        mdtmSocialClient.columnsAttDoc=columnsAttDocument;
+        mdtmSocialClient.columnClassAttDoc=columnClassAttDocument;
+        mdtmSocialClient.persNum = Integer.parseInt(persNum);
+        mdtmSocialClient.sqlPreparedStatement=sqlQuery3;
+        dtmAttDocument=mdtmSocialClient.MyTableModelDocument(2);
+        tableAttDocument.setModel(dtmAttDocument);
+        dtmAttDocument.fireTableDataChanged();
+        rowTableAttDoc = tableAttDocument.getRowCount();
+    }
+
+    String[] columnsAddress = new String[]
+            {"Регион","Район","Нас.пункт","Улица","Дом","Квартира","Индекс" };
+    final Class[] columnClassAddress = new Class[] {
+            String.class,
+            String.class, String.class,String.class,Integer.class,Integer.class,Integer.class};
+    // Дописать SQL
+    String sqlQuery4="select ra.name, da.name, ia.name, sa.name, a.house, a.flat, a.`index`\n" +
+            "from address a inner join social_client sc on a.id = sc.addressId\n" +
+            "inner join region_address ra on a.regionNum = ra.number\n" +
+            "inner join district_address da on a.districtNum = da.number\n" +
+            "inner join inhabited_locality_address ia on a.inhabitedLocalityNum = ia.number\n" +
+            "inner join street_address sa on a.streetNum = sa.number\n" +
+            "where sc.addressId=(SELECT sc.addressId from social_client sc where sc.personalNumber=?)";
+
+    public void initModelAddress(String persAddress){
+        mdtmSocialClient.columnsAddress=columnsAddress;
+        mdtmSocialClient.columnClassAddress=columnClassAddress;
+        mdtmSocialClient.persNum = Integer.parseInt(persNum);
+        mdtmSocialClient.sqlPreparedStatement=sqlQuery4;
+        dtmAddress=mdtmSocialClient.MyTableModelDocument(3);
+        tableAddress.setModel(dtmAddress);
+        dtmAddress.fireTableDataChanged();
+        rowTableAddress = tableAddress.getRowCount();
+    }
+
+    String persNum;
+    String surname;
+    String name;
+    String patronymic;
+    String dateBirth;
+    String snils;
+    String telephone;
+    String email;
+
+    String region;
+    String district;
+    String inhabitedLocality;
+    String street;
+    String house;
+    String flat;
+    String index;
 
     public void getRowTableSC(){
-        String persNum;
-        String surname;
-        String name;
-        String patronymic;
-        String dateBirth;
-        String snils;
-        String telephone;
-        String email;
-
-        selRow = tableSocialClients.getSelectedRow();
-        persNum = tableSocialClients.getModel().getValueAt(selRow,0).toString();
+        selRowSC = tableSocialClients.getSelectedRow();
+        persNum = tableSocialClients.getModel().getValueAt(selRowSC,0).toString();
         textPersNum.setText(persNum);
-        surname = tableSocialClients.getModel().getValueAt(selRow,1).toString();
+        surname = tableSocialClients.getModel().getValueAt(selRowSC,1).toString();
         textSurname.setText(surname);
-        name = tableSocialClients.getModel().getValueAt(selRow,2).toString();
+        name = tableSocialClients.getModel().getValueAt(selRowSC,2).toString();
         textName.setText(name);
-        patronymic = tableSocialClients.getModel().getValueAt(selRow,3).toString();
+        patronymic = tableSocialClients.getModel().getValueAt(selRowSC,3).toString();
         textPatronymic.setText(patronymic);
-        dateBirth = tableSocialClients.getModel().getValueAt(selRow,4).toString();
+        dateBirth = tableSocialClients.getModel().getValueAt(selRowSC,4).toString();
         textDateBirth.setText(dateBirth);
-        snils = tableSocialClients.getModel().getValueAt(selRow,5).toString();
+        snils = tableSocialClients.getModel().getValueAt(selRowSC,5).toString();
         textSNILS.setText(snils);
-        telephone = tableSocialClients.getModel().getValueAt(selRow,6).toString();
+        telephone = tableSocialClients.getModel().getValueAt(selRowSC,6).toString();
         textTelephone.setText(telephone);
-        email = tableSocialClients.getModel().getValueAt(selRow,7).toString();
+        email = tableSocialClients.getModel().getValueAt(selRowSC,7).toString();
         textEmail.setText(email);
+
+        initModelAddress(persNum);
+
+        region = tableAddress.getModel().getValueAt(0,0).toString();
+        textRegion.setText(region);
+        district = tableAddress.getModel().getValueAt(0,1).toString();
+        textDistrict.setText(district);
+        inhabitedLocality = tableAddress.getModel().getValueAt(0,2).toString();
+        textInhabitedLocality.setText(inhabitedLocality);
+        street = tableAddress.getModel().getValueAt(0,3).toString();
+        textStreet.setText(street);
+        house = tableAddress.getModel().getValueAt(0,4).toString();
+        textHouse.setText(house);
+        flat = tableAddress.getModel().getValueAt(0,5).toString();
+        textFlat.setText(flat);
+        index = tableAddress.getModel().getValueAt(0,6).toString();
+        textIndex.setText(index);
+
+        initModelIdDocument(persNum);
+//        initModelAddress();
+        initModelAttDocument(persNum);
 
 //        String typeDoc;
 //        String series;
@@ -168,10 +243,6 @@ public class SocialProtectionForm extends JFrame{
 //        String givenBy;
 //        String dateStart;
 //        String status;
-    }
-
-    public void getRowTableIdDoc(){
-
     }
 
     //для вкладки НСИ
