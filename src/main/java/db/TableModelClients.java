@@ -29,6 +29,42 @@ import javax.swing.table.DefaultTableModel;
         public String[] columnsAddress;
         public Class[] columnClassAddress;
 
+        //для таблицы(справочнка) индекс
+        public String[] columnsIndex;
+        public Class[] columnClassIndex;
+
+        //для таблицы(справочнка) регион
+        public String[] columnsRegion;
+        public Class[] columnClassRegion;
+
+        //для таблицы(справочнка) район
+        public String[] columnsDistrict;
+        public Class[] columnClassDistrict;
+
+        //для таблицы(справочнка) населенный пункт
+        public String[] columnsLocality;
+        public Class[] columnClassLocality;
+
+        //для таблицы(справочнка) улица
+        public String[] columnsStreet;
+        public Class[] columnClassStreet;
+
+        //для таблицы(справочнка) родств.отношения
+        public String[] columnsRelation;
+        public Class[] columnClassRelation;
+
+        //для таблицы(справочнка) вид дохода
+        public String[] columnsTypeIncome;
+        public Class[] columnClassTypeIncome;
+
+        //для таблицы(справочнка) вид документа удостоверения
+        public String[] columnsTypeIndDoc;
+        public Class[] columnClassTypeIndDoc;
+
+        //для таблицы(справочнка) вид документа
+        public String[] columnsTypeDoc;
+        public Class[] columnClassTypeDoc;
+
         public String sqlQuery;
         public String sqlPreparedStatement;
         public int persNum;
@@ -77,6 +113,49 @@ import javax.swing.table.DefaultTableModel;
                         break;
                     case 3:  // Address
                         createTable(rs,columnsAddress,columnClassAddress);
+                        break;
+                }
+
+                mdbc.close(stmt);
+                return dtm;
+            }
+            catch(SQLException e){
+                return null;
+            }
+        }
+
+        public DefaultTableModel MyTableModelHandbook(int type){
+            try{
+                stmt= conn.createStatement();
+                rs = stmt.executeQuery(sqlQuery);
+
+                switch (type){
+                    case 1: // Индекс
+                        createTable(rs,columnsIndex,columnClassIndex);
+                        break;
+                    case 2: // Регион
+                        createTable(rs,columnsRegion,columnClassRegion);
+                        break;
+                    case 3: // Район
+                        createTable(rs,columnsDistrict,columnClassDistrict);
+                        break;
+                    case 4: // Пункт
+                        createTable(rs,columnsLocality,columnClassLocality);
+                        break;
+                    case 5: // Улица
+                        createTable(rs,columnsStreet,columnClassStreet);
+                        break;
+                    case 6: // Родственники
+                        createTable(rs,columnsRelation,columnClassRelation);
+                        break;
+                    case 7: // Доход
+                        createTable(rs,columnsTypeIncome,columnClassTypeIncome);
+                        break;
+                    case 8: // Документ идентификатор
+                        createTable(rs,columnsTypeIndDoc,columnClassTypeIndDoc);
+                        break;
+                    case 9: // Документ
+                        createTable(rs,columnsTypeDoc,columnClassTypeDoc);
                         break;
                 }
 

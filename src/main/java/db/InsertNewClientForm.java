@@ -28,10 +28,11 @@ public class InsertNewClientForm extends JFrame{
     private JButton addButton;
     private JComboBox comboBoxStreet;
     private JComboBox comboBoxRegion;
+    private JComboBox comboBoxIndex;
 
     private DatabaseConnection mdbc;
     private Statement stmt;
-    InsertNewClientForm(){
+    InsertNewClientForm(JTable [] t){
         setContentPane(rootPanel);
         setButtonGroup();
         addButton.addActionListener(new ActionListener() {
@@ -40,6 +41,21 @@ public class InsertNewClientForm extends JFrame{
                 setVisible(false);
             }
         });
+        //передача данных из справочников в списки
+        getComboBox(comboBoxIndex, t[0]);
+        getComboBox(comboBoxRegion, t[1]);
+        getComboBox(comboBoxDistrict, t[2]);
+        getComboBox(comboBoxInhabitedLoc, t[3]);
+        getComboBox(comboBoxStreet, t[4]);
+    }
+
+    public void getComboBox(JComboBox cb, JTable tl){
+        String item;
+        int k=tl.getColumnCount()-1;
+        for (int i = 0;i<tl.getRowCount();i++){
+            item = tl.getModel().getValueAt(i, k).toString();
+            cb.addItem(item);
+        }
     }
 
 //    public void setSelectedValueCategory(String value){
@@ -68,6 +84,9 @@ public class InsertNewClientForm extends JFrame{
 //    private int getCategory(){
 //        return comboBoxCategory.getSelectedIndex();
 //    }
+    private int getIndex(){
+    return comboBoxIndex.getSelectedIndex()+1;
+}
     private int getRegion(){
         return comboBoxRegion.getSelectedIndex()+1;
     }
@@ -119,13 +138,14 @@ public class InsertNewClientForm extends JFrame{
 
 //        district = comboBoxDistrict.getSelectedItem().toString();
 //        inhabitedLoc = comboBoxInhabitedLoc.getSelectedItem().toString();
+        index = Integer.toString(getIndex());
         region = Integer.toString(getRegion());
         district = Integer.toString(getDistrict());
         inhabitedLoc = Integer.toString(getInhabitedLoc());
         street = Integer.toString(getStreet());
         house = textHouse.getText();
         flat = textFlat.getText();
-        index = textIndex.getText();
+
         String addressId = "5";
 
         String query1 = "insert into address(house, flat, `index`, regionNum, districtNum, inhabitedLocalityNum, streetNum) values"+
