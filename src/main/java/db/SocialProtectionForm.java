@@ -3,11 +3,16 @@ package db;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
+import java.nio.charset.Charset;
 
 public class SocialProtectionForm extends JFrame{
     private JTabbedPane tabbedPane1;
@@ -40,6 +45,8 @@ public class SocialProtectionForm extends JFrame{
     private JTable tableAttDocument;
     private JTextField textRegion;
     private JTable tableAddress;
+    private JTextArea docViewPanel;
+    private JTextPane docViewPane;
 
     private DefaultTableModel dtmSocialClient;
     private DefaultTableModel dtmIdDocument;
@@ -64,6 +71,52 @@ public class SocialProtectionForm extends JFrame{
         initModelSocialClient();
         //initModelIdDocument();
         glossaryJTree.setModel( new DefaultTreeModel(setGlossaryJTree()) );
+
+        glossaryJTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        docViewPanel.setEditable(false);
+        docViewPane.setEditable(false);
+        docViewPane.setText("");
+
+        // по выделенному листу дерева должен открываться справочный файл
+        glossaryJTree.addTreeSelectionListener(new TreeSelectionListener() {
+            public void valueChanged(TreeSelectionEvent e) {
+                DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) glossaryJTree.getLastSelectedPathComponent();
+                Object nodePath = glossaryJTree.getLastSelectedPathComponent();
+                if (selectedNode.isLeaf()) {
+                    System.out.println("you selected: "+nodePath);
+                    File folder = new File("./glossary");
+                    File[] files = folder.listFiles();
+                    for(int i=0; i<files.length;i++) {
+                    if(files[i].getName().equals(nodePath+".txt")) {
+                        // здесь происходит вывод данных из файла на docViewPanel\docViewPane
+                        // не знаю пока, какая лучше
+                        StringBuilder sb = new StringBuilder();
+                        try {
+                        BufferedReader in = new BufferedReader(
+                                new InputStreamReader(new FileInputStream(files[i]), "Cp1251"));
+                        String s;
+                        while((s=in.readLine())!=null) {
+                            sb.append(s);
+                            sb.append("\n");
+                            docViewPane.setText(sb.toString());
+                            docViewPanel.setText(sb.toString());
+                        }
+                        } catch (FileNotFoundException e1) {
+                            e1.printStackTrace();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+
+
+                    }
+                }
+                }
+            }
+        });
+
+
+
+
         listenerRowTable();
 //        getRowTable();
         addClientButton.addActionListener(new ActionListener() {
@@ -250,7 +303,8 @@ public class SocialProtectionForm extends JFrame{
         final String ROOT  = "Справочники";
         // Массив листьев деревьев
         final   String[]   nodes = new String[]  {"Пособия", "Организации","Адреса","Личная карточка","Прочие"};
-        final   String[][] leafs = new String[][]{{"Виды пособий", "Категории пособия", "Правила расчёта"},
+        final   String[][] leafs = new String[][]{
+                {"Виды пособий", "Категории пособия", "Правила расчёта"},
                 {"Типы организаций", "Организации"},
                 {"Районы","Населённые пункты","Улицы"},
                 {"Родственные отношения","Виды доходов"},
