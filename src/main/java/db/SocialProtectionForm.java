@@ -11,6 +11,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
 
 public class SocialProtectionForm extends JFrame implements TreeSelectionListener{
     private JTabbedPane tabbedPane1;
@@ -44,6 +45,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTextField textRegion;
     private JTable tableAddress;
     private JTable tableHandbook;
+
+    private JTable tableSCCategory=new JTable();
+    private JTable tableBenefitCategory=new JTable();
+    private JTable tableTypeBenCategory=new JTable();
+    private JTable tableLaw=new JTable();
+    private JTable tableVersionArticle=new JTable();
+    private JTable tableArticle=new JTable();
     private JTable tableIndex=new JTable();
     private JTable tableRegion=new JTable();
     private JTable tableDistrict=new JTable();
@@ -53,6 +61,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableIncome=new JTable();
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
+
     private JTable []box={tableIndex, tableRegion, tableDistrict, tableLocality, tableStreet};
     private DefaultTableModel dtmSocialClient;
     private DefaultTableModel dtmIdDocument;
@@ -266,9 +275,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private DefaultMutableTreeNode setGlossaryJTree(){
         final String ROOT  = "Справочники";
         // Массив листьев деревьев
-        final   String[]   nodes = new String[]  {"Пособия", "Организации","Адреса","Личная карточка","Прочие"};
-        final   String[][] leafs = new String[][]{{"Виды пособий", "Категории пособия", "Правила расчёта"},
-                {"Типы организаций", "Организации"},
+        final   String[]   nodes = new String[]  {"Пособия","Адреса","Личная карточка","Прочие"};
+        final   String[][] leafs = new String[][]{{"Категории гражданина", "Категории пособия", "Виды категории пособия", "Законы", "Версии статей", "Статьи", "Правила расчёта"},
                 {"Индексы","Регионы","Районы","Населённые пункты","Улицы"},
                 {"Родственные отношения","Виды доходов"},
                 {"Документы удостоверения","Документы"}};
@@ -277,13 +285,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(ROOT);
         // Ветви первого уровня
         DefaultMutableTreeNode benefit = new DefaultMutableTreeNode(nodes[0]);
-        DefaultMutableTreeNode organization = new DefaultMutableTreeNode(nodes[1]);
-        DefaultMutableTreeNode address = new DefaultMutableTreeNode(nodes[2]);
-        DefaultMutableTreeNode personalCard = new DefaultMutableTreeNode(nodes[3]);
-        DefaultMutableTreeNode other = new DefaultMutableTreeNode(nodes[4]);
+        DefaultMutableTreeNode address = new DefaultMutableTreeNode(nodes[1]);
+        DefaultMutableTreeNode personalCard = new DefaultMutableTreeNode(nodes[2]);
+        DefaultMutableTreeNode other = new DefaultMutableTreeNode(nodes[3]);
         // Добавление ветвей к корневой записи
         root.add(benefit);
-        root.add(organization);
         root.add(address);
         root.add(personalCard);
         root.add(other);
@@ -291,23 +297,31 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         for ( int i = 0; i < leafs[0].length; i++)
             benefit.add(new DefaultMutableTreeNode(leafs[0][i], false));
         for ( int i = 0; i < leafs[1].length; i++)
-            organization.add(new DefaultMutableTreeNode(leafs[1][i], false));
+            address.add(new DefaultMutableTreeNode(leafs[1][i], false));
         for ( int i = 0; i < leafs[2].length; i++)
-            address.add(new DefaultMutableTreeNode(leafs[2][i], false));
+            personalCard.add(new DefaultMutableTreeNode(leafs[2][i], false));
         for ( int i = 0; i < leafs[3].length; i++)
-            personalCard.add(new DefaultMutableTreeNode(leafs[3][i], false));
-        for ( int i = 0; i < leafs[4].length; i++)
-            other.add(new DefaultMutableTreeNode(leafs[4][i], false));
+            other.add(new DefaultMutableTreeNode(leafs[3][i], false));
         return root;
     }
 
-    String[] columnsIndex = new String[]
-            {"Наименование"};
+    String[] columnsIndex = new String[] {"Наименование"};
     final Class[] columnClassIndex = new Class[] {String.class};
-    String[] columnsHandbook = new String[]
-            {"№", "Наименование"};
-    final Class[] columnClassHandbook = new Class[] {
-            Integer.class, String.class};
+    String[] columnsHandbook = new String[] {"№", "Наименование"};
+    final Class[] columnClassHandbook = new Class[] { Integer.class, String.class};
+    String[] columnsBenefit = new String[] {"Код категории льготы", "Наименование"};
+    String[] columnsTypeBenefit = new String[] {"Код вида категории льготы", "Наименование"};
+    String[] columnsLaw = new String[] {"№ закона", "Дата утверждения", "Наименование"};
+    final Class[] columnClassLaw = new Class[] {Integer.class, Date.class, String.class};
+    String[] columnsVersion = new String[] {"№ версии", "Сумма выплаты", "Дата принятия"};
+    final Class[] columnClassVersion = new Class[] {Integer.class, Integer.class, Date.class};
+
+    String sqlQuerySCCat="select * from social_client_category";
+    String sqlQueryBenCat="select * from benefit_category";
+    String sqlQueryTypeBenCat="select * from type_category";
+    String sqlQueryLaw="select * from law";
+    String sqlQueryVerArt="select * from version_of_the_article";
+    String sqlQueryArt="select * from article";
     String sqlQueryInd="select * from index_address";
     String sqlQueryReg="select * from region_address";
     String sqlQueryDist="select * from district_address";
@@ -320,66 +334,108 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     //запонение справочников
     public void initModelHandbook(){
+        mdtmSocialClient.columnsSCCategory = columnsHandbook;
+        mdtmSocialClient.columnClassSCCategory = columnClassHandbook;
+        mdtmSocialClient.sqlQuery = sqlQuerySCCat;
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(1);
+        tableSCCategory.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+
+        mdtmSocialClient.columnsBenCategory = columnsBenefit;
+        mdtmSocialClient.columnClassBenCategory = columnClassHandbook;
+        mdtmSocialClient.sqlQuery = sqlQueryBenCat;
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(2);
+        tableBenefitCategory.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+
+        mdtmSocialClient.columnsTypeBenCategory = columnsTypeBenefit;
+        mdtmSocialClient.columnClassTypeBenCategory = columnClassHandbook;
+        mdtmSocialClient.sqlQuery = sqlQueryTypeBenCat;
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(3);
+        tableTypeBenCategory.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+
+        mdtmSocialClient.columnsLaw = columnsLaw;
+        mdtmSocialClient.columnClassLaw = columnClassLaw;
+        mdtmSocialClient.sqlQuery = sqlQueryLaw;
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(4);
+        tableLaw.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+
+        mdtmSocialClient.columnsVersionArt = columnsVersion;
+        mdtmSocialClient.columnClassVersionArt = columnClassVersion;
+        mdtmSocialClient.sqlQuery = sqlQueryVerArt;
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(5);
+        tableVersionArticle.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+
+        mdtmSocialClient.columnsArticle = columnsHandbook;
+        mdtmSocialClient.columnClassArticle = columnClassHandbook;
+        mdtmSocialClient.sqlQuery = sqlQueryArt;
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(6);
+        tableArticle.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+
         mdtmSocialClient.columnsIndex = columnsIndex;
         mdtmSocialClient.columnClassIndex = columnClassIndex;
             mdtmSocialClient.sqlQuery = sqlQueryInd;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(1);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(7);
             tableIndex.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsRegion = columnsHandbook;
             mdtmSocialClient.columnClassRegion = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryReg;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(2);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(8);
             tableRegion.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsDistrict = columnsHandbook;
             mdtmSocialClient.columnClassDistrict = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryDist;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(3);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(9);
             tableDistrict.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsLocality = columnsHandbook;
             mdtmSocialClient.columnClassLocality = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryLoc;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(4);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(10);
             tableLocality.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsStreet = columnsHandbook;
             mdtmSocialClient.columnClassStreet = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryStr;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(5);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(11);
             tableStreet.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsRelation = columnsHandbook;
             mdtmSocialClient.columnClassRelation = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryRel;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(6);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(12);
             tableRelation.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsTypeIncome = columnsHandbook;
             mdtmSocialClient.columnClassTypeIncome = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryInc;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(7);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(13);
             tableIncome.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsTypeIndDoc = columnsHandbook;
             mdtmSocialClient.columnClassTypeIndDoc = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryIdDoc;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(8);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(14);
             tableIndDoc.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsTypeDoc = columnsHandbook;
             mdtmSocialClient.columnClassTypeDoc = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryDoc;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(9);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(15);
             tableDoc.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
@@ -389,6 +445,25 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
         TreePath[] paths=glossaryJTree.getSelectionPaths();
         treeSelect=paths[0].getLastPathComponent().toString();
+
+        if ("Категории гражданина".equals(treeSelect)) {
+            tableHandbook.setModel(tableSCCategory.getModel());
+        }else
+        if ("Категории пособия".equals(treeSelect)) {
+            tableHandbook.setModel(tableBenefitCategory.getModel());
+        }else
+        if ("Виды категории пособия".equals(treeSelect)) {
+            tableHandbook.setModel(tableTypeBenCategory.getModel());
+        }else
+        if ("Законы".equals(treeSelect)) {
+            tableHandbook.setModel(tableLaw.getModel());
+        }else
+        if ("Версии статей".equals(treeSelect)) {
+            tableHandbook.setModel(tableVersionArticle.getModel());
+        }else
+        if ("Статьи".equals(treeSelect)) {
+            tableHandbook.setModel(tableArticle.getModel());
+        }else
         if ("Индексы".equals(treeSelect)) {
             tableHandbook.setModel(tableIndex.getModel());
         }else
@@ -415,7 +490,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         }else
         if ("Документы".equals(treeSelect)) {
             tableHandbook.setModel(tableDoc.getModel());
-        }
+        }else
+            tableHandbook.setModel(new DefaultTableModel());
 
     }
 }

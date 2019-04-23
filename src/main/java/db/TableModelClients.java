@@ -29,6 +29,30 @@ import javax.swing.table.DefaultTableModel;
         public String[] columnsAddress;
         public Class[] columnClassAddress;
 
+        //для таблицы(справочнка) категория льготника
+        public String[] columnsSCCategory;
+        public Class[] columnClassSCCategory;
+
+        //для таблицы(справочнка) категория льготы
+        public String[] columnsBenCategory;
+        public Class[] columnClassBenCategory;
+
+        //для таблицы(справочнка) тип категории льготы
+        public String[] columnsTypeBenCategory;
+        public Class[] columnClassTypeBenCategory;
+
+        //для таблицы(справочнка) закон
+        public String[] columnsLaw;
+        public Class[] columnClassLaw;
+
+        //для таблицы(справочнка) версия статьи
+        public String[] columnsVersionArt;
+        public Class[] columnClassVersionArt;
+
+        //для таблицы(справочнка) статья
+        public String[] columnsArticle;
+        public Class[] columnClassArticle;
+
         //для таблицы(справочнка) индекс
         public String[] columnsIndex;
         public Class[] columnClassIndex;
@@ -130,31 +154,49 @@ import javax.swing.table.DefaultTableModel;
                 rs = stmt.executeQuery(sqlQuery);
 
                 switch (type){
-                    case 1: // Индекс
+                    case 1: // категория льготника
+                        createTable(rs,columnsSCCategory,columnClassSCCategory);
+                        break;
+                    case 2: // категория льготы
+                        createTable(rs,columnsBenCategory,columnClassBenCategory);
+                        break;
+                    case 3: // тип категории льготы
+                        createTable(rs,columnsTypeBenCategory,columnClassTypeBenCategory);
+                        break;
+                    case 4: // закон
+                        createTable(rs,columnsLaw,columnClassLaw);
+                        break;
+                    case 5: // версия статьи
+                        createTable(rs,columnsVersionArt,columnClassVersionArt);
+                        break;
+                    case 6: // статья
+                        createTable(rs,columnsArticle,columnClassArticle);
+                        break;
+                    case 7: // Индекс
                         createTable(rs,columnsIndex,columnClassIndex);
                         break;
-                    case 2: // Регион
+                    case 8: // Регион
                         createTable(rs,columnsRegion,columnClassRegion);
                         break;
-                    case 3: // Район
+                    case 9: // Район
                         createTable(rs,columnsDistrict,columnClassDistrict);
                         break;
-                    case 4: // Пункт
+                    case 10: // Пункт
                         createTable(rs,columnsLocality,columnClassLocality);
                         break;
-                    case 5: // Улица
+                    case 11: // Улица
                         createTable(rs,columnsStreet,columnClassStreet);
                         break;
-                    case 6: // Родственники
+                    case 12: // Родственники
                         createTable(rs,columnsRelation,columnClassRelation);
                         break;
-                    case 7: // Доход
+                    case 13: // Доход
                         createTable(rs,columnsTypeIncome,columnClassTypeIncome);
                         break;
-                    case 8: // Документ идентификатор
+                    case 14: // Документ идентификатор
                         createTable(rs,columnsTypeIndDoc,columnClassTypeIndDoc);
                         break;
-                    case 9: // Документ
+                    case 15: // Документ
                         createTable(rs,columnsTypeDoc,columnClassTypeDoc);
                         break;
                 }
