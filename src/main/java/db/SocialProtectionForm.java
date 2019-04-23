@@ -6,11 +6,14 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Date;
 
 public class SocialProtectionForm extends JFrame implements TreeSelectionListener{
@@ -18,9 +21,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JPanel rootPanel;
     private JTabbedPane tabbedPane2;
     private JButton editClientButton;
-    private JComboBox comboBox1;
-    private JComboBox comboBox2;
-    private JButton начислитьВыплатуButton;
+    private JComboBox comboBoxSCCategory;
+    private JComboBox comboBoxBenefitCategory;
+    private JButton findClientButton;
     private JTable tableSocialClients;
     private JTree glossaryJTree;
     private JButton addClientButton;
@@ -45,6 +48,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTextField textRegion;
     private JTable tableAddress;
     private JTable tableHandbook;
+    private JTabbedPane tabbedPane3;
+    private JTable tableChargeRequest;
+    private JButton chargeButton;
+    private JTable tablePayoff;
+    private JButton PayoffButton;
 
     private JTable tableSCCategory=new JTable();
     private JTable tableBenefitCategory=new JTable();
@@ -92,6 +100,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         listenerRowTable();
 //        getRowTable();
         initModelHandbook();
+
+        getComboBox(comboBoxSCCategory, tableSCCategory);
+
         addClientButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFrame insertNewClientForm = new InsertNewClientForm(box);
@@ -104,6 +115,20 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 initModelSocialClient();
                 selModel = tableSocialClients.getSelectionModel();
                 selModel.setSelectionInterval(rowTableSC-1, rowTableSC-1);
+            }
+        });
+
+        comboBoxSCCategory.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent itemEvent) {
+                comboBoxBenefitCategory.removeAllItems();
+                String item;
+                int k=tableBenefitCategory.getColumnCount()-1;
+                for (int i = 0;i<tableBenefitCategory.getRowCount();i++){
+                    if(Integer.valueOf(tableBenefitCategory.getValueAt(i, 2).toString())==comboBoxSCCategory.getSelectedIndex()+1) {
+                        item = tableBenefitCategory.getModel().getValueAt(i, k-1).toString();
+                        comboBoxBenefitCategory.addItem(item);
+                    }
+                }
             }
         });
 //        tabbedPane2.addChangeListener(new ChangeListener() {
@@ -271,6 +296,20 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 //        String status;
     }
 
+
+    //для вкладки назначения и выплаты
+    public void getComboBox(JComboBox cb, JTable tl){
+        String item;
+        int k=tl.getColumnCount()-1;
+        for (int i = 0;i<tl.getRowCount();i++){
+            item = tl.getModel().getValueAt(i, k).toString();
+            cb.addItem(item);
+        }
+    }
+
+
+
+
     //для вкладки НСИ
     private DefaultMutableTreeNode setGlossaryJTree(){
         final String ROOT  = "Справочники";
@@ -309,12 +348,15 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     final Class[] columnClassIndex = new Class[] {String.class};
     String[] columnsHandbook = new String[] {"№", "Наименование"};
     final Class[] columnClassHandbook = new Class[] { Integer.class, String.class};
-    String[] columnsBenefit = new String[] {"Код категории льготы", "Наименование"};
+    String[] columnsBenefit = new String[] {"Код категории льготы", "Наименование", "Номер категории льготника"};
+    final Class[] columnClassBenefit = new Class[] { Integer.class, String.class, Integer.class};
+    String[] columnsTypeBenefitFull = new String[] {"Код вида категории льготы", "Наименование", "Код категории"};
     String[] columnsTypeBenefit = new String[] {"Код вида категории льготы", "Наименование"};
     String[] columnsLaw = new String[] {"№ закона", "Дата утверждения", "Наименование"};
     final Class[] columnClassLaw = new Class[] {Integer.class, Date.class, String.class};
+    String[] columnsVersionFull = new String[] {"№ версии", "Сумма выплаты", "Дата принятия", "Номер закона", "Номер статьи"};
+    final Class[] columnClassVersionFull = new Class[] {Integer.class, Integer.class, Date.class, Integer.class, Integer.class};
     String[] columnsVersion = new String[] {"№ версии", "Сумма выплаты", "Дата принятия"};
-    final Class[] columnClassVersion = new Class[] {Integer.class, Integer.class, Date.class};
 
     String sqlQuerySCCat="select * from social_client_category";
     String sqlQueryBenCat="select * from benefit_category";
@@ -342,14 +384,14 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         dtmHandbook.fireTableDataChanged();
 
         mdtmSocialClient.columnsBenCategory = columnsBenefit;
-        mdtmSocialClient.columnClassBenCategory = columnClassHandbook;
+        mdtmSocialClient.columnClassBenCategory = columnClassBenefit;
         mdtmSocialClient.sqlQuery = sqlQueryBenCat;
         dtmHandbook = mdtmSocialClient.MyTableModelHandbook(2);
         tableBenefitCategory.setModel(dtmHandbook);
         dtmHandbook.fireTableDataChanged();
 
         mdtmSocialClient.columnsTypeBenCategory = columnsTypeBenefit;
-        mdtmSocialClient.columnClassTypeBenCategory = columnClassHandbook;
+        mdtmSocialClient.columnClassTypeBenCategory = columnClassBenefit;
         mdtmSocialClient.sqlQuery = sqlQueryTypeBenCat;
         dtmHandbook = mdtmSocialClient.MyTableModelHandbook(3);
         tableTypeBenCategory.setModel(dtmHandbook);
@@ -362,8 +404,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         tableLaw.setModel(dtmHandbook);
         dtmHandbook.fireTableDataChanged();
 
-        mdtmSocialClient.columnsVersionArt = columnsVersion;
-        mdtmSocialClient.columnClassVersionArt = columnClassVersion;
+        mdtmSocialClient.columnsVersionArt = columnsVersionFull;
+        mdtmSocialClient.columnClassVersionArt = columnClassVersionFull;
         mdtmSocialClient.sqlQuery = sqlQueryVerArt;
         dtmHandbook = mdtmSocialClient.MyTableModelHandbook(5);
         tableVersionArticle.setModel(dtmHandbook);
@@ -441,6 +483,21 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     }
 
+    private DefaultTableModel getModelHandbook(JTable t, String[] col){
+        DefaultTableModel mod = new DefaultTableModel();
+        mod.setColumnIdentifiers(col);
+        for(int i=0; i<t.getRowCount(); i++) {
+            if(t==tableVersionArticle) {
+                Object[] o = {t.getValueAt(i, 0), t.getValueAt(i, 1), t.getValueAt(i, 2)};
+                mod.addRow(o);
+            }
+            else {
+                Object[] ob = {t.getValueAt(i, 0), t.getValueAt(i, 1)};
+                mod.addRow(ob);
+            }
+        }
+        return mod;
+    }
     //выделение пункта дерева - новая таблица справочника
     public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
         TreePath[] paths=glossaryJTree.getSelectionPaths();
@@ -450,16 +507,16 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             tableHandbook.setModel(tableSCCategory.getModel());
         }else
         if ("Категории пособия".equals(treeSelect)) {
-            tableHandbook.setModel(tableBenefitCategory.getModel());
+            tableHandbook.setModel(getModelHandbook(tableBenefitCategory, columnsHandbook));
         }else
         if ("Виды категории пособия".equals(treeSelect)) {
-            tableHandbook.setModel(tableTypeBenCategory.getModel());
+            tableHandbook.setModel(getModelHandbook(tableTypeBenCategory, columnsHandbook));
         }else
         if ("Законы".equals(treeSelect)) {
             tableHandbook.setModel(tableLaw.getModel());
         }else
         if ("Версии статей".equals(treeSelect)) {
-            tableHandbook.setModel(tableVersionArticle.getModel());
+            tableHandbook.setModel(getModelHandbook(tableVersionArticle, columnsVersion));
         }else
         if ("Статьи".equals(treeSelect)) {
             tableHandbook.setModel(tableArticle.getModel());

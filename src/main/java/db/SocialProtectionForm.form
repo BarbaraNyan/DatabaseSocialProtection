@@ -485,7 +485,7 @@
               </component>
             </children>
           </grid>
-          <grid id="9cd23" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="9cd23" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <tabbedpane title="Начисления и выплаты"/>
@@ -495,65 +495,132 @@
             </properties>
             <border type="none"/>
             <children>
-              <component id="223c5" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
+              <tabbedpane id="d8fa2" binding="tabbedPane3" default-binding="true">
                 <constraints>
-                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="175" height="30"/>
-                  </grid>
-                </constraints>
-                <properties>
-                  <model>
-                    <item value="Ветеран"/>
-                    <item value="Мать"/>
-                  </model>
-                  <toolTipText value=""/>
-                </properties>
-              </component>
-              <component id="6d777" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
-                    <preferred-size width="114" height="16"/>
-                  </grid>
-                </constraints>
-                <properties>
-                  <text value="Категория"/>
-                </properties>
-              </component>
-              <component id="efc5d" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
-                    <preferred-size width="114" height="16"/>
-                  </grid>
-                </constraints>
-                <properties>
-                  <text value="Вид категории"/>
-                </properties>
-              </component>
-              <component id="d6584" class="javax.swing.JComboBox" binding="comboBox2" default-binding="true">
-                <constraints>
-                  <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="175" height="30"/>
+                  <grid row="0" column="0" row-span="2" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                    <preferred-size width="200" height="200"/>
                   </grid>
                 </constraints>
                 <properties/>
-              </component>
-              <component id="bc395" class="javax.swing.JButton" binding="начислитьВыплатуButton" default-binding="true">
-                <constraints>
-                  <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                    <preferred-size width="175" height="30"/>
+                <border type="none"/>
+                <children>
+                  <grid id="6ea90" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                    <margin top="0" left="0" bottom="0" right="0"/>
+                    <constraints>
+                      <tabbedpane title="Начисления"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="223c5" class="javax.swing.JComboBox" binding="comboBoxSCCategory">
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="175" height="30"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <model/>
+                          <toolTipText value=""/>
+                        </properties>
+                      </component>
+                      <component id="efc5d" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                            <preferred-size width="114" height="16"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="Категория льготы"/>
+                        </properties>
+                      </component>
+                      <component id="d6584" class="javax.swing.JComboBox" binding="comboBoxBenefitCategory">
+                        <constraints>
+                          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="175" height="30"/>
+                          </grid>
+                        </constraints>
+                        <properties/>
+                      </component>
+                      <component id="bc395" class="javax.swing.JButton" binding="findClientButton">
+                        <constraints>
+                          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                            <preferred-size width="175" height="30"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="Найти льготников"/>
+                        </properties>
+                      </component>
+                      <component id="6d777" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                            <preferred-size width="114" height="16"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="Категория льготника"/>
+                        </properties>
+                      </component>
+                      <scrollpane id="5a4d6">
+                        <constraints>
+                          <grid row="3" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <component id="4e609" class="javax.swing.JTable" binding="tableChargeRequest">
+                            <constraints/>
+                            <properties/>
+                          </component>
+                        </children>
+                      </scrollpane>
+                      <component id="6a43a" class="javax.swing.JButton" binding="chargeButton">
+                        <constraints>
+                          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                            <preferred-size width="175" height="30"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="Назначить выплату"/>
+                        </properties>
+                      </component>
+                    </children>
                   </grid>
-                </constraints>
-                <properties>
-                  <text value="Начислить выплату"/>
-                </properties>
-              </component>
-              <vspacer id="529ee">
-                <constraints>
-                  <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
-                    <preferred-size width="175" height="14"/>
+                  <grid id="80d19" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                    <margin top="0" left="0" bottom="0" right="0"/>
+                    <constraints>
+                      <tabbedpane title="Выплаты"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <scrollpane id="2e94c">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <component id="ded2f" class="javax.swing.JTable" binding="tablePayoff">
+                            <constraints/>
+                            <properties/>
+                          </component>
+                        </children>
+                      </scrollpane>
+                      <component id="dd746" class="javax.swing.JButton" binding="PayoffButton">
+                        <constraints>
+                          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                            <preferred-size width="145" height="30"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="Выплатить"/>
+                        </properties>
+                      </component>
+                    </children>
                   </grid>
-                </constraints>
-              </vspacer>
+                </children>
+              </tabbedpane>
             </children>
           </grid>
           <grid id="4ea0b" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">

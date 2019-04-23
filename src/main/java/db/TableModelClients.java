@@ -236,6 +236,8 @@ import javax.swing.table.DefaultTableModel;
                     dtm.addRow(rowData);
                 }
             }
-            catch (SQLException e){}
+            catch (SQLException e){
+                System.out.println("Error createTable");
+            }
         }
     }
