@@ -7,7 +7,6 @@ public class AuthForm extends JFrame{
     private JTextField loginTextField;
     private JPasswordField passwordField;
     private JButton logInButton;
-    private JButton authButton;
 
     AuthForm(){
         setContentPane(rootPanel);

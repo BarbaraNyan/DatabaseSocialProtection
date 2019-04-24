@@ -6,7 +6,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -90,7 +89,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private DefaultTableModel dtmAddress;
     private DefaultTableModel dtmHandbook;
     private DefaultTableModel dtmSaldoReport;
-    private ListSelectionModel selModel = tableSocialClients.getSelectionModel();
+    private ListSelectionModel selModelSC = tableSocialClients.getSelectionModel();
     private TableModelClients mdtmSocialClient = new TableModelClients();
 
     private int rowTableSC;
@@ -106,10 +105,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         setContentPane(rootPanel);
         tableAddress.setVisible(false);
         initModelSocialClient();
-        //initModelIdDocument();
         glossaryJTree.setModel( new DefaultTreeModel(setGlossaryJTree()) );
         glossaryJTree.addTreeSelectionListener(this);
-        listenerRowTable();
+        listenerRowTableSC();
         initModelHandbook();
 
         getComboBox(comboBoxSCCategory, tableSCCategory);
@@ -125,8 +123,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         updateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 initModelSocialClient();
-                selModel = tableSocialClients.getSelectionModel();
-                selModel.setSelectionInterval(rowTableSC-1, rowTableSC-1);
+                selModelSC = tableSocialClients.getSelectionModel();
+                selModelSC.setSelectionInterval(rowTableSC-1, rowTableSC-1);
             }
         });
 
@@ -164,14 +162,15 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     }
 
-    private void listenerRowTable(){
-        selModel.addListSelectionListener(new ListSelectionListener() {
+    private void listenerRowTableSC(){
+        selModelSC.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     getRowTableSC();
                 }
             });
         }
 
+    //Персональные данные (Вкладка "Личные дела")
     String[] columnsSocialClient = new String[]
             {"Личный счёт", "Фамилия", "Имя", "Отчество","Дата рождения","СНИЛС","Телефон","Email" };
     final Class[] columnClassSocialClient = new Class[] {
@@ -189,6 +188,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         rowTableSC = tableSocialClients.getRowCount();
     }
 
+    //Уд. личности (Вкладка "Личные дела")
     String[] columnsIdDocument = new String[]
             {"Тип документа","Серия","Номер","Кем выдан","Дата выдачи","Статус"};
     final Class[] columnClassIdDocument = new Class[]{
@@ -209,6 +209,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         rowTableIdDoc = tableIdDocument.getRowCount();
     }
 
+    //Доп. документы (Вкладка "Личные дела")
     String[] columnsAttDocument = new String[]
             {"Тип документа","Номер","Название","Дата выдачи","Статус"};
     final Class[] columnClassAttDocument = new Class[]{
@@ -229,12 +230,12 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         rowTableAttDoc = tableAttDocument.getRowCount();
     }
 
+    // Адрес (Вкладка 'Личные дела')
     String[] columnsAddress = new String[]
             {"Регион","Район","Нас.пункт","Улица","Дом","Квартира","Индекс" };
     final Class[] columnClassAddress = new Class[] {
             String.class,
             String.class, String.class,String.class,Integer.class,Integer.class,Integer.class};
-    // Дописать SQL
     String sqlQuery4="select ra.name, da.name, ila.name, sa.name, a.house, a.flat, ia.number\n" +
             "from address a inner join social_client sc on a.id = sc.addressId\n" +
             "inner join region_address ra on a.regionNum = ra.number\n" +
@@ -255,7 +256,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         rowTableAddress = tableAddress.getRowCount();
     }
 
-    // для отчета сальдовой ведомости
+    // Оборотно-сальдовая ведомосоть (Вкладка 'Отчёты')
     String[] columnsSaldoReport = new String[]
             {"Личный счет","Фамилия","Имя","Отчество", "Входное сальдо", "Начислено"};
     final Class[] columnClassSaldoReport =  new Class[] {
@@ -279,6 +280,21 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         rowTableSC = tableSocialClients.getRowCount();
     }
 
+    // Начисления (Вкладка 'Начисления и выплаты')
+    String[] columnsChargeReq = new String[] {"Фамилия", "Имя", "Отчество", "Категория гражданина", "Категория льготы"};
+    final Class[] columnClassChargeReq = new Class[] {String.class, String.class, String.class, String.class, String.class};
+    String sqlQueryChargeReq="select sc.surname, sc.name, sc.patronymic, scc.name, bc.name from social_client sc inner join social_client_scCategory scsc on sc.personalNumber=scsc.personalNumberClient inner join social_client_category scc on scsc.numberCategory=scc.number inner join benefit_category bc on scc.number=bc.social_client_category_number where scc.name=? and bc.name=?";
+
+    public void initModelPayoff() {
+        mdtmSocialClient.columnsChargeReq = columnsChargeReq;
+        mdtmSocialClient.columnClassChargeReq = columnClassChargeReq;
+        mdtmSocialClient.cat = comboBoxSCCategory.getItemAt(comboBoxSCCategory.getSelectedIndex()).toString();
+        mdtmSocialClient.ben = comboBoxBenefitCategory.getItemAt(comboBoxBenefitCategory.getSelectedIndex()).toString();
+        mdtmSocialClient.sqlPreparedStatement=sqlQueryChargeReq;
+        dtmHandbook = mdtmSocialClient.MyTableModelPayoff(1);
+        tableChargeRequest.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+    }
 
     String persNum;
     String surname;
@@ -297,6 +313,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String flat;
     String index;
 
+    //Отображение даннных во вкладках Перс.данные, Адрес, Уд. личнсоти, Доп.документы
     public void getRowTableSC(){
         selRowSC = tableSocialClients.getSelectedRow();
         persNum = tableSocialClients.getModel().getValueAt(selRowSC,0).toString();
@@ -334,17 +351,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         textIndex.setText(index);
 
         initModelIdDocument(persNum);
-//        initModelAddress();
         initModelAttDocument(persNum);
-
-//        String typeDoc;
-//        String series;
-//        String number;
-//        String givenBy;
-//        String dateStart;
-//        String status;
     }
-
 
     //для вкладки назначения и выплаты
     public void getComboBox(JComboBox cb, JTable tl){
@@ -354,20 +362,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             item = tl.getModel().getValueAt(i, k).toString();
             cb.addItem(item);
         }
-    }
-    String[] columnsChargeReq = new String[] {"Фамилия", "Имя", "Отчество", "Категория гражданина", "Категория льготы"};
-    final Class[] columnClassChargeReq = new Class[] {String.class, String.class, String.class, String.class, String.class};
-    String sqlQueryChargeReq="select sc.surname, sc.name, sc.patronymic, scc.name, bc.name from social_client sc inner join social_client_scCategory scsc on sc.personalNumber=scsc.personalNumberClient inner join social_client_category scc on scsc.numberCategory=scc.number inner join benefit_category bc on scc.number=bc.social_client_category_number where scc.name=? and bc.name=?";
-
-    public void initModelPayoff() {
-        mdtmSocialClient.columnsChargeReq = columnsChargeReq;
-        mdtmSocialClient.columnClassChargeReq = columnClassChargeReq;
-        mdtmSocialClient.cat = comboBoxSCCategory.getItemAt(comboBoxSCCategory.getSelectedIndex()).toString();
-        mdtmSocialClient.ben = comboBoxBenefitCategory.getItemAt(comboBoxBenefitCategory.getSelectedIndex()).toString();
-        mdtmSocialClient.sqlPreparedStatement=sqlQueryChargeReq;
-        dtmHandbook = mdtmSocialClient.MyTableModelPayoff(1);
-        tableChargeRequest.setModel(dtmHandbook);
-        dtmHandbook.fireTableDataChanged();
     }
 
 
@@ -435,7 +429,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String sqlQueryIdDoc="select * from type_identification_document";
     String sqlQueryDoc="select * from type_attached_document";
 
-    //запонение справочников
+    //запонение справочников (Вкладка 'НСИ')
     public void initModelHandbook(){
         mdtmSocialClient.columnsSCCategory = columnsHandbook;
         mdtmSocialClient.columnClassSCCategory = columnClassHandbook;

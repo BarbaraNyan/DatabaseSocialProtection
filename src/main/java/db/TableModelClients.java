@@ -36,7 +36,6 @@ import javax.swing.table.DefaultTableModel;
         String ben;
         String cat;
 
-
         //для таблицы(справочнка) категория льготника
         public String[] columnsSCCategory;
         public Class[] columnClassSCCategory;

@@ -18,6 +18,7 @@
           </grid>
         </constraints>
         <properties>
+          <inheritsPopupMenu value="false"/>
           <text value=""/>
           <toolTipText value=""/>
         </properties>
@@ -35,18 +36,10 @@
       </component>
       <component id="92bf9" class="javax.swing.JButton" binding="logInButton">
         <constraints>
-          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="3" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Войти"/>
-        </properties>
-      </component>
-      <component id="7ac13" class="javax.swing.JButton" binding="authButton">
-        <constraints>
-          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Зарегистрироваться"/>
         </properties>
       </component>
       <grid id="961d5" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
