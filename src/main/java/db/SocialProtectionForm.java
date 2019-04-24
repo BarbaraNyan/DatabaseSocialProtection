@@ -48,11 +48,16 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTextField textRegion;
     private JTable tableAddress;
     private JTable tableHandbook;
+    private JTabbedPane reports;
+    private JPanel saldoReport;
     private JTabbedPane tabbedPane3;
     private JTable tableChargeRequest;
     private JButton chargeButton;
     private JTable tablePayoff;
     private JButton PayoffButton;
+    private JTabbedPane tabbedPane4;
+    private JPanel drugoePanel;
+    private JPanel сальдо;
 
     private JTable tableSCCategory=new JTable();
     private JTable tableBenefitCategory=new JTable();
