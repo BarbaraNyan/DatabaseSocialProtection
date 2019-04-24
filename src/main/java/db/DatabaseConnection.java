@@ -11,6 +11,7 @@ public class DatabaseConnection {
     public static final String PASSWORD = "fuckyakimov";
     public Connection myConnection;
     public Statement statement;
+    //комментарий
 
     public DatabaseConnection() throws SQLException {
         myConnection = DriverManager.getConnection(URL,USERNAME,PASSWORD);
