@@ -61,8 +61,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JComboBox categoryCombox;
     private JComboBox employeeCombox;
     private JButton createSaldoReport;
-    private JTable saldoReportTable;
     private JLabel empLabel;
+
+    private JTable tableSaldoReport;
+    private JButton saveReportBtn;
+    private JScrollPane scrollPaneSaldo;
 
     private JTable tableSCCategory=new JTable();
     private JTable tableBenefitCategory=new JTable();
@@ -86,6 +89,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private DefaultTableModel dtmAttDocument;
     private DefaultTableModel dtmAddress;
     private DefaultTableModel dtmHandbook;
+    private DefaultTableModel dtmSaldoReport;
     private ListSelectionModel selModel = tableSocialClients.getSelectionModel();
     private TableModelClients mdtmSocialClient = new TableModelClients();
 
@@ -96,8 +100,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String treeSelect;
 
     private int selRowSC;
-//    private int selRowAddress;
-
 
     SocialProtectionForm(){
         super("CommonTable");
@@ -108,7 +110,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         glossaryJTree.setModel( new DefaultTreeModel(setGlossaryJTree()) );
         glossaryJTree.addTreeSelectionListener(this);
         listenerRowTable();
-//        getRowTable();
         initModelHandbook();
 
         getComboBox(comboBoxSCCategory, tableSCCategory);
@@ -120,6 +121,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 insertNewClientForm.setVisible(true);
             }
         });
+
         updateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 initModelSocialClient();
@@ -142,6 +144,12 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             }
         });
 
+        createSaldoReport.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                initModelSaldoReport();
+            }
+        });
+
         findClientButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 initModelPayoff();
@@ -157,7 +165,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     }
 
     private void listenerRowTable(){
-//        ListSelectionModel selModel = tableSocialClients.getSelectionModel();
         selModel.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     getRowTableSC();
@@ -248,7 +255,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         rowTableAddress = tableAddress.getRowCount();
     }
 
-
     // для отчета сальдовой ведомости
     String[] columnsSaldoReport = new String[]
             {"Личный счет","Фамилия","Имя","Отчество", "Входное сальдо", "Начислено"};
@@ -256,7 +262,22 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             String.class, String.class,String.class,String.class, Integer.class, Integer.class
     };
 
-    String sqlQuerySaldoReport ="";
+    String sqlQuerySaldoReport ="select pa.numberPersonalAccount, sc.surname, sc.name,sc.patronymic, pa.inputBalance, pa.accrued\n" +
+            "from personal_account pa inner join payoff p on pa.numberPersonalAccount = p.personal_account_numberPersonalAccount\n" +
+            "inner join request_for_cash_settlement rfcs on p.numberPayoff = rfcs.payoff_numberPayoff\n" +
+            "inner join operating_account oa on rfcs.operating_account_numberAcc = oa.numberAcc\n" +
+            "inner join social_client sc on oa.numberSocialClient = sc.personalNumber\n" +
+            "where sc.personalNumber = pa.numberPersonalAccount;";
+
+    public void initModelSaldoReport() {
+        mdtmSocialClient.columnsSalRep = columnsSaldoReport;
+        mdtmSocialClient.columnClassSalRep = columnClassSaldoReport;
+        mdtmSocialClient.sqlQuery = sqlQuerySaldoReport;
+        dtmSaldoReport=mdtmSocialClient.MyTableModelReports(1);
+        tableSaldoReport.setModel(dtmSaldoReport);
+        dtmSocialClient.fireTableDataChanged();
+        rowTableSC = tableSocialClients.getRowCount();
+    }
 
 
     String persNum;

@@ -97,6 +97,10 @@ import javax.swing.table.DefaultTableModel;
         public String[] columnsTypeDoc;
         public Class[] columnClassTypeDoc;
 
+        // для таблицы saldoReportTable
+        public String[] columnsSalRep;
+        public Class[] columnClassSalRep;
+
         public String sqlQuery;
         public String sqlPreparedStatement;
         public int persNum;
@@ -129,6 +133,20 @@ import javax.swing.table.DefaultTableModel;
             }
         }
 
+        public DefaultTableModel MyTableModelReports(int type) {
+            try {
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery(sqlQuery);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            switch(type) {
+                case 1: createTable(rs, columnsSalRep, columnClassSalRep);
+            }
+
+            mdbc.close(stmt);
+            return dtm;
+        }
 
         public DefaultTableModel MyTableModelDocument(int type){
             try{
