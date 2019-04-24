@@ -4,7 +4,10 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 public class InsertNewClientForm extends JFrame{
     private JPanel rootPanel;
@@ -29,12 +32,19 @@ public class InsertNewClientForm extends JFrame{
     private JComboBox comboBoxStreet;
     private JComboBox comboBoxRegion;
     private JComboBox comboBoxIndex;
+    private JTabbedPane tabbedPane1;
+    private JComboBox comboBoxTypeIdDoc;
+    private JTextField textIdDocSeries;
+    private JTextField textIdDocNumber;
+    private JTextField textIdDocGivenBy;
+    private JFormattedTextField textIdDocDateStart;
 
     private DatabaseConnection mdbc;
     private Statement stmt;
     InsertNewClientForm(JTable [] t){
         setContentPane(rootPanel);
         setButtonGroup();
+
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 insertClientTable();
@@ -47,6 +57,7 @@ public class InsertNewClientForm extends JFrame{
         getComboBox(comboBoxDistrict, t[2]);
         getComboBox(comboBoxInhabitedLoc, t[3]);
         getComboBox(comboBoxStreet, t[4]);
+        getComboBox(comboBoxTypeIdDoc, t[5]);
     }
 
     public void getComboBox(JComboBox cb, JTable tl){
@@ -81,12 +92,12 @@ public class InsertNewClientForm extends JFrame{
             return "2";
     }
 
-//    private int getCategory(){
+    //    private int getCategory(){
 //        return comboBoxCategory.getSelectedIndex();
 //    }
-    private int getIndex(){
-    return comboBoxIndex.getSelectedIndex()+1;
-}
+    private String getIndex(){
+        return comboBoxIndex.getSelectedItem().toString();
+    }
     private int getRegion(){
         return comboBoxRegion.getSelectedIndex()+1;
     }
@@ -98,6 +109,10 @@ public class InsertNewClientForm extends JFrame{
     }
     private int getStreet(){
         return comboBoxStreet.getSelectedIndex()+1;
+    }
+
+    private int getTypeIdDoc() {
+        return comboBoxTypeIdDoc.getSelectedIndex()+1;
     }
 
     public String quotate(String content){
@@ -124,6 +139,13 @@ public class InsertNewClientForm extends JFrame{
         String flat;
         String index;
 
+        String typeIdDoc;
+        String idDocSeries;
+        String idDocNumber;
+        String idDocGivenBy;
+        String idDocDateStart;
+        String idDocStatus;
+
 //        category = comboBoxCategory.getSelectedItem().toString();
 //        category = Integer.toString(getCategory());
 
@@ -136,9 +158,7 @@ public class InsertNewClientForm extends JFrame{
         telephone = textTelephone.getText();
         email = textEmail.getText();
 
-//        district = comboBoxDistrict.getSelectedItem().toString();
-//        inhabitedLoc = comboBoxInhabitedLoc.getSelectedItem().toString();
-        index = Integer.toString(getIndex());
+        index = getIndex();
         region = Integer.toString(getRegion());
         district = Integer.toString(getDistrict());
         inhabitedLoc = Integer.toString(getInhabitedLoc());
@@ -146,33 +166,44 @@ public class InsertNewClientForm extends JFrame{
         house = textHouse.getText();
         flat = textFlat.getText();
 
-        String addressId = "5";
+        typeIdDoc = Integer.toString(getTypeIdDoc());
+        idDocSeries = textIdDocSeries.getText();
+        idDocNumber = textIdDocNumber.getText();
+        idDocGivenBy = textIdDocGivenBy.getText();
+        idDocDateStart = textIdDocDateStart.getText();
+        idDocStatus = "действителен";
 
-        String query1 = "insert into address(house, flat, `index`, regionNum, districtNum, inhabitedLocalityNum, streetNum) values"+
-                "("+quotate(house)+","+quotate(flat)+","+quotate(index)+","+quotate(region)+","+quotate(district)+","+
-                quotate(inhabitedLoc)+","+quotate(street)+")";
-
-//        String idAdressQuery = "select @@identity";
-
-        String query2 = "insert into social_client(personalNumber, surname, name, patronymic, dateBirth, snils, telephone, email, genderNum, addressId) values"+
-                "("+quotate("3")+","+quotate(surname)+","+quotate(name)+","+quotate(patronymic)+","+"{d "+quotate(dateBirth)+" }"+
-                ","+quotate(snils)+","+quotate(telephone)+","+quotate(email)+","+
-                quotate(gender)+","+quotate(addressId)+")";
+        String addressId ="1";
+        String persNum = "1";
 
         try {
             mdbc=new DatabaseConnection();
             Connection conn=mdbc.getMyConnection();
             stmt= conn.createStatement();
 
-            stmt.addBatch(query1);
-//            stmt.addBatch(idAdressQuery);
-            stmt.addBatch(query2);
-            stmt.executeBatch();
+            String sqlQuery1 = "insert into address(house, flat, indexNum, regionNum, districtNum, inhabitedLocalityNum, streetNum) values\n" +
+                    "("+quotate(house)+","+quotate(flat)+","+quotate(index)+","+quotate(region)+","+quotate(district)+","+
+                    quotate(inhabitedLoc)+","+quotate(street)+")";
+            stmt.executeUpdate(sqlQuery1);
+            ResultSet rs = stmt.executeQuery("select max(id) as maxId from address");
+            if(rs.next())
+                addressId = rs.getString("maxId");
+            ResultSet rs2 = stmt.executeQuery("select max(personalNumber) as maxId from social_client");
+            if(rs2.next()){
+                int personalNumber = rs2.getInt("maxId");
+                personalNumber++;
+                persNum = Integer.toString(personalNumber);
+            }
+            String sqlQuery2 = "insert into social_client(personalNumber, surname, name, patronymic, dateBirth, snils, telephone, email, genderNum, addressId) values"+
+                    "("+quotate(persNum)+","+quotate(surname)+","+quotate(name)+","+quotate(patronymic)+","+"{d "+quotate(dateBirth)+" }"+
+                    ","+quotate(snils)+","+quotate(telephone)+","+quotate(email)+","+
+                    quotate(gender)+","+quotate(addressId)+")";
+            stmt.executeUpdate(sqlQuery2);
+            String sqlQuery3 = "insert into identification_document(docSeries, docNumber, givenBy, dateStart, status, typeIdDocNum, social_client_personalNumber) values" +
+                    "("+quotate(idDocSeries)+","+quotate(idDocNumber)+","+quotate(idDocGivenBy)+","+quotate(idDocDateStart)+","+
+                    quotate(idDocStatus)+","+quotate(typeIdDoc)+","+quotate(persNum)+")";
+            stmt.executeUpdate(sqlQuery3);
 
-//            stmt.executeUpdate(sqlQuery);
-//            initModelSocialClient();
-//            selModel = tableSocialClient.getSelectionModel();
-//            selModel.setSelectionInterval(rowTableSC-1, rowTableSC-1);
             mdbc.close(stmt);
         }
         catch(Exception e){

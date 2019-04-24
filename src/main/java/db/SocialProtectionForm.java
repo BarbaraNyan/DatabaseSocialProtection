@@ -80,7 +80,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
-    private JTable []box={tableIndex, tableRegion, tableDistrict, tableLocality, tableStreet};
+    private JTable []box={tableIndex, tableRegion, tableDistrict, tableLocality, tableStreet,tableIndDoc};
     private DefaultTableModel dtmSocialClient;
     private DefaultTableModel dtmIdDocument;
     private DefaultTableModel dtmAttDocument;
@@ -228,15 +228,16 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             String.class,
             String.class, String.class,String.class,Integer.class,Integer.class,Integer.class};
     // Дописать SQL
-    String sqlQuery4="select ra.name, da.name, ia.name, sa.name, a.house, a.flat, a.`index`\n" +
+    String sqlQuery4="select ra.name, da.name, ila.name, sa.name, a.house, a.flat, ia.number\n" +
             "from address a inner join social_client sc on a.id = sc.addressId\n" +
             "inner join region_address ra on a.regionNum = ra.number\n" +
             "inner join district_address da on a.districtNum = da.number\n" +
-            "inner join inhabited_locality_address ia on a.inhabitedLocalityNum = ia.number\n" +
+            "inner join inhabited_locality_address ila on a.inhabitedLocalityNum = ila.number\n" +
             "inner join street_address sa on a.streetNum = sa.number\n" +
-            "where sc.addressId=(SELECT sc.addressId from social_client sc where sc.personalNumber=?)";
+            "inner join index_address ia on a.indexNum = ia.number\n" +
+            "where sc.addressId=(SELECT sc.addressId from social_client sc where sc.personalNumber=?);";
 
-    public void initModelAddress(String persAddress){
+    public void initModelAddress(String persNum){
         mdtmSocialClient.columnsAddress=columnsAddress;
         mdtmSocialClient.columnClassAddress=columnClassAddress;
         mdtmSocialClient.persNum = Integer.parseInt(persNum);
