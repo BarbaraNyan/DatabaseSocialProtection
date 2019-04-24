@@ -670,7 +670,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <tabbedpane id="9672c" binding="tabbedPane4" default-binding="true">
+              <tabbedpane id="9672c" binding="reportsPane">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
                     <preferred-size width="200" height="200"/>
@@ -679,19 +679,109 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <grid id="4af76" binding="сальдо" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="4af76" binding="saldoReport" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
-                      <tabbedpane title="Untitled"/>
+                      <tabbedpane title="Оборотно-сальдовая ведомость"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
-                    <children/>
+                    <children>
+                      <component id="aa99c" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Выберите период:"/>
+                        </properties>
+                      </component>
+                      <vspacer id="45493">
+                        <constraints>
+                          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                      </vspacer>
+                      <component id="a5e73" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Выберите категорию:"/>
+                        </properties>
+                      </component>
+                      <component id="38945" class="javax.swing.JLabel" binding="empLabel">
+                        <constraints>
+                          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Выберите сотрудника:"/>
+                        </properties>
+                      </component>
+                      <component id="5aab2" class="javax.swing.JComboBox" binding="periodCombox">
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <model>
+                            <item value="январь"/>
+                            <item value="февраль"/>
+                            <item value="март"/>
+                            <item value="апрель"/>
+                            <item value="май"/>
+                            <item value="июнь"/>
+                            <item value="июль"/>
+                            <item value="август"/>
+                            <item value="сентябрь"/>
+                            <item value="октябпь"/>
+                            <item value="ноябрь"/>
+                          </model>
+                        </properties>
+                      </component>
+                      <component id="e6b54" class="javax.swing.JComboBox" binding="categoryCombox">
+                        <constraints>
+                          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <model>
+                            <item value="Матери-одиночки"/>
+                            <item value="Ветераны ВОВ"/>
+                            <item value="Инвалиды"/>
+                            <item value="Многодетные"/>
+                          </model>
+                        </properties>
+                      </component>
+                      <component id="4493" class="javax.swing.JComboBox" binding="employeeCombox">
+                        <constraints>
+                          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <model>
+                            <item value="Сотрудник 1"/>
+                            <item value="Сотрудник 2"/>
+                          </model>
+                        </properties>
+                      </component>
+                      <component id="60856" class="javax.swing.JButton" binding="createSaldoReport">
+                        <constraints>
+                          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Составить отчет"/>
+                        </properties>
+                      </component>
+                      <component id="54567" class="javax.swing.JTable" binding="saldoReportTable">
+                        <constraints>
+                          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="8" fill="2" indent="0" use-parent-layout="false">
+                            <preferred-size width="150" height="50"/>
+                          </grid>
+                        </constraints>
+                        <properties/>
+                      </component>
+                    </children>
                   </grid>
-                  <grid id="77da0" binding="drugoePanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="77da0" binding="otherReports" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
-                      <tabbedpane title="Untitled"/>
+                      <tabbedpane title="Другие отчеты"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
