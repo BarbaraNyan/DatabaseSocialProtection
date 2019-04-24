@@ -241,6 +241,17 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         rowTableAddress = tableAddress.getRowCount();
     }
 
+
+    // для отчета сальдовой ведомости
+    String[] columnsSaldoReport = new String[]
+            {"Личный счет","Фамилия","Имя","Отчество", "Входное сальдо", "Начислено"};
+    final Class[] columnClassSaldoReport =  new Class[] {
+            String.class, String.class,String.class,String.class, Integer.class, Integer.class
+    };
+
+    String sqlQuerySaldoReport ="";
+
+
     String persNum;
     String surname;
     String name;
