@@ -29,6 +29,14 @@ import javax.swing.table.DefaultTableModel;
         public String[] columnsAddress;
         public Class[] columnClassAddress;
 
+
+        //для таблицы charge
+        public String[] columnsChargeReq;
+        public Class[] columnClassChargeReq;
+        String ben;
+        String cat;
+
+
         //для таблицы(справочнка) категория льготника
         public String[] columnsSCCategory;
         public Class[] columnClassSCCategory;
@@ -198,6 +206,30 @@ import javax.swing.table.DefaultTableModel;
                         break;
                     case 15: // Документ
                         createTable(rs,columnsTypeDoc,columnClassTypeDoc);
+                        break;
+                }
+
+                mdbc.close(stmt);
+                return dtm;
+            }
+            catch(SQLException e){
+                return null;
+            }
+        }
+
+        public DefaultTableModel MyTableModelPayoff(int type){
+            try{
+                ps = conn.prepareStatement(sqlPreparedStatement);
+                ps.setString(1,cat);
+                ps.setString(2,ben);
+                rs = ps.executeQuery();
+
+                switch (type){
+                    case 1: // категория льготника
+                        createTable(rs,columnsChargeReq,columnClassChargeReq);
+                        break;
+                    case 2: // категория льготы
+                        //createTable(rs,columnsBenCategory,columnClassBenCategory);
                         break;
                 }
 

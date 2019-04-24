@@ -141,6 +141,12 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 }
             }
         });
+
+        findClientButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                initModelPayoff();
+            }
+        });
 //        tabbedPane2.addChangeListener(new ChangeListener() {
 //            public void stateChanged(ChangeEvent e) {
 //                if(tabbedPane2.getSelectedIndex()==1)
@@ -327,8 +333,20 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             cb.addItem(item);
         }
     }
+    String[] columnsChargeReq = new String[] {"Фамилия", "Имя", "Отчество", "Категория гражданина", "Категория льготы"};
+    final Class[] columnClassChargeReq = new Class[] {String.class, String.class, String.class, String.class, String.class};
+    String sqlQueryChargeReq="select sc.surname, sc.name, sc.patronymic, scc.name, bc.name from social_client sc inner join social_client_scCategory scsc on sc.personalNumber=scsc.personalNumberClient inner join social_client_category scc on scsc.numberCategory=scc.number inner join benefit_category bc on scc.number=bc.social_client_category_number where scc.name=? and bc.name=?";
 
-
+    public void initModelPayoff() {
+        mdtmSocialClient.columnsChargeReq = columnsChargeReq;
+        mdtmSocialClient.columnClassChargeReq = columnClassChargeReq;
+        mdtmSocialClient.cat = comboBoxSCCategory.getItemAt(comboBoxSCCategory.getSelectedIndex()).toString();
+        mdtmSocialClient.ben = comboBoxBenefitCategory.getItemAt(comboBoxBenefitCategory.getSelectedIndex()).toString();
+        mdtmSocialClient.sqlPreparedStatement=sqlQueryChargeReq;
+        dtmHandbook = mdtmSocialClient.MyTableModelPayoff(1);
+        tableChargeRequest.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+    }
 
 
     //для вкладки НСИ
@@ -411,7 +429,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         tableBenefitCategory.setModel(dtmHandbook);
         dtmHandbook.fireTableDataChanged();
 
-        mdtmSocialClient.columnsTypeBenCategory = columnsTypeBenefit;
+        mdtmSocialClient.columnsTypeBenCategory = columnsTypeBenefitFull;
         mdtmSocialClient.columnClassTypeBenCategory = columnClassBenefit;
         mdtmSocialClient.sqlQuery = sqlQueryTypeBenCat;
         dtmHandbook = mdtmSocialClient.MyTableModelHandbook(3);
@@ -531,7 +549,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             tableHandbook.setModel(getModelHandbook(tableBenefitCategory, columnsHandbook));
         }else
         if ("Виды категории пособия".equals(treeSelect)) {
-            tableHandbook.setModel(getModelHandbook(tableTypeBenCategory, columnsHandbook));
+            tableHandbook.setModel(getModelHandbook(tableTypeBenCategory, columnsTypeBenefit));
         }else
         if ("Законы".equals(treeSelect)) {
             tableHandbook.setModel(tableLaw.getModel());
