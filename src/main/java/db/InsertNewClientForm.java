@@ -181,11 +181,11 @@ public class InsertNewClientForm extends JFrame{
             Connection conn=mdbc.getMyConnection();
             stmt= conn.createStatement();
 
-            String sqlQuery1 = "insert into address(house, flat, indexNum, regionNum, districtNum, inhabitedLocalityNum, streetNum) values\n" +
+            String sqlQuery1 = "insert into address(house, flat, numberIndex, numberRegion, numberDistrict, numberInhabitedLocality, numberStreet) values\n" +
                     "("+quotate(house)+","+quotate(flat)+","+quotate(index)+","+quotate(region)+","+quotate(district)+","+
                     quotate(inhabitedLoc)+","+quotate(street)+")";
             stmt.executeUpdate(sqlQuery1);
-            ResultSet rs = stmt.executeQuery("select max(id) as maxId from address");
+            ResultSet rs = stmt.executeQuery("select max(idAddress) as maxId from address");
             if(rs.next())
                 addressId = rs.getString("maxId");
             ResultSet rs2 = stmt.executeQuery("select max(personalNumber) as maxId from social_client");
@@ -194,12 +194,12 @@ public class InsertNewClientForm extends JFrame{
                 personalNumber++;
                 persNum = Integer.toString(personalNumber);
             }
-            String sqlQuery2 = "insert into social_client(personalNumber, surname, name, patronymic, dateBirth, snils, telephone, email, genderNum, addressId) values"+
+            String sqlQuery2 = "insert into social_client(personalNumber, surname, name, patronymic, dateBirth, snils, telephone, email, numberGender, idAddress) values"+
                     "("+quotate(persNum)+","+quotate(surname)+","+quotate(name)+","+quotate(patronymic)+","+"{d "+quotate(dateBirth)+" }"+
                     ","+quotate(snils)+","+quotate(telephone)+","+quotate(email)+","+
                     quotate(gender)+","+quotate(addressId)+")";
             stmt.executeUpdate(sqlQuery2);
-            String sqlQuery3 = "insert into identification_document(docSeries, docNumber, givenBy, dateStart, status, typeIdDocNum, social_client_personalNumber) values" +
+            String sqlQuery3 = "insert into identification_document(docSeries, docNumber, givenBy, dateStartIdDocument, statusIdDocument, numberTypeIdDocument, personalNumber) values" +
                     "("+quotate(idDocSeries)+","+quotate(idDocNumber)+","+quotate(idDocGivenBy)+","+quotate(idDocDateStart)+","+
                     quotate(idDocStatus)+","+quotate(typeIdDoc)+","+quotate(persNum)+")";
             stmt.executeUpdate(sqlQuery3);

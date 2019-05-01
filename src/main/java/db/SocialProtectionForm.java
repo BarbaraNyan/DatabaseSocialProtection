@@ -13,7 +13,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.sql.*;
 import java.util.Date;
+import java.text.*;
 
 public class SocialProtectionForm extends JFrame implements TreeSelectionListener{
     private JTabbedPane tabbedPane1;
@@ -65,6 +67,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableSaldoReport;
     private JButton saveReportBtn;
     private JScrollPane scrollPaneSaldo;
+    private JTextField textGender;
 
     private JTable tableSCCategory=new JTable();
     private JTable tableBenefitCategory=new JTable();
@@ -91,6 +94,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private DefaultTableModel dtmSaldoReport;
     private ListSelectionModel selModelSC = tableSocialClients.getSelectionModel();
     private TableModelClients mdtmSocialClient = new TableModelClients();
+
+    private DatabaseConnection mdbc;
+    private Statement stmt;
 
     private int rowTableSC;
     private int rowTableIdDoc;
@@ -153,6 +159,12 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 initModelPayoff();
             }
         });
+
+        chargeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                setPayoff();
+            }
+        });
 //        tabbedPane2.addChangeListener(new ChangeListener() {
 //            public void stateChanged(ChangeEvent e) {
 //                if(tabbedPane2.getSelectedIndex()==1)
@@ -172,11 +184,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     //Персональные данные (Вкладка "Личные дела")
     String[] columnsSocialClient = new String[]
-            {"Личный счёт", "Фамилия", "Имя", "Отчество","Дата рождения","СНИЛС","Телефон","Email" };
+            {"Личный счёт", "Фамилия", "Имя", "Отчество", "Пол", "Дата рождения","СНИЛС","Телефон","Email" };
     final Class[] columnClassSocialClient = new Class[] {
-            Integer.class, String.class,
-            String.class, String.class,String.class,String.class,String.class,String.class};
-    String sqlQuery1="select * from social_client";
+            Integer.class, String.class,String.class,
+            String.class, String.class, String.class, String.class, String.class, String.class};
+    String sqlQuery1="select sc.personalNumber, sc.surname, sc.name, sc.patronymic, g.nameGender, DATE_FORMAT(sc.dateBirth,'%d.%m.%Y'), sc.snils, sc.telephone, sc.email from social_client sc inner join gender g on g.numberGender=sc.numberGender";
 
     public void initModelSocialClient(){
         mdtmSocialClient.columnsSC=columnsSocialClient;
@@ -192,10 +204,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String[] columnsIdDocument = new String[]
             {"Тип документа","Серия","Номер","Кем выдан","Дата выдачи","Статус"};
     final Class[] columnClassIdDocument = new Class[]{
-            String.class,String.class,String.class,String.class,String.class,String.class};
-    String sqlQuery2 = "select typeDoc.name, idDoc.docSeries, idDoc.docNumber, idDoc.givenBy, idDoc.dateStart, idDoc.status\n" +
-            "from identification_document idDoc inner join social_client sc on idDoc.social_client_personalNumber = sc.personalNumber\n" +
-            "inner join type_identification_document typeDoc on idDoc.typeIdDocNum = typeDoc.number\n" +
+            String.class, Integer.class, Integer.class, String.class, String.class, String.class};
+    String sqlQuery2 = "select typeDoc.nameTypeIdDocument, idDoc.docSeries, idDoc.docNumber, idDoc.givenBy, DATE_FORMAT(idDoc.dateStartIdDocument,'%d.%m.%Y'), idDoc.statusIdDocument\n" +
+            "from identification_document idDoc inner join social_client sc on idDoc.personalNumber = sc.personalNumber\n" +
+            "inner join type_identification_document typeDoc on idDoc.numberTypeIdDocument = typeDoc.numberTypeIdDocument\n" +
             "where sc.personalNumber=?";
 
     public void initModelIdDocument(String persNum){
@@ -211,12 +223,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     //Доп. документы (Вкладка "Личные дела")
     String[] columnsAttDocument = new String[]
-            {"Тип документа","Номер","Название","Дата выдачи","Статус"};
+            {"Номер","Тип документа","Название","Дата выдачи","Статус"};
     final Class[] columnClassAttDocument = new Class[]{
-            String.class,String.class,String.class,String.class,String.class};
-    String sqlQuery3 = "select typeDoc.name, attDoc.number, attDoc.name, attDoc.dateStart, attDoc.status\n" +
-            "from attached_document attDoc inner join social_client sc on attDoc.socialClient = sc.personalNumber\n" +
-            "inner join type_attached_document typeDoc on attDoc.typeAttachedDocNum = typeDoc.number\n" +
+            Integer.class, String.class, String.class, String.class, String.class};
+    String sqlQuery3 = "select typeDoc.nameTypeAttachedDocument, attDoc.numberAttachedDocument, attDoc.nameAttachedDocument, " +
+            "attDoc.dateStartAttachedDocument, attDoc.statusAttachedDocument\n" +
+            "from attached_document attDoc inner join social_client sc on attDoc.personalNumber = sc.personalNumber\n" +
+            "inner join type_attached_document typeDoc on attDoc.numberTypeAttachedDocument = typeDoc.numberTypeAttachedDocument\n" +
             "where sc.personalNumber=?";
 
     public void initModelAttDocument(String persNum){
@@ -232,18 +245,18 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     // Адрес (Вкладка 'Личные дела')
     String[] columnsAddress = new String[]
-            {"Регион","Район","Нас.пункт","Улица","Дом","Квартира","Индекс" };
+            {"Индекс","Регион","Район","Нас.пункт","Улица","Дом","Квартира" };
     final Class[] columnClassAddress = new Class[] {
-            String.class,
-            String.class, String.class,String.class,Integer.class,Integer.class,Integer.class};
-    String sqlQuery4="select ra.name, da.name, ila.name, sa.name, a.house, a.flat, ia.number\n" +
-            "from address a inner join social_client sc on a.id = sc.addressId\n" +
-            "inner join region_address ra on a.regionNum = ra.number\n" +
-            "inner join district_address da on a.districtNum = da.number\n" +
-            "inner join inhabited_locality_address ila on a.inhabitedLocalityNum = ila.number\n" +
-            "inner join street_address sa on a.streetNum = sa.number\n" +
-            "inner join index_address ia on a.indexNum = ia.number\n" +
-            "where sc.addressId=(SELECT sc.addressId from social_client sc where sc.personalNumber=?);";
+            Integer.class, String.class,
+            String.class, String.class,String.class,Integer.class,Integer.class};
+    String sqlQuery4="select ia.numberIndex, ra.nameRegion, da.nameDistrict, ila.nameInhabitedLocality, sa.nameStreet, a.house, a.flat\n" +
+            "from address a inner join social_client sc on a.idAddress = sc.idAddress\n" +
+            "inner join region_address ra on a.numberRegion = ra.numberRegion\n" +
+            "inner join district_address da on a.numberDistrict = da.numberDistrict\n" +
+            "inner join inhabited_locality_address ila on a.numberInhabitedLocality = ila.numberInhabitedLocality\n" +
+            "inner join street_address sa on a.numberStreet = sa.numberStreet\n" +
+            "inner join index_address ia on a.numberIndex = ia.numberIndex\n" +
+            "where sc.idAddress=(SELECT sc.idAddress from social_client sc where sc.personalNumber=?);";
 
     public void initModelAddress(String persNum){
         mdtmSocialClient.columnsAddress=columnsAddress;
@@ -260,14 +273,14 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String[] columnsSaldoReport = new String[]
             {"Личный счет","Фамилия","Имя","Отчество", "Входное сальдо", "Начислено"};
     final Class[] columnClassSaldoReport =  new Class[] {
-            String.class, String.class,String.class,String.class, Integer.class, Integer.class
+            Integer.class, String.class,String.class,String.class, Integer.class, Integer.class
     };
 
     String sqlQuerySaldoReport ="select pa.numberPersonalAccount, sc.surname, sc.name,sc.patronymic, pa.inputBalance, pa.accrued\n" +
-            "from personal_account pa inner join payoff p on pa.numberPersonalAccount = p.personal_account_numberPersonalAccount\n" +
-            "inner join request_for_cash_settlement rfcs on p.numberPayoff = rfcs.payoff_numberPayoff\n" +
-            "inner join operating_account oa on rfcs.operating_account_numberAcc = oa.numberAcc\n" +
-            "inner join social_client sc on oa.numberSocialClient = sc.personalNumber\n" +
+            "from personal_account pa inner join payoff p on pa.numberPersonalAccount = p.numberPersonalAccount\n" +
+            "inner join request_for_cash_settlement rfcs on p.numberPayoff = rfcs.numberPayoff\n" +
+            "inner join operating_account oa on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
+            "inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
             "where sc.personalNumber = pa.numberPersonalAccount;";
 
     public void initModelSaldoReport() {
@@ -281,9 +294,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     }
 
     // Начисления (Вкладка 'Начисления и выплаты')
-    String[] columnsChargeReq = new String[] {"Фамилия", "Имя", "Отчество", "Категория гражданина", "Категория льготы"};
-    final Class[] columnClassChargeReq = new Class[] {String.class, String.class, String.class, String.class, String.class};
-    String sqlQueryChargeReq="select sc.surname, sc.name, sc.patronymic, scc.name, bc.name from social_client sc inner join social_client_scCategory scsc on sc.personalNumber=scsc.personalNumberClient inner join social_client_category scc on scsc.numberCategory=scc.number inner join benefit_category bc on scc.number=bc.social_client_category_number where scc.name=? and bc.name=?";
+    String[] columnsChargeReq = new String[] {"Номер личного счета", "Фамилия", "Имя", "Отчество", "Категория гражданина", "Категория льготы"};
+    final Class[] columnClassChargeReq = new Class[] {Integer.class, String.class, String.class, String.class, String.class, String.class};
+    String sqlQueryChargeReq="select sc.personalNumber, sc.surname, sc.name, sc.patronymic, scc.nameClientCategory, bc.nameBenefitCategory " +
+            "from social_client sc inner join client_category cc on sc.personalNumber=cc.personalNumber " +
+            "inner join social_client_category scc on cc.numberClientCategory=scc.numberClientCategory " +
+            "inner join benefit_category bc on scc.numberClientCategory=bc.numberClientCategory " +
+            "where scc.nameClientCategory=? and bc.nameBenefitCategory=?";
 
     public void initModelPayoff() {
         mdtmSocialClient.columnsChargeReq = columnsChargeReq;
@@ -296,10 +313,49 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         dtmHandbook.fireTableDataChanged();
     }
 
+    public void setPayoff(){
+        try {
+            mdbc=new DatabaseConnection();
+            Connection conn=mdbc.getMyConnection();
+            stmt= conn.createStatement();
+            String amount="";
+            String date;
+            String persNum="";
+
+            Date dateNow = new Date();
+            SimpleDateFormat formatForDateNow = new SimpleDateFormat("yyyy-MM-dd");
+            date=formatForDateNow.format(dateNow).toString();
+
+            String ben=comboBoxBenefitCategory.getItemAt(comboBoxBenefitCategory.getSelectedIndex()).toString();
+            String sqlAm="select vota.payoutAmount from version_of_the_article vota " +
+                    "inner join law l on vota.numberLaw=l.numberLaw " +
+                    "inner join benefit_law bl on l.numberLaw=bl.numberLaw " +
+                    "inner join benefit_category bc on bl.codeBenefitCategory=bc.codeBenefitCategory " +
+                    "where bc.nameBenefitCategory='"+ben+"'";
+            ResultSet rs = stmt.executeQuery(sqlAm);
+            if(rs.next())
+                amount = rs.getString(1);
+
+            for(int i=0; i<tableChargeRequest.getRowCount(); i++){
+                persNum=tableChargeRequest.getModel().getValueAt(i,0).toString();
+                String sqlPayoff="insert into payoff(amountPayoff, datePayoff, numberPersonalAccount)" +
+                        "values ('"+amount+"', '"+date+"', '"+persNum+"')";
+                stmt.executeUpdate(sqlPayoff);
+            }
+
+            mdbc.close(stmt);
+        }
+        catch(Exception e){
+            System.out.println("Failed to set payoff");
+            mdbc.close(stmt);
+        }
+    }
+
     String persNum;
     String surname;
     String name;
     String patronymic;
+    String gender;
     String dateBirth;
     String snils;
     String telephone;
@@ -324,13 +380,15 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         textName.setText(name);
         patronymic = tableSocialClients.getModel().getValueAt(selRowSC,3).toString();
         textPatronymic.setText(patronymic);
-        dateBirth = tableSocialClients.getModel().getValueAt(selRowSC,4).toString();
+        gender = tableSocialClients.getModel().getValueAt(selRowSC,4).toString();
+        textGender.setText(gender);
+        dateBirth = tableSocialClients.getModel().getValueAt(selRowSC,5).toString();
         textDateBirth.setText(dateBirth);
-        snils = tableSocialClients.getModel().getValueAt(selRowSC,5).toString();
+        snils = tableSocialClients.getModel().getValueAt(selRowSC,6).toString();
         textSNILS.setText(snils);
-        telephone = tableSocialClients.getModel().getValueAt(selRowSC,6).toString();
+        telephone = tableSocialClients.getModel().getValueAt(selRowSC,7).toString();
         textTelephone.setText(telephone);
-        email = tableSocialClients.getModel().getValueAt(selRowSC,7).toString();
+        email = tableSocialClients.getModel().getValueAt(selRowSC,8).toString();
         textEmail.setText(email);
 
         initModelAddress(persNum);
@@ -415,7 +473,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     String sqlQuerySCCat="select * from social_client_category";
     String sqlQueryBenCat="select * from benefit_category";
-    String sqlQueryTypeBenCat="select * from type_category";
+    String sqlQueryTypeBenCat="select * from type_benefit_category";
     String sqlQueryLaw="select * from law";
     String sqlQueryVerArt="select * from version_of_the_article";
     String sqlQueryArt="select * from article";
