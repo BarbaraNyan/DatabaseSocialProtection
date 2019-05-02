@@ -9,6 +9,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -16,6 +17,7 @@ import java.awt.event.ItemListener;
 import java.sql.*;
 import java.util.Date;
 import java.text.*;
+import javax.swing.JComboBox;
 
 public class SocialProtectionForm extends JFrame implements TreeSelectionListener{
     private JTabbedPane tabbedPane1;
@@ -68,6 +70,15 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JButton saveReportBtn;
     private JScrollPane scrollPaneSaldo;
     private JTextField textGender;
+    private JComboBox textRegionComboBox;
+    private JComboBox textStreetComboBox;
+    private JComboBox textDistrictComboBox;
+    private JComboBox textInhabitedLocalityComboBox;
+    private JComboBox textIndexComboBox;
+    private JRadioButton radioButtonM;
+    private JRadioButton radioButtonF;
+    private JButton buttonSave;
+    private ButtonGroup radioButtonGender;
 
     private JTable tableSCCategory=new JTable();
     private JTable tableBenefitCategory=new JTable();
@@ -94,6 +105,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private DefaultTableModel dtmSaldoReport;
     private ListSelectionModel selModelSC = tableSocialClients.getSelectionModel();
     private TableModelClients mdtmSocialClient = new TableModelClients();
+    private EditClient editClient = new EditClient();
 
     private DatabaseConnection mdbc;
     private Statement stmt;
@@ -106,6 +118,24 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     private int selRowSC;
 
+    private void hideComboBox(){
+        textRegionComboBox.setVisible(false);
+        textStreetComboBox.setVisible(false);
+        textIndexComboBox.setVisible(false);
+        textInhabitedLocalityComboBox.setVisible(false);
+        textDistrictComboBox.setVisible(false);
+        radioButtonM.setVisible(false);
+        radioButtonF.setVisible(false);
+    }
+
+    private void fillComboBox(){
+        getComboBox(textRegionComboBox,tableRegion);
+        getComboBox(textStreetComboBox,tableStreet);
+        getComboBox(textIndexComboBox,tableIndex);
+        getComboBox(textDistrictComboBox,tableDistrict);
+        getComboBox(textInhabitedLocalityComboBox,tableLocality);
+    }
+
     SocialProtectionForm(){
         super("CommonTable");
         setContentPane(rootPanel);
@@ -117,6 +147,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         initModelHandbook();
 
         getComboBox(comboBoxSCCategory, tableSCCategory);
+
+        hideComboBox();
+        fillComboBox();
+        setButtonGroup();
 
         addClientButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -172,6 +206,53 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 //            }
 //        });
 
+
+    //Вкладка "Личные дела", кнопка "Редактирование"
+        editClientButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //Перс.данные
+                textSurname.setEditable(true);
+                textName.setEditable(true);
+                textPatronymic.setEditable(true);
+                textGender.setVisible(false);
+                radioButtonF.setVisible(true);
+                radioButtonM.setVisible(true);
+                textDateBirth.setEditable(true);
+                textSNILS.setEditable(true);
+                textTelephone.setEditable(true);
+                textEmail.setEditable(true);
+
+                //Адрес
+                textRegion.setVisible(false);
+                textRegionComboBox.setVisible(true);
+                textStreet.setVisible(false);
+                textStreetComboBox.setVisible(true);
+                textIndex.setVisible(false);
+                textIndexComboBox.setVisible(true);
+                textDistrict.setVisible(false);
+                textDistrictComboBox.setVisible(true);
+                textInhabitedLocality.setVisible(false);
+                textInhabitedLocalityComboBox.setVisible(true);
+                textHouse.setEditable(true);
+                textFlat.setEditable(true);
+
+            }
+        });
+        buttonSave.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String [] params = {textSurname.getText(),textName.getText(), textPatronymic.getText(),textSNILS.getText(),
+                textTelephone.getText(),textEmail.getText(),textPersNum.getText()};
+                String sqlUpdate = "update social_client set surname = ?, name = ?, patronymic = ?, snils = ?,\n" +
+                        "  telephone = ?, email = ? where personalNumber = ?";
+                editClient.update(sqlUpdate,params);
+            }
+        });
+    }
+
+    private void setButtonGroup(){
+        radioButtonGender = new ButtonGroup();
+        radioButtonGender.add(radioButtonM);
+        radioButtonGender.add(radioButtonF);
     }
 
     private void listenerRowTableSC(){
@@ -382,6 +463,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         textPatronymic.setText(patronymic);
         gender = tableSocialClients.getModel().getValueAt(selRowSC,4).toString();
         textGender.setText(gender);
+        setSelectedGender(gender);
         dateBirth = tableSocialClients.getModel().getValueAt(selRowSC,5).toString();
         textDateBirth.setText(dateBirth);
         snils = tableSocialClients.getModel().getValueAt(selRowSC,6).toString();
@@ -393,24 +475,48 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
         initModelAddress(persNum);
 
-        region = tableAddress.getModel().getValueAt(0,0).toString();
+        region = tableAddress.getModel().getValueAt(0,1).toString();
         textRegion.setText(region);
-        district = tableAddress.getModel().getValueAt(0,1).toString();
+        setSelectedValue(region,textRegionComboBox);
+        district = tableAddress.getModel().getValueAt(0,2).toString();
         textDistrict.setText(district);
-        inhabitedLocality = tableAddress.getModel().getValueAt(0,2).toString();
+        setSelectedValue(district,textDistrictComboBox);
+        inhabitedLocality = tableAddress.getModel().getValueAt(0,3).toString();
         textInhabitedLocality.setText(inhabitedLocality);
-        street = tableAddress.getModel().getValueAt(0,3).toString();
+        setSelectedValue(inhabitedLocality,textInhabitedLocalityComboBox);
+        street = tableAddress.getModel().getValueAt(0,4).toString();
         textStreet.setText(street);
-        house = tableAddress.getModel().getValueAt(0,4).toString();
+        setSelectedValue(street,textStreetComboBox);
+        house = tableAddress.getModel().getValueAt(0,5).toString();
         textHouse.setText(house);
-        flat = tableAddress.getModel().getValueAt(0,5).toString();
+        flat = tableAddress.getModel().getValueAt(0,6).toString();
         textFlat.setText(flat);
-        index = tableAddress.getModel().getValueAt(0,6).toString();
+        index = tableAddress.getModel().getValueAt(0,0).toString();
         textIndex.setText(index);
+        setSelectedValue(index,textIndexComboBox);
 
         initModelIdDocument(persNum);
         initModelAttDocument(persNum);
     }
+
+        private void setSelectedValue(String value,JComboBox comboBox) {
+            String item;
+            for (int i = 0; i < comboBox.getItemCount(); i++) {
+                item = comboBox.getItemAt(i).toString();
+                if (item.equalsIgnoreCase(value)) {
+                    comboBox.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+
+        private void setSelectedGender(String gender){
+            if(gender.equals("М"))
+                radioButtonM.setSelected(true);
+            else
+                radioButtonF.setSelected(true);
+        }
+
 
     //для вкладки назначения и выплаты
     public void getComboBox(JComboBox cb, JTable tl){
@@ -421,7 +527,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             cb.addItem(item);
         }
     }
-
 
     //для вкладки НСИ
     private DefaultMutableTreeNode setGlossaryJTree(){
