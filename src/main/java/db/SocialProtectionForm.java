@@ -9,7 +9,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -78,7 +77,27 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JRadioButton radioButtonM;
     private JRadioButton radioButtonF;
     private JButton buttonSave;
+    private JTable tableOperatingAccount;
+    private JTextField textNumOperatingAccount;
+    private JTextField textDateStartAccount;
+    private JTextField textBICOrg;
+    private JTextField textNameOrg;
+    private JTextField textAdressOrg;
+    private JTextField textTin;
+    private JRadioButton rbStatusTrue;
+    private JRadioButton rbStatusFalse;
+    private JLabel lbNumOA;
+    private JLabel lbDateOA;
+    private JLabel lbStOA;
+    private JLabel lbBICOA;
+    private JLabel lbNameOA;
+    private JLabel lbAdOA;
+    private JLabel lbTinOA;
+    private JTable tableRelatives;
+    private JTable tableIdDocRelatives;
+    private JLabel lbSum;
     private ButtonGroup radioButtonGender;
+    private ButtonGroup radioButtonStatusAccount;
 
     private JTable tableSCCategory=new JTable();
     private JTable tableBenefitCategory=new JTable();
@@ -93,14 +112,24 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableStreet=new JTable();
     private JTable tableRelation=new JTable();
     private JTable tableIncome=new JTable();
+    private JTable tableCategory;
+    private JTabbedPane tabbedPane4;
+    private JTable tableRequest;
+    private JTable tablePayoffClient;
+    private JTable tablePA;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
+
 
     private JTable []box={tableIndex, tableRegion, tableDistrict, tableLocality, tableStreet,tableIndDoc};
     private DefaultTableModel dtmSocialClient;
     private DefaultTableModel dtmIdDocument;
     private DefaultTableModel dtmAttDocument;
     private DefaultTableModel dtmAddress;
+    private DefaultTableModel dtmOpAcc;
+    private DefaultTableModel dtmRelatives;
+    private DefaultTableModel dtmIdDocRelatives;
+    private DefaultTableModel dtmIncome;
     private DefaultTableModel dtmHandbook;
     private DefaultTableModel dtmSaldoReport;
     private ListSelectionModel selModelSC = tableSocialClients.getSelectionModel();
@@ -114,6 +143,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private int rowTableIdDoc;
     private int rowTableAttDoc;
     private int rowTableAddress;
+    private int rowTableOpAcc;
+    private int rowTableRelatives;
     String treeSelect;
 
     private int selRowSC;
@@ -151,6 +182,12 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         hideComboBox();
         fillComboBox();
         setButtonGroup();
+
+        hideOperAcc();
+        setButtonGroupStatus();
+        listenerRowTableOpAcc();
+
+        listenerRowTableRelatives();
 
         addClientButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -350,6 +387,266 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         rowTableAddress = tableAddress.getRowCount();
     }
 
+
+    //Расчетный счет (вкладка "Личные дела")
+    String[] columnsOperAcc = new String[]
+            {"Номер расчетного счета","Дата открытия","Статус"};
+    final Class[] columnClassOperAcc = new Class[] {
+            Integer.class, String.class, String.class};
+    String sqlQueryOperAcc="select oa.numberOperatingAccount, DATE_FORMAT(oa.dateStartAccount,'%d.%m.%Y'), oa.statusOperaingAccount\n" +
+            "from operating_account oa inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
+            "where sc.personalNumber=?;";
+
+    private void setButtonGroupStatus(){
+        radioButtonStatusAccount = new ButtonGroup();
+        radioButtonStatusAccount.add(rbStatusTrue);
+        radioButtonStatusAccount.add(rbStatusFalse);
+    }
+
+    public void hideOperAcc(){
+        lbNumOA.setVisible(false);
+        textNumOperatingAccount.setVisible(false);
+        lbDateOA.setVisible(false);
+        textDateStartAccount.setVisible(false);
+        lbStOA.setVisible(false);
+        rbStatusFalse.setVisible(false);
+        rbStatusTrue.setVisible(false);
+        lbBICOA.setVisible(false);
+        textBICOrg.setVisible(false);
+        lbNameOA.setVisible(false);
+        textNameOrg.setVisible(false);
+        lbAdOA.setVisible(false);
+        textAdressOrg.setVisible(false);
+        lbTinOA.setVisible(false);
+        textTin.setVisible(false);
+
+        tableIdDocRelatives.setModel(new DefaultTableModel());
+    }
+
+    public void initModelOperAcc(String persNum){
+        mdtmSocialClient.columnsOpAcc=columnsOperAcc;
+        mdtmSocialClient.columnClassOpAcc=columnClassOperAcc;
+        mdtmSocialClient.persNum = Integer.parseInt(persNum);
+        mdtmSocialClient.sqlPreparedStatement=sqlQueryOperAcc;
+        dtmOpAcc=mdtmSocialClient.MyTableModelDocument(4);
+        tableOperatingAccount.setModel(dtmOpAcc);
+        dtmOpAcc.fireTableDataChanged();
+        rowTableOpAcc = tableOperatingAccount.getRowCount();
+    }
+
+    String numAcc;
+    String dateAcc;
+    String statAcc;
+    String BICAcc;
+    String nameAcc;
+    String adrAcc;
+    String tinAcc;
+
+
+    public void setOrganization(){
+        try {
+            mdbc=new DatabaseConnection();
+            Connection conn=mdbc.getMyConnection();
+            stmt= conn.createStatement();
+
+            String sqlAm="select bo.bic, bo.nameBank, bo.addressBank, bo.tinBank from bank_organization bo " +
+                    "inner join bank_operating_account boa on bo.bic=boa.bic " +
+                    "where boa.numberOperatingAccount='"+numAcc+"'";
+            ResultSet rs = stmt.executeQuery(sqlAm);
+            if(rs.next()){
+                BICAcc=rs.getString(1);
+                nameAcc=rs.getString(2);
+                adrAcc=rs.getString(3);
+                tinAcc=rs.getString(4);
+
+                lbBICOA.setVisible(true);
+                lbBICOA.setText("БИК");
+                textBICOrg.setVisible(true);
+                textBICOrg.setText(BICAcc);
+                lbNameOA.setVisible(true);
+                textNameOrg.setVisible(true);
+                textNameOrg.setText(nameAcc);
+                lbAdOA.setVisible(true);
+                textAdressOrg.setVisible(true);
+                textAdressOrg.setText(adrAcc);
+                lbTinOA.setVisible(true);
+                textTin.setVisible(true);
+                textTin.setText(tinAcc);
+            } else {
+                sqlAm="select co.tinCash, co.nameCash, co.addressCash from cash_organization co " +
+                        "inner join cash_operating_account coa on co.tinCash=coa.tinCash " +
+                        "where coa.numberOperatingAccount='"+numAcc+"'";
+                rs = stmt.executeQuery(sqlAm);
+                if(rs.next()) {
+                    BICAcc = rs.getString(1);
+                    nameAcc = rs.getString(2);
+                    adrAcc = rs.getString(3);
+
+                    lbBICOA.setVisible(true);
+                    lbBICOA.setText("ИНН");
+                    textBICOrg.setVisible(true);
+                    textBICOrg.setText(BICAcc);
+                    lbNameOA.setVisible(true);
+                    textNameOrg.setVisible(true);
+                    textNameOrg.setText(nameAcc);
+                    lbAdOA.setVisible(true);
+                    textAdressOrg.setVisible(true);
+                    textAdressOrg.setText(adrAcc);
+                } else {
+                    sqlAm="select po.postCode, po.namePost, po.addressPost, po.tinPost from post_organization po " +
+                            "inner join post_operating_account poa on po.postCode=poa.postCode " +
+                            "where poa.numberOperatingAccount='"+numAcc+"'";
+                    rs = stmt.executeQuery(sqlAm);
+                    if(rs.next()) {
+                        BICAcc = rs.getString(1);
+                        nameAcc = rs.getString(2);
+                        adrAcc = rs.getString(3);
+                        tinAcc=rs.getString(4);
+
+                        lbBICOA.setVisible(true);
+                        lbBICOA.setText("Почтовый индекс");
+                        textBICOrg.setVisible(true);
+                        textBICOrg.setText(BICAcc);
+                        lbNameOA.setVisible(true);
+                        textNameOrg.setVisible(true);
+                        textNameOrg.setText(nameAcc);
+                        lbAdOA.setVisible(true);
+                        textAdressOrg.setVisible(true);
+                        textAdressOrg.setText(adrAcc);
+                        lbTinOA.setVisible(true);
+                        textTin.setVisible(true);
+                        textTin.setText(tinAcc);
+                    }
+                }
+            }
+
+
+            mdbc.close(stmt);
+        }
+        catch(Exception e){
+            System.out.println("Failed to set payoff");
+            mdbc.close(stmt);
+        }
+    }
+
+    private void listenerRowTableOpAcc(){
+        tableOperatingAccount.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() == false)
+                {
+                    hideOperAcc();
+                    int selRow = tableOperatingAccount.getSelectedRow();
+                    if(selRow>=0) {
+                        lbNumOA.setVisible(true);
+                        textNumOperatingAccount.setVisible(true);
+                        lbDateOA.setVisible(true);
+                        textDateStartAccount.setVisible(true);
+                        lbStOA.setVisible(true);
+                        rbStatusFalse.setVisible(true);
+                        rbStatusTrue.setVisible(true);
+                        numAcc = tableOperatingAccount.getModel().getValueAt(selRow, 0).toString();
+                        textNumOperatingAccount.setText(numAcc);
+                        dateAcc = tableOperatingAccount.getModel().getValueAt(selRow, 1).toString();
+                        textDateStartAccount.setText(dateAcc);
+                        statAcc = tableOperatingAccount.getModel().getValueAt(selRow, 2).toString();
+                        if (statAcc.equals("Действителен"))
+                            rbStatusTrue.setSelected(true);
+                        else
+                            rbStatusFalse.setSelected(true);
+                        setOrganization();
+                    }
+                }
+            }
+        });
+    }
+
+
+    //Родственники (Вкладка "Личные дела")
+    String[] columnsRelatives = new String[]
+            {"Номер","Фамилия","Имя","Отчество","Дата рождения","Степень родства"};
+    final Class[] columnClassRelatives = new Class[]{
+            Integer.class, String.class, String.class, String.class, String.class, String.class};
+    String sqlQueryRelatives = "select r.relativePersonalNumber, r.surnameRelative, r.nameRelative, r.patronymicRelative, DATE_FORMAT(r.dateBirthRelative,'%d.%m.%Y'), rd.nameRelationDegree " +
+            "from relatives r inner join relation_degree rd on r.numberRelationDegree = rd.numberRelationDegree \n" +
+            "inner join social_client sc on r.personalNumber = sc.personalNumber\n" +
+            "where sc.personalNumber=?";
+
+    public void initModelRelatives(String persNum){
+        mdtmSocialClient.columnsRelatives=columnsRelatives;
+        mdtmSocialClient.columnClassRelatives=columnClassRelatives;
+        mdtmSocialClient.persNum = Integer.parseInt(persNum);
+        mdtmSocialClient.sqlPreparedStatement=sqlQueryRelatives;
+        dtmRelatives=mdtmSocialClient.MyTableModelDocument(5);
+        tableRelatives.setModel(dtmRelatives);
+        tableRelatives.removeColumn(tableRelatives.getColumnModel().getColumn(0));
+        dtmRelatives.fireTableDataChanged();
+        rowTableRelatives = tableRelatives.getRowCount();
+    }
+
+    String sqlQueryIdDocRelatives = "select typeDoc.nameTypeIdDocument, idDoc.docSeries, idDoc.docNumber, idDoc.givenBy, DATE_FORMAT(idDoc.dateStartIdDocument,'%d.%m.%Y'), idDoc.statusIdDocument\n" +
+            "from identification_document idDoc inner join relatives r on idDoc.relativePersonalNumber = r.relativePersonalNumber\n" +
+            "inner join social_client sc on r.personalNumber = sc.personalNumber\n" +
+            "inner join type_identification_document typeDoc on idDoc.numberTypeIdDocument = typeDoc.numberTypeIdDocument\n" +
+            "where sc.personalNumber=? and r.relativePersonalNumber=?";
+
+    public void initModelIdDocRelatives(String idRel){
+        mdtmSocialClient.columnsIdDocRelatives=columnsIdDocument;
+        mdtmSocialClient.columnClassIdDocRelatives=columnClassIdDocument;
+        mdtmSocialClient.cat = persNum;
+        mdtmSocialClient.ben = idRel;
+        mdtmSocialClient.sqlPreparedStatement=sqlQueryIdDocRelatives;
+        dtmIdDocRelatives=mdtmSocialClient.MyTableModelPayoff(3);
+        tableIdDocRelatives.setModel(dtmIdDocRelatives);
+        dtmIdDocRelatives.fireTableDataChanged();
+    }
+
+    private void listenerRowTableRelatives(){
+        tableRelatives.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() == false)
+                {
+                    int selRow = tableRelatives.getSelectedRow();
+                    if(selRow>=0) {
+                        String idRel=tableRelatives.getModel().getValueAt(selRow,0).toString();
+                        initModelIdDocRelatives(idRel);
+                    }
+                }
+            }
+        });
+    }
+
+    //Доход (Вкладка "Личные дела")
+    String[] columnsIncome = new String[]
+            {"Период","Вид","Сумма"};
+    final Class[] columnClassIncome = new Class[]{
+            String.class, String.class, Double.class};
+
+    //Не выходит сделать нормальный запрос, чтобы отображался доход не только клиента, но и его родственников(( Посмотри, а?
+    String sqlQueryIncome = "select DATE_FORMAT(i.periodIncome,'%m.%Y'), ti.nameTypeIncone, i.amount " +
+            "from income i inner join type_income ti on i.numberTypeIncone = ti.numberTypeIncone \n" +
+            "inner join social_client sc on i.personalNumber = sc.personalNumber\n" +
+            "where sc.personalNumber=?";
+
+    public void initModelIncome(String persNum){
+        mdtmSocialClient.columnsIncome=columnsIncome;
+        mdtmSocialClient.columnClassIncome=columnClassIncome;
+        mdtmSocialClient.persNum = Integer.parseInt(persNum);
+        mdtmSocialClient.sqlPreparedStatement=sqlQueryIncome;
+        dtmIncome=mdtmSocialClient.MyTableModelDocument(6);
+        tableIncome.setModel(dtmIncome);
+        dtmIncome.fireTableDataChanged();
+        int row=tableIncome.getRowCount();
+        double sum=0;
+        for (int i=0; i<row; i++){
+            sum+=Double.valueOf(tableIncome.getModel().getValueAt(i,2).toString());
+        }
+        if(row!=0)
+            lbSum.setText(String.valueOf(sum/row));
+        else
+            lbSum.setText("");
+    }
+
+
     // Оборотно-сальдовая ведомосоть (Вкладка 'Отчёты')
     String[] columnsSaldoReport = new String[]
             {"Личный счет","Фамилия","Имя","Отчество", "Входное сальдо", "Начислено"};
@@ -497,6 +794,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
         initModelIdDocument(persNum);
         initModelAttDocument(persNum);
+        initModelOperAcc(persNum);
+        hideOperAcc();
+        initModelIncome(persNum);
+        initModelRelatives(persNum);
     }
 
         private void setSelectedValue(String value,JComboBox comboBox) {

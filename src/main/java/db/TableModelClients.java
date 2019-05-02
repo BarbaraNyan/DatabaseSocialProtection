@@ -29,6 +29,21 @@ import javax.swing.table.DefaultTableModel;
         public String[] columnsAddress;
         public Class[] columnClassAddress;
 
+        //для таблицы operation_account
+        public String[] columnsOpAcc;
+        public Class[] columnClassOpAcc;
+
+        //для таблицы relatives
+        public String[] columnsRelatives;
+        public Class[] columnClassRelatives;
+
+        //для таблицы identification_document relatives
+        public String[] columnsIdDocRelatives;
+        public Class[] columnClassIdDocRelatives;
+
+        //для таблицы relatives
+        public String[] columnsIncome;
+        public Class[] columnClassIncome;
 
         //для таблицы charge
         public String[] columnsChargeReq;
@@ -163,6 +178,15 @@ import javax.swing.table.DefaultTableModel;
                     case 3:  // Address
                         createTable(rs,columnsAddress,columnClassAddress);
                         break;
+                    case 4: //OperationAccount
+                        createTable(rs, columnsOpAcc, columnClassOpAcc);
+                        break;
+                    case 5: //Relatives
+                        createTable(rs, columnsRelatives, columnClassRelatives);
+                        break;
+                    case 6: //Income
+                        createTable(rs, columnsIncome, columnClassIncome);
+                        break;
                 }
 
                 mdbc.close(stmt);
@@ -247,6 +271,9 @@ import javax.swing.table.DefaultTableModel;
                         break;
                     case 2: // категория льготы
                         //createTable(rs,columnsBenCategory,columnClassBenCategory);
+                        break;
+                    case 3:
+                        createTable(rs, columnsIdDocRelatives, columnClassIdDocRelatives);
                         break;
                 }
 
