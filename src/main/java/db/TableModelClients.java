@@ -33,6 +33,22 @@ import javax.swing.table.DefaultTableModel;
         public String[] columnsOpAcc;
         public Class[] columnClassOpAcc;
 
+        //для таблицы category measure
+        public String[] columnsCategoryMeasure;
+        public Class[] columnClassCategoryMeasure;
+
+        //для таблицы request
+        public String[] columnsRequest;
+        public Class[] columnClassRequest;
+
+        //для таблицы payoff
+        public String[] columnsPayoff;
+        public Class[] columnClassPayoff;
+
+        //для таблицы personal_account
+        public String[] columnsPersonalAccount;
+        public Class[] columnClassPersonalAccount;
+
         //для таблицы relatives
         public String[] columnsRelatives;
         public Class[] columnClassRelatives;
@@ -55,21 +71,13 @@ import javax.swing.table.DefaultTableModel;
         public String[] columnsSCCategory;
         public Class[] columnClassSCCategory;
 
-        //для таблицы(справочнка) категория льготы
-        public String[] columnsBenCategory;
-        public Class[] columnClassBenCategory;
-
-        //для таблицы(справочнка) тип категории льготы
-        public String[] columnsTypeBenCategory;
-        public Class[] columnClassTypeBenCategory;
+        //для таблицы(справочнка) мера социальной поддержки
+        public String[] columnsMeasure;
+        public Class[] columnClassMeasure;
 
         //для таблицы(справочнка) закон
         public String[] columnsLaw;
         public Class[] columnClassLaw;
-
-        //для таблицы(справочнка) версия статьи
-        public String[] columnsVersionArt;
-        public Class[] columnClassVersionArt;
 
         //для таблицы(справочнка) статья
         public String[] columnsArticle;
@@ -187,6 +195,18 @@ import javax.swing.table.DefaultTableModel;
                     case 6: //Income
                         createTable(rs, columnsIncome, columnClassIncome);
                         break;
+                    case 7: //category measure
+                        createTable(rs, columnsCategoryMeasure, columnClassCategoryMeasure);
+                        break;
+                    case 8: //request
+                        createTable(rs, columnsRequest, columnClassRequest);
+                        break;
+                    case 9: //payoff
+                        createTable(rs, columnsPayoff, columnClassPayoff);
+                        break;
+                    case 10: //pers account
+                        createTable(rs, columnsPersonalAccount, columnClassPersonalAccount);
+                        break;
                 }
 
                 mdbc.close(stmt);
@@ -206,46 +226,40 @@ import javax.swing.table.DefaultTableModel;
                     case 1: // категория льготника
                         createTable(rs,columnsSCCategory,columnClassSCCategory);
                         break;
-                    case 2: // категория льготы
-                        createTable(rs,columnsBenCategory,columnClassBenCategory);
+                    case 2: // категория меры
+                        createTable(rs,columnsMeasure,columnClassMeasure);
                         break;
-                    case 3: // тип категории льготы
-                        createTable(rs,columnsTypeBenCategory,columnClassTypeBenCategory);
-                        break;
-                    case 4: // закон
+                    case 3: // закон
                         createTable(rs,columnsLaw,columnClassLaw);
                         break;
-                    case 5: // версия статьи
-                        createTable(rs,columnsVersionArt,columnClassVersionArt);
-                        break;
-                    case 6: // статья
+                    case 4: // статья
                         createTable(rs,columnsArticle,columnClassArticle);
                         break;
-                    case 7: // Индекс
+                    case 5: // Индекс
                         createTable(rs,columnsIndex,columnClassIndex);
                         break;
-                    case 8: // Регион
+                    case 6: // Регион
                         createTable(rs,columnsRegion,columnClassRegion);
                         break;
-                    case 9: // Район
+                    case 7: // Район
                         createTable(rs,columnsDistrict,columnClassDistrict);
                         break;
-                    case 10: // Пункт
+                    case 8: // Пункт
                         createTable(rs,columnsLocality,columnClassLocality);
                         break;
-                    case 11: // Улица
+                    case 9: // Улица
                         createTable(rs,columnsStreet,columnClassStreet);
                         break;
-                    case 12: // Родственники
+                    case 10: // Родственники
                         createTable(rs,columnsRelation,columnClassRelation);
                         break;
-                    case 13: // Доход
+                    case 11: // Доход
                         createTable(rs,columnsTypeIncome,columnClassTypeIncome);
                         break;
-                    case 14: // Документ идентификатор
+                    case 12: // Документ идентификатор
                         createTable(rs,columnsTypeIndDoc,columnClassTypeIndDoc);
                         break;
-                    case 15: // Документ
+                    case 13: // Документ
                         createTable(rs,columnsTypeDoc,columnClassTypeDoc);
                         break;
                 }
@@ -281,6 +295,40 @@ import javax.swing.table.DefaultTableModel;
                 return dtm;
             }
             catch(SQLException e){
+                return null;
+            }
+        }
+
+        public String [] setComponentOrganization(String [] par){
+            try {
+                stmt= conn.createStatement();
+                rs = stmt.executeQuery(par[1]);
+                if(rs.next()){
+                    par[0]="1";
+                    par[4]=rs.getString(1);
+                    par[5]=rs.getString(2);
+                    par[6]=rs.getString(3);
+                    par[7]=rs.getString(4);
+                } else {
+                    rs = stmt.executeQuery(par[2]);
+                    if (rs.next()) {
+                        par[0]="2";
+                        par[4] = rs.getString(1);
+                        par[5] = rs.getString(2);
+                        par[6] = rs.getString(3);
+                    } else {
+                        rs = stmt.executeQuery(par[3]);
+                        if (rs.next()) {
+                            par[0]="3";
+                            par[4] = rs.getString(1);
+                            par[5] = rs.getString(2);
+                            par[6] = rs.getString(3);
+                            par[7] = rs.getString(4);
+                        }
+                    }
+                }
+                return par;
+            } catch (SQLException e) {
                 return null;
             }
         }

@@ -24,7 +24,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTabbedPane tabbedPane2;
     private JButton editClientButton;
     private JComboBox comboBoxSCCategory;
-    private JComboBox comboBoxBenefitCategory;
+    private JComboBox comboBoxMeasure;
     private JButton findClientButton;
     private JTable tableSocialClients;
     private JTree glossaryJTree;
@@ -100,10 +100,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private ButtonGroup radioButtonStatusAccount;
 
     private JTable tableSCCategory=new JTable();
-    private JTable tableBenefitCategory=new JTable();
-    private JTable tableTypeBenCategory=new JTable();
+    private JTable tableMeasure=new JTable();
     private JTable tableLaw=new JTable();
-    private JTable tableVersionArticle=new JTable();
     private JTable tableArticle=new JTable();
     private JTable tableIndex=new JTable();
     private JTable tableRegion=new JTable();
@@ -111,8 +109,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableLocality=new JTable();
     private JTable tableStreet=new JTable();
     private JTable tableRelation=new JTable();
-    private JTable tableIncome=new JTable();
-    private JTable tableCategory;
+    private JTable tableTypeIncome=new JTable();
+    private JTable tableCategoryMeasure;
     private JTabbedPane tabbedPane4;
     private JTable tableRequest;
     private JTable tablePayoffClient;
@@ -139,6 +137,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JLabel labelAttDocStatus;
     private JTextField textAttDocNumber;
     private JLabel labelAttDocNumber;
+    private JTable tableIncome;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -149,9 +148,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private DefaultTableModel dtmAttDocument;
     private DefaultTableModel dtmAddress;
     private DefaultTableModel dtmOpAcc;
+    private DefaultTableModel dtmCategoryMeasure;
     private DefaultTableModel dtmRelatives;
     private DefaultTableModel dtmIdDocRelatives;
     private DefaultTableModel dtmIncome;
+    private DefaultTableModel dtmRequest;
+    private DefaultTableModel dtmPayoff;
+    private DefaultTableModel dtmPersAcc;
     private DefaultTableModel dtmHandbook;
     private DefaultTableModel dtmSaldoReport;
     private ListSelectionModel selModelSC = tableSocialClients.getSelectionModel();
@@ -215,13 +218,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
         comboBoxSCCategory.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
-                comboBoxBenefitCategory.removeAllItems();
+                comboBoxMeasure.removeAllItems();
                 String item;
-                int k=tableBenefitCategory.getColumnCount()-1;
-                for (int i = 0;i<tableBenefitCategory.getRowCount();i++){
-                    if(Integer.valueOf(tableBenefitCategory.getValueAt(i, 2).toString())==comboBoxSCCategory.getSelectedIndex()+1) {
-                        item = tableBenefitCategory.getModel().getValueAt(i, k-1).toString();
-                        comboBoxBenefitCategory.addItem(item);
+                int k=tableMeasure.getColumnCount()-1;
+                for (int i = 0;i<tableMeasure.getRowCount();i++){
+                    if(Integer.valueOf(tableMeasure.getValueAt(i, 1).toString())==comboBoxSCCategory.getSelectedIndex()+1) {
+                        item = tableMeasure.getModel().getValueAt(i, 2).toString();
+                        comboBoxMeasure.addItem(item);
                     }
                 }
             }
@@ -239,11 +242,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             }
         });
 
-        chargeButton.addActionListener(new ActionListener() {
+        /*chargeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 setPayoff();
             }
-        });
+        });*/
 //        tabbedPane2.addChangeListener(new ChangeListener() {
 //            public void stateChanged(ChangeEvent e) {
 //                if(tabbedPane2.getSelectedIndex()==1)
@@ -499,7 +502,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String sqlQuery2 = "select typeDoc.nameTypeIdDocument, idDoc.docSeries, idDoc.docNumber, idDoc.givenBy, DATE_FORMAT(idDoc.dateStartIdDocument,'%d.%m.%Y'), idDoc.statusIdDocument\n" +
             "from identification_document idDoc inner join social_client sc on idDoc.personalNumber = sc.personalNumber\n" +
             "inner join type_identification_document typeDoc on idDoc.numberTypeIdDocument = typeDoc.numberTypeIdDocument\n" +
-            "where sc.personalNumber=?";
+            "where sc.personalNumber=? and idDoc.relativePersonalNumber is null";
 
     public void initModelIdDocument(String persNum){
         mdtmSocialClient.columnsIdDoc=columnsIdDocument;
@@ -617,89 +620,57 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
 
     public void setOrganization(){
-        try {
-            mdbc=new DatabaseConnection();
-            Connection conn=mdbc.getMyConnection();
-            stmt= conn.createStatement();
-
-            String sqlAm="select bo.bic, bo.nameBank, bo.addressBank, bo.tinBank from bank_organization bo " +
-                    "inner join bank_operating_account boa on bo.bic=boa.bic " +
-                    "where boa.numberOperatingAccount='"+numAcc+"'";
-            ResultSet rs = stmt.executeQuery(sqlAm);
-            if(rs.next()){
-                BICAcc=rs.getString(1);
-                nameAcc=rs.getString(2);
-                adrAcc=rs.getString(3);
-                tinAcc=rs.getString(4);
-
+        String sqlAm="select bo.bic, bo.nameBank, bo.addressBank, bo.tinBank from bank_organization bo " +
+                "inner join bank_operating_account boa on bo.bic=boa.bic " +
+                "where boa.numberOperatingAccount='"+numAcc+"'";
+        String sqlAm2="select co.tinCash, co.nameCash, co.addressCash from cash_organization co " +
+                "inner join cash_operating_account coa on co.tinCash=coa.tinCash " +
+                "where coa.numberOperatingAccount='"+numAcc+"'";
+        String sqlAm3="select po.postCode, po.namePost, po.addressPost, po.tinPost from post_organization po " +
+                "inner join post_operating_account poa on po.postCode=poa.postCode " +
+                    "where poa.numberOperatingAccount='"+numAcc+"'";
+        String [] comp={"", sqlAm, sqlAm2, sqlAm3, BICAcc, nameAcc, adrAcc, tinAcc};
+        comp=mdtmSocialClient.setComponentOrganization(comp);
+            if(comp[0].equals("1")){
                 lbBICOA.setVisible(true);
                 lbBICOA.setText("БИК");
                 textBICOrg.setVisible(true);
-                textBICOrg.setText(BICAcc);
+                textBICOrg.setText(comp[4]);
                 lbNameOA.setVisible(true);
                 textNameOrg.setVisible(true);
-                textNameOrg.setText(nameAcc);
+                textNameOrg.setText(comp[5]);
                 lbAdOA.setVisible(true);
                 textAdressOrg.setVisible(true);
-                textAdressOrg.setText(adrAcc);
+                textAdressOrg.setText(comp[6]);
                 lbTinOA.setVisible(true);
                 textTin.setVisible(true);
-                textTin.setText(tinAcc);
-            } else {
-                sqlAm="select co.tinCash, co.nameCash, co.addressCash from cash_organization co " +
-                        "inner join cash_operating_account coa on co.tinCash=coa.tinCash " +
-                        "where coa.numberOperatingAccount='"+numAcc+"'";
-                rs = stmt.executeQuery(sqlAm);
-                if(rs.next()) {
-                    BICAcc = rs.getString(1);
-                    nameAcc = rs.getString(2);
-                    adrAcc = rs.getString(3);
-
-                    lbBICOA.setVisible(true);
-                    lbBICOA.setText("ИНН");
-                    textBICOrg.setVisible(true);
-                    textBICOrg.setText(BICAcc);
-                    lbNameOA.setVisible(true);
-                    textNameOrg.setVisible(true);
-                    textNameOrg.setText(nameAcc);
-                    lbAdOA.setVisible(true);
-                    textAdressOrg.setVisible(true);
-                    textAdressOrg.setText(adrAcc);
-                } else {
-                    sqlAm="select po.postCode, po.namePost, po.addressPost, po.tinPost from post_organization po " +
-                            "inner join post_operating_account poa on po.postCode=poa.postCode " +
-                            "where poa.numberOperatingAccount='"+numAcc+"'";
-                    rs = stmt.executeQuery(sqlAm);
-                    if(rs.next()) {
-                        BICAcc = rs.getString(1);
-                        nameAcc = rs.getString(2);
-                        adrAcc = rs.getString(3);
-                        tinAcc=rs.getString(4);
-
-                        lbBICOA.setVisible(true);
-                        lbBICOA.setText("Почтовый индекс");
-                        textBICOrg.setVisible(true);
-                        textBICOrg.setText(BICAcc);
-                        lbNameOA.setVisible(true);
-                        textNameOrg.setVisible(true);
-                        textNameOrg.setText(nameAcc);
-                        lbAdOA.setVisible(true);
-                        textAdressOrg.setVisible(true);
-                        textAdressOrg.setText(adrAcc);
-                        lbTinOA.setVisible(true);
-                        textTin.setVisible(true);
-                        textTin.setText(tinAcc);
-                    }
-                }
+                textTin.setText(comp[7]);
+            } else if (comp[0].equals("2")){
+                lbBICOA.setVisible(true);
+                lbBICOA.setText("ИНН");
+                textBICOrg.setVisible(true);
+                textBICOrg.setText(comp[4]);
+                lbNameOA.setVisible(true);
+                textNameOrg.setVisible(true);
+                textNameOrg.setText(comp[5]);
+                lbAdOA.setVisible(true);
+                textAdressOrg.setVisible(true);
+                textAdressOrg.setText(comp[6]);
+            } else if (comp[0].equals("3")){
+                lbBICOA.setVisible(true);
+                lbBICOA.setText("Почтовый индекс");
+                textBICOrg.setVisible(true);
+                textBICOrg.setText(comp[4]);
+                lbNameOA.setVisible(true);
+                textNameOrg.setVisible(true);
+                textNameOrg.setText(comp[5]);
+                lbAdOA.setVisible(true);
+                textAdressOrg.setVisible(true);
+                textAdressOrg.setText(comp[6]);
+                lbTinOA.setVisible(true);
+                textTin.setVisible(true);
+                textTin.setText(comp[7]);
             }
-
-
-            mdbc.close(stmt);
-        }
-        catch(Exception e){
-            System.out.println("Failed to set payoff");
-            mdbc.close(stmt);
-        }
     }
 
     private void listenerRowTableOpAcc(){
@@ -733,6 +704,89 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         });
     }
 
+
+    //Соц.выплаты (Вкладка "Личные дела")
+    String [] columnsCategoryMeasure = new String []
+            {"Код категории", "Код меры социальной поддержки", "Категория гражданина", "Название меры социальной поддержки"};
+    final Class[] columnClassCategoryMeasure = new Class[]
+            {Integer.class, Integer.class, String.class, String.class};
+    String sqlQueryCatMeasure = "select cm.codeClientCategory, cm.codeSocialMeasure, scc.nameClientCategory, moss.nameSocialMeasure " +
+            "from social_client sc inner join client_measure cm on sc.personalNumber=cm.personalNumber " +
+            "inner join measure_of_social_support moss on (cm.codeSocialMeasure=moss.codeSocialMeasure and cm.codeClientCategory=moss.codeClientCategory) " +
+            "inner join social_client_category scc on moss.codeClientCategory=scc.codeClientCategory " +
+            "where sc.personalNumber=?";
+
+    public void initModelCategoryMeasure(String persNum){
+        mdtmSocialClient.columnsCategoryMeasure=columnsCategoryMeasure;
+        mdtmSocialClient.columnClassCategoryMeasure=columnClassCategoryMeasure;
+        mdtmSocialClient.persNum = Integer.parseInt(persNum);
+        mdtmSocialClient.sqlPreparedStatement=sqlQueryCatMeasure;
+        dtmCategoryMeasure=mdtmSocialClient.MyTableModelDocument(7);
+        tableCategoryMeasure.setModel(dtmCategoryMeasure);
+        tableCategoryMeasure.removeColumn(tableCategoryMeasure.getColumnModel().getColumn(1));
+        tableCategoryMeasure.removeColumn(tableCategoryMeasure.getColumnModel().getColumn(0));
+        dtmCategoryMeasure.fireTableDataChanged();
+    }
+
+    String [] columnsRequest = new String []
+            {"Дата составления", "Дата начала", "Дата окончания", "Сумма", "Состояние"};
+    final Class[] columnClassRequest = new Class[]
+            {String.class, String.class, String.class, Double.class, String.class};
+    String sqlQueryRequest = "select DATE_FORMAT(rfcs.dateOfPreparation, '%d.%m.%Y'), DATE_FORMAT(rfcs.periodFrom, '%d.%m.%Y'), DATE_FORMAT(rfcs.periodTo, '%d.%m.%Y'), rfcs.totalAmount, rfcs.stateRequest " +
+            "from request_for_cash_settlement rfcs inner join operating_account oa on rfcs.numberOperatingAccount=oa.numberOperatingAccount " +
+            "inner join social_client sc on oa.personalNumber=sc.personalNumber " +
+            "where sc.personalNumber=?";
+
+    public void initModelRequest(String persNum){
+        mdtmSocialClient.columnsRequest=columnsRequest;
+        mdtmSocialClient.columnClassRequest=columnClassRequest;
+        mdtmSocialClient.persNum = Integer.parseInt(persNum);
+        mdtmSocialClient.sqlPreparedStatement=sqlQueryRequest;
+        dtmRequest=mdtmSocialClient.MyTableModelDocument(8);
+        tableRequest.setModel(dtmRequest);
+        dtmRequest.fireTableDataChanged();
+    }
+
+    String [] columnsPayoffClient = new String []
+            {"Дата выплаты", "Сумма", "Номер расчетного счета"};
+    final Class[] columnClassPayoffClient = new Class[]
+            {String.class, Double.class, Integer.class};
+    String sqlQueryPayoffClient = "select DISTINCTROW DATE_FORMAT(p.datePayoff, '%d.%m.%Y'), p.amountPayoff, oa.numberOperatingAccount " +
+            "from payoff p inner join request_for_cash_settlement rfcs on p.numberPayoff=rfcs.numberPayoff " +
+            "inner join operating_account oa on rfcs.numberOperatingAccount=oa.numberOperatingAccount " +
+            "inner join social_client sc on oa.personalNumber=sc.personalNumber " +
+            "where sc.personalNumber=?";
+
+    public void initModelPayoffClient(String persNum){
+        mdtmSocialClient.columnsPayoff=columnsPayoffClient;
+        mdtmSocialClient.columnClassPayoff=columnClassPayoffClient;
+        mdtmSocialClient.persNum = Integer.parseInt(persNum);
+        mdtmSocialClient.sqlPreparedStatement=sqlQueryPayoffClient;
+        dtmPayoff=mdtmSocialClient.MyTableModelDocument(9);
+        tablePayoffClient.setModel(dtmPayoff);
+        dtmPayoff.fireTableDataChanged();
+    }
+
+    String [] columnsPersAcc = new String []
+            {"Период", "Входное сальдо", "Начислено", "Выплачено", "Исходящее сальдо"};
+    final Class[] columnClassPersAcc = new Class[]
+            {String.class, Double.class, Double.class, Double.class, Double.class};
+    String sqlQueryPersAcc = "select DISTINCTROW DATE_FORMAT(pa.periodPayoff, '%m.%Y'), pa.inputBalance, pa.accrued, pa.paid, pa.outputBalance " +
+            "from personal_account pa inner join payoff p on pa.numberPersonalAccount=p.numberPersonalAccount " +
+            "inner join request_for_cash_settlement rfcs on p.numberPayoff=rfcs.numberPayoff " +
+            "inner join operating_account oa on rfcs.numberOperatingAccount=oa.numberOperatingAccount " +
+            "inner join social_client sc on oa.personalNumber=sc.personalNumber " +
+            "where sc.personalNumber=?";
+
+    public void initModelPersAcc(String persNum){
+        mdtmSocialClient.columnsPersonalAccount=columnsPersAcc;
+        mdtmSocialClient.columnClassPersonalAccount=columnClassPersAcc;
+        mdtmSocialClient.persNum = Integer.parseInt(persNum);
+        mdtmSocialClient.sqlPreparedStatement=sqlQueryPersAcc;
+        dtmPersAcc=mdtmSocialClient.MyTableModelDocument(10);
+        tablePA.setModel(dtmPersAcc);
+        dtmPersAcc.fireTableDataChanged();
+    }
 
     //Родственники (Вкладка "Личные дела")
     String[] columnsRelatives = new String[]
@@ -794,7 +848,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     final Class[] columnClassIncome = new Class[]{
             String.class, String.class, Double.class};
 
-    //Не выходит сделать нормальный запрос, чтобы отображался доход не только клиента, но и его родственников(( Посмотри, а?
     String sqlQueryIncome = "select DATE_FORMAT(i.periodIncome,'%m.%Y'), ti.nameTypeIncone, i.amount " +
             "from income i inner join type_income ti on i.numberTypeIncone = ti.numberTypeIncone \n" +
             "inner join social_client sc on i.personalNumber = sc.personalNumber\n" +
@@ -857,14 +910,14 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         mdtmSocialClient.columnsChargeReq = columnsChargeReq;
         mdtmSocialClient.columnClassChargeReq = columnClassChargeReq;
         mdtmSocialClient.cat = comboBoxSCCategory.getItemAt(comboBoxSCCategory.getSelectedIndex()).toString();
-        mdtmSocialClient.ben = comboBoxBenefitCategory.getItemAt(comboBoxBenefitCategory.getSelectedIndex()).toString();
+        mdtmSocialClient.ben = comboBoxMeasure.getItemAt(comboBoxMeasure.getSelectedIndex()).toString();
         mdtmSocialClient.sqlPreparedStatement=sqlQueryChargeReq;
         dtmHandbook = mdtmSocialClient.MyTableModelPayoff(1);
         tableChargeRequest.setModel(dtmHandbook);
         dtmHandbook.fireTableDataChanged();
     }
 
-    public void setPayoff(){
+    /*public void setPayoff(){
         try {
             mdbc=new DatabaseConnection();
             Connection conn=mdbc.getMyConnection();
@@ -900,7 +953,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             System.out.println("Failed to set payoff");
             mdbc.close(stmt);
         }
-    }
+    }*/
 
     String persNum;
     String surname;
@@ -971,6 +1024,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         hideOperAcc();
         initModelIncome(persNum);
         initModelRelatives(persNum);
+        initModelCategoryMeasure(persNum);
+        initModelRequest(persNum);
+        initModelPayoffClient(persNum);
+        initModelPersAcc(persNum);
     }
 
         private void setSelectedValue(String value,JComboBox comboBox) {
@@ -1007,7 +1064,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         final String ROOT  = "Справочники";
         // Массив листьев деревьев
         final   String[]   nodes = new String[]  {"Пособия","Адреса","Личная карточка","Прочие"};
-        final   String[][] leafs = new String[][]{{"Категории гражданина", "Категории пособия", "Виды категории пособия", "Законы", "Версии статей", "Статьи", "Правила расчёта"},
+        final   String[][] leafs = new String[][]{{"Категории гражданина", "Меры социальной поддержки", "Законы", "Статьи", "Правила расчёта"},
                 {"Индексы","Регионы","Районы","Населённые пункты","Улицы"},
                 {"Родственные отношения","Виды доходов"},
                 {"Документы удостоверения","Документы"}};
@@ -1039,28 +1096,26 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String[] columnsIndex = new String[] {"Наименование"};
     final Class[] columnClassIndex = new Class[] {String.class};
     String[] columnsHandbook = new String[] {"№", "Наименование"};
+    String[] columnsClientCategory = new String[] {"Код категории", "Наименование"};
     final Class[] columnClassHandbook = new Class[] { Integer.class, String.class};
-    String[] columnsBenefit = new String[] {"Код категории льготы", "Наименование", "Номер категории льготника"};
-    final Class[] columnClassBenefit = new Class[] { Integer.class, String.class, Integer.class};
-    String[] columnsTypeBenefitFull = new String[] {"Код вида категории льготы", "Наименование", "Код категории"};
-    String[] columnsTypeBenefit = new String[] {"Код вида категории льготы", "Наименование"};
-    String[] columnsLaw = new String[] {"№ закона", "Дата утверждения", "Наименование"};
-    final Class[] columnClassLaw = new Class[] {Integer.class, Date.class, String.class};
-    String[] columnsVersionFull = new String[] {"№ версии", "Сумма выплаты", "Дата принятия", "Номер закона", "Номер статьи"};
-    final Class[] columnClassVersionFull = new Class[] {Integer.class, Integer.class, Date.class, Integer.class, Integer.class};
-    String[] columnsVersion = new String[] {"№ версии", "Сумма выплаты", "Дата принятия"};
+    String[] columnsMeasure = new String[] {"Код меры социальной поддержки", "Код категории гражданина", "Наименование", "Сумма", "Код статьи", "Код закона"};
+    final Class[] columnClassMeasure = new Class[] { Integer.class, Integer.class, String.class, Double.class, Integer.class, Integer.class};
+    String[] columnsLaw = new String[] {"Код закона", "№ закона", "Наименование", "Дата утверждения"};
+    final Class[] columnClassLaw = new Class[] {Integer.class, Integer.class, String.class, String.class};
+    String[] columnsArticle = new String[] {"Код статьи", "Код закона", "№ статьи", "Название статьи", "Дата принятия"};
+    final Class[] columnClassArticle = new Class[] {Integer.class, Integer.class, Double.class, String.class, String.class};
 
     String sqlQuerySCCat="select * from social_client_category";
-    String sqlQueryBenCat="select * from benefit_category";
-    String sqlQueryTypeBenCat="select * from type_benefit_category";
-    String sqlQueryLaw="select * from law";
-    String sqlQueryVerArt="select * from version_of_the_article";
-    String sqlQueryArt="select * from article";
+    String sqlQueryMeasure="select * from measure_of_social_support";
+    String sqlQueryLaw="select codeOfLaw, numberLaw, nameLaw, DATE_FORMAT(certifiedDateLaw, '%d.%m.%Y') from law";
+    String sqlQueryArt="select articleCode, codeOfLaw, articleNumber, nameArticle, DATE_FORMAT(certifiedDateArticle, '%d.%m.%Y') from article";
+
     String sqlQueryInd="select * from index_address";
     String sqlQueryReg="select * from region_address";
     String sqlQueryDist="select * from district_address";
     String sqlQueryLoc="select * from inhabited_locality_address";
     String sqlQueryStr="select * from street_address";
+
     String sqlQueryRel="select * from relation_degree";
     String sqlQueryInc="select * from type_income";
     String sqlQueryIdDoc="select * from type_identification_document";
@@ -1068,128 +1123,99 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     //запонение справочников (Вкладка 'НСИ')
     public void initModelHandbook(){
-        mdtmSocialClient.columnsSCCategory = columnsHandbook;
+        mdtmSocialClient.columnsSCCategory = columnsClientCategory;
         mdtmSocialClient.columnClassSCCategory = columnClassHandbook;
         mdtmSocialClient.sqlQuery = sqlQuerySCCat;
         dtmHandbook = mdtmSocialClient.MyTableModelHandbook(1);
         tableSCCategory.setModel(dtmHandbook);
         dtmHandbook.fireTableDataChanged();
 
-        mdtmSocialClient.columnsBenCategory = columnsBenefit;
-        mdtmSocialClient.columnClassBenCategory = columnClassBenefit;
-        mdtmSocialClient.sqlQuery = sqlQueryBenCat;
+        mdtmSocialClient.columnsMeasure = columnsMeasure;
+        mdtmSocialClient.columnClassMeasure = columnClassMeasure;
+        mdtmSocialClient.sqlQuery = sqlQueryMeasure;
         dtmHandbook = mdtmSocialClient.MyTableModelHandbook(2);
-        tableBenefitCategory.setModel(dtmHandbook);
-        dtmHandbook.fireTableDataChanged();
-
-        mdtmSocialClient.columnsTypeBenCategory = columnsTypeBenefitFull;
-        mdtmSocialClient.columnClassTypeBenCategory = columnClassBenefit;
-        mdtmSocialClient.sqlQuery = sqlQueryTypeBenCat;
-        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(3);
-        tableTypeBenCategory.setModel(dtmHandbook);
+        tableMeasure.setModel(dtmHandbook);
         dtmHandbook.fireTableDataChanged();
 
         mdtmSocialClient.columnsLaw = columnsLaw;
         mdtmSocialClient.columnClassLaw = columnClassLaw;
         mdtmSocialClient.sqlQuery = sqlQueryLaw;
-        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(4);
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(3);
         tableLaw.setModel(dtmHandbook);
         dtmHandbook.fireTableDataChanged();
 
-        mdtmSocialClient.columnsVersionArt = columnsVersionFull;
-        mdtmSocialClient.columnClassVersionArt = columnClassVersionFull;
-        mdtmSocialClient.sqlQuery = sqlQueryVerArt;
-        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(5);
-        tableVersionArticle.setModel(dtmHandbook);
-        dtmHandbook.fireTableDataChanged();
-
-        mdtmSocialClient.columnsArticle = columnsHandbook;
-        mdtmSocialClient.columnClassArticle = columnClassHandbook;
+        mdtmSocialClient.columnsArticle = columnsArticle;
+        mdtmSocialClient.columnClassArticle = columnClassArticle;
         mdtmSocialClient.sqlQuery = sqlQueryArt;
-        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(6);
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(4);
         tableArticle.setModel(dtmHandbook);
         dtmHandbook.fireTableDataChanged();
 
         mdtmSocialClient.columnsIndex = columnsIndex;
         mdtmSocialClient.columnClassIndex = columnClassIndex;
             mdtmSocialClient.sqlQuery = sqlQueryInd;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(7);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(5);
             tableIndex.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsRegion = columnsHandbook;
             mdtmSocialClient.columnClassRegion = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryReg;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(8);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(6);
             tableRegion.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsDistrict = columnsHandbook;
             mdtmSocialClient.columnClassDistrict = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryDist;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(9);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(7);
             tableDistrict.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsLocality = columnsHandbook;
             mdtmSocialClient.columnClassLocality = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryLoc;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(10);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(8);
             tableLocality.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsStreet = columnsHandbook;
             mdtmSocialClient.columnClassStreet = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryStr;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(11);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(9);
             tableStreet.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsRelation = columnsHandbook;
             mdtmSocialClient.columnClassRelation = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryRel;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(12);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(10);
             tableRelation.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsTypeIncome = columnsHandbook;
             mdtmSocialClient.columnClassTypeIncome = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryInc;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(13);
-            tableIncome.setModel(dtmHandbook);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(11);
+            tableTypeIncome.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsTypeIndDoc = columnsHandbook;
             mdtmSocialClient.columnClassTypeIndDoc = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryIdDoc;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(14);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(12);
             tableIndDoc.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
             mdtmSocialClient.columnsTypeDoc = columnsHandbook;
             mdtmSocialClient.columnClassTypeDoc = columnClassHandbook;
             mdtmSocialClient.sqlQuery = sqlQueryDoc;
-            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(15);
+            dtmHandbook = mdtmSocialClient.MyTableModelHandbook(13);
             tableDoc.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
 
     }
 
-    private DefaultTableModel getModelHandbook(JTable t, String[] col){
-        DefaultTableModel mod = new DefaultTableModel();
-        mod.setColumnIdentifiers(col);
-        for(int i=0; i<t.getRowCount(); i++) {
-            if(t==tableVersionArticle) {
-                Object[] o = {t.getValueAt(i, 0), t.getValueAt(i, 1), t.getValueAt(i, 2)};
-                mod.addRow(o);
-            }
-            else {
-                Object[] ob = {t.getValueAt(i, 0), t.getValueAt(i, 1)};
-                mod.addRow(ob);
-            }
-        }
-        return mod;
-    }
     //выделение пункта дерева - новая таблица справочника
     public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
         TreePath[] paths=glossaryJTree.getSelectionPaths();
@@ -1198,20 +1224,18 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         if ("Категории гражданина".equals(treeSelect)) {
             tableHandbook.setModel(tableSCCategory.getModel());
         }else
-        if ("Категории пособия".equals(treeSelect)) {
-            tableHandbook.setModel(getModelHandbook(tableBenefitCategory, columnsHandbook));
-        }else
-        if ("Виды категории пособия".equals(treeSelect)) {
-            tableHandbook.setModel(getModelHandbook(tableTypeBenCategory, columnsTypeBenefit));
+        if ("Меры социальной поддержки".equals(treeSelect)) {
+            tableHandbook.setModel(tableMeasure.getModel());
+            tableHandbook.removeColumn(tableHandbook.getColumnModel().getColumn(5));
+            tableHandbook.removeColumn(tableHandbook.getColumnModel().getColumn(4));
+            tableHandbook.removeColumn(tableHandbook.getColumnModel().getColumn(1));
         }else
         if ("Законы".equals(treeSelect)) {
             tableHandbook.setModel(tableLaw.getModel());
         }else
-        if ("Версии статей".equals(treeSelect)) {
-            tableHandbook.setModel(getModelHandbook(tableVersionArticle, columnsVersion));
-        }else
         if ("Статьи".equals(treeSelect)) {
             tableHandbook.setModel(tableArticle.getModel());
+            tableHandbook.removeColumn(tableHandbook.getColumnModel().getColumn(1));
         }else
         if ("Индексы".equals(treeSelect)) {
             tableHandbook.setModel(tableIndex.getModel());
@@ -1232,7 +1256,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             tableHandbook.setModel(tableRelation.getModel());
         }else
         if ("Виды доходов".equals(treeSelect)) {
-            tableHandbook.setModel(tableIncome.getModel());
+            tableHandbook.setModel(tableTypeIncome.getModel());
         }else
         if ("Документы удостоверения".equals(treeSelect)) {
             tableHandbook.setModel(tableIndDoc.getModel());
