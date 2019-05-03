@@ -123,6 +123,10 @@ import javax.swing.table.DefaultTableModel;
         public String[] columnsSalRep;
         public Class[] columnClassSalRep;
 
+        //для таблицы льгот в Добавлении нового клиента
+        public String[] columnsCatMeasure;
+        public Class[] columnClassCatMeasure;
+
         public String sqlQuery;
         public String sqlPreparedStatement;
         public int persNum;
@@ -147,6 +151,19 @@ import javax.swing.table.DefaultTableModel;
                         break;
                 }
 
+                mdbc.close(stmt);
+                return dtm;
+            }
+            catch(SQLException e){
+                return null;
+            }
+        }
+
+        public DefaultTableModel MyTableModelMeasure(){
+            try {
+                stmt= conn.createStatement();
+                rs = stmt.executeQuery(sqlQuery);
+                createTable(rs,columnsCatMeasure,columnClassCatMeasure);
                 mdbc.close(stmt);
                 return dtm;
             }

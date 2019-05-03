@@ -142,7 +142,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableDoc=new JTable();
 
 
-    private JTable []box={tableIndex, tableRegion, tableDistrict, tableLocality, tableStreet,tableIndDoc};
+    private JTable []box={tableIndex, tableRegion, tableDistrict, tableLocality, tableStreet,tableIndDoc,tableDoc,tableSCCategory};
     private DefaultTableModel dtmSocialClient;
     private DefaultTableModel dtmIdDocument;
     private DefaultTableModel dtmAttDocument;
