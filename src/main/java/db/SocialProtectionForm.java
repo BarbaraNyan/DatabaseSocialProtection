@@ -117,6 +117,28 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableRequest;
     private JTable tablePayoffClient;
     private JTable tablePA;
+    private JComboBox textIdDocTypeComboBox;
+    private JComboBox textIdDocStatusComboBox;
+    private JFormattedTextField textIdDocSeries;
+    private JFormattedTextField textIdDocNumber;
+    private JTextField textIdDocGivenBy;
+    private JFormattedTextField textIdDocDateStart;
+    private JLabel labelIdDocType;
+    private JLabel labelIdDocSeries;
+    private JLabel labelIdDocNumber;
+    private JLabel labelIdDocGivenBy;
+    private JLabel labelIdDocDateStart;
+    private JLabel labelIdDocStatus;
+    private JComboBox textAttDocTypeComboBox;
+    private JFormattedTextField textAttDocDateStart;
+    private JComboBox textAttDocStatusComboBox;
+    private JTextField textAttDocName;
+    private JLabel labelAttDocType;
+    private JLabel labelAttDocName;
+    private JLabel labelAttDocDateStart;
+    private JLabel labelAttDocStatus;
+    private JTextField textAttDocNumber;
+    private JLabel labelAttDocNumber;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -133,6 +155,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private DefaultTableModel dtmHandbook;
     private DefaultTableModel dtmSaldoReport;
     private ListSelectionModel selModelSC = tableSocialClients.getSelectionModel();
+    private ListSelectionModel selModelSC_IdDoc = tableIdDocument.getSelectionModel();
+    private ListSelectionModel selModelSC_AttDoc = tableAttDocument.getSelectionModel();
     private TableModelClients mdtmSocialClient = new TableModelClients();
     private EditClient editClient = new EditClient();
 
@@ -148,24 +172,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String treeSelect;
 
     private int selRowSC;
-
-    private void hideComboBox(){
-        textRegionComboBox.setVisible(false);
-        textStreetComboBox.setVisible(false);
-        textIndexComboBox.setVisible(false);
-        textInhabitedLocalityComboBox.setVisible(false);
-        textDistrictComboBox.setVisible(false);
-        radioButtonM.setVisible(false);
-        radioButtonF.setVisible(false);
-    }
-
-    private void fillComboBox(){
-        getComboBox(textRegionComboBox,tableRegion);
-        getComboBox(textStreetComboBox,tableStreet);
-        getComboBox(textIndexComboBox,tableIndex);
-        getComboBox(textDistrictComboBox,tableDistrict);
-        getComboBox(textInhabitedLocalityComboBox,tableLocality);
-    }
+    private int selRowSC_IdDoc;
+    private int selRowSC_AttDoc;
 
     SocialProtectionForm(){
         super("CommonTable");
@@ -179,7 +187,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
         getComboBox(comboBoxSCCategory, tableSCCategory);
 
-        hideComboBox();
+        openFieldsForEdit(false);
         fillComboBox();
         setButtonGroup();
 
@@ -247,49 +255,159 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     //Вкладка "Личные дела", кнопка "Редактирование"
         editClientButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //Перс.данные
-                textSurname.setEditable(true);
-                textName.setEditable(true);
-                textPatronymic.setEditable(true);
-                textGender.setVisible(false);
-                radioButtonF.setVisible(true);
-                radioButtonM.setVisible(true);
-                textDateBirth.setEditable(true);
-                textSNILS.setEditable(true);
-                textTelephone.setEditable(true);
-                textEmail.setEditable(true);
-
-                //Адрес
-                textRegion.setVisible(false);
-                textRegionComboBox.setVisible(true);
-                textStreet.setVisible(false);
-                textStreetComboBox.setVisible(true);
-                textIndex.setVisible(false);
-                textIndexComboBox.setVisible(true);
-                textDistrict.setVisible(false);
-                textDistrictComboBox.setVisible(true);
-                textInhabitedLocality.setVisible(false);
-                textInhabitedLocalityComboBox.setVisible(true);
-                textHouse.setEditable(true);
-                textFlat.setEditable(true);
-
+                openFieldsForEdit(true);
+                listenerRowTableSC_IdDoc();
+                tableIdDocument.setRowSelectionInterval(0,0);
+                listenerRowTableSC_AttDoc();
+                if(tableAttDocument.getRowCount()!=0)
+                    tableAttDocument.setRowSelectionInterval(0,0);
             }
         });
         buttonSave.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String [] params = {textSurname.getText(),textName.getText(), textPatronymic.getText(),textSNILS.getText(),
-                textTelephone.getText(),textEmail.getText(),textPersNum.getText()};
-                String sqlUpdate = "update social_client set surname = ?, name = ?, patronymic = ?, snils = ?,\n" +
-                        "  telephone = ?, email = ? where personalNumber = ?";
-                editClient.update(sqlUpdate,params);
+                //Перс.данные
+                String [] paramsPersInf = {textSurname.getText(),textName.getText(), textPatronymic.getText(),textDateBirth.getText(),textSNILS.getText(),
+                        textTelephone.getText(),textEmail.getText(),getGender(),textPersNum.getText()};
+                String sqlUpdatePersInf = "update social_client set surname = ?, name = ?, patronymic = ?, dateBirth=?, snils = ?,\n" +
+                        "  telephone = ?, email = ?, numberGender = ? where personalNumber = ?";
+                editClient.update(sqlUpdatePersInf,paramsPersInf);
+
+                //Адрес
+                Integer [] paramsAddress = {Integer.parseInt(textHouse.getText()), Integer.parseInt(textFlat.getText()),Integer.parseInt(getIndex()),
+                        getRegion(),getDistrict(),getInhabitedLoc(),getStreet(),Integer.parseInt(textPersNum.getText())};
+                String sqlUpdateAddress = "update address set house=?, flat=?, numberIndex=?, numberRegion=?, numberDistrict=?," +
+                        "numberInhabitedLocality=?, numberStreet=? where idAddress=(select sc.idAddress from social_client sc\n" +
+                        "where sc.personalNumber=?)";
+                editClient.update(sqlUpdateAddress,paramsAddress);
+
+                //Уд.личности
+                Object [] paramsIdDoc = {textIdDocGivenBy.getText(), textIdDocDateStart.getText(),getIdDocStatus(),getTypeIdDoc(),
+                        Integer.parseInt(textIdDocSeries.getText()), Integer.parseInt(textIdDocNumber.getText()),textPersNum.getText()};
+                String sqlUpdateIdDoc = "update identification_document set givenBy=?, dateStartIdDocument=?," +
+                        "statusIdDocument=?,numberTypeIdDocument=? where docSeries=? && docNumber=? && personalNumber=?";
+                editClient.update(sqlUpdateIdDoc,paramsIdDoc);
+
+                //Доп.документы
+                Object [] paramsAttDoc = {textAttDocName.getText(),textAttDocDateStart.getText(),getAttDocStatus(),
+                        getTypeAttDoc(), textAttDocNumber.getText(), textPersNum.getText()}; //вставить поля attDoc
+                String sqlUpdateAttDoc = "update attached_document set nameAttachedDocument=?, dateStartAttachedDocument=?,"+
+                        "statusAttachedDocument=?,numberTypeAttachedDocument=? where numberAttachedDocument = ? && personalNumber=?";
+                editClient.update(sqlUpdateAttDoc,paramsAttDoc);
+
+                //Расчётный счёт
+
+                openFieldsForEdit(false);
             }
         });
+    }
+
+    //сделать потом через один метод и скрывать и показывать true-false
+    private void openFieldsForEdit(boolean yes){
+        //Перс.данные
+        textSurname.setEditable(yes);
+        textName.setEditable(yes);
+        textPatronymic.setEditable(yes);
+        radioButtonF.setVisible(yes);
+        radioButtonM.setVisible(yes);
+        textDateBirth.setEditable(yes);
+        textSNILS.setEditable(yes);
+        textTelephone.setEditable(yes);
+        textEmail.setEditable(yes);
+
+
+        //Адрес
+        textRegionComboBox.setVisible(yes);
+        textStreetComboBox.setVisible(yes);
+        textIndexComboBox.setVisible(yes);
+        textInhabitedLocalityComboBox.setVisible(yes);
+        textDistrictComboBox.setVisible(yes);
+        radioButtonM.setVisible(yes);
+        radioButtonF.setVisible(yes);
+        textHouse.setEditable(yes);
+        textFlat.setEditable(yes);
+
+        //Уд.личности
+        labelIdDocType.setVisible(yes);
+        labelIdDocSeries.setVisible(yes);
+        labelIdDocNumber.setVisible(yes);
+        labelIdDocGivenBy.setVisible(yes);
+        labelIdDocDateStart.setVisible(yes);
+        labelIdDocStatus.setVisible(yes);
+        textIdDocTypeComboBox.setVisible(yes);
+        textIdDocSeries.setVisible(yes);
+        textIdDocNumber.setVisible(yes);
+        textIdDocGivenBy.setVisible(yes);
+        textIdDocDateStart.setVisible(yes);
+        textIdDocStatusComboBox.setVisible(yes);
+
+
+        labelAttDocDateStart.setVisible(yes);
+        labelAttDocName.setVisible(yes);
+        labelAttDocStatus.setVisible(yes);
+        labelAttDocType.setVisible(yes);
+        labelAttDocNumber.setVisible(yes);
+        textAttDocDateStart.setVisible(yes);
+        textAttDocName.setVisible(yes);
+        textAttDocStatusComboBox.setVisible(yes);
+        textAttDocTypeComboBox.setVisible(yes);
+        textAttDocNumber.setVisible(yes);
+
+        textGender.setVisible(!yes);
+
+        textRegion.setVisible(!yes);
+        textStreet.setVisible(!yes);
+        textIndex.setVisible(!yes);
+        textDistrict.setVisible(!yes);
+        textInhabitedLocality.setVisible(!yes);
+    }
+
+    private void fillComboBox(){
+        getComboBox(textRegionComboBox,tableRegion);
+        getComboBox(textStreetComboBox,tableStreet);
+        getComboBox(textIndexComboBox,tableIndex);
+        getComboBox(textDistrictComboBox,tableDistrict);
+        getComboBox(textInhabitedLocalityComboBox,tableLocality);
+        getComboBox(textIdDocTypeComboBox,tableIndDoc);
+        getComboBox(textAttDocTypeComboBox,tableDoc);
     }
 
     private void setButtonGroup(){
         radioButtonGender = new ButtonGroup();
         radioButtonGender.add(radioButtonM);
         radioButtonGender.add(radioButtonF);
+    }
+    private String getGender(){
+        if(radioButtonF.isSelected())
+            return "1";
+        else
+            return "2";
+    }
+    private String getIndex(){
+        return textIndexComboBox.getSelectedItem().toString();
+    }
+    private int getRegion(){
+        return textRegionComboBox.getSelectedIndex()+1;
+    }
+    private int getDistrict(){
+        return textDistrictComboBox.getSelectedIndex()+1;
+    }
+    private int getInhabitedLoc(){
+        return textInhabitedLocalityComboBox.getSelectedIndex()+1;
+    }
+    private int getStreet(){
+        return textStreetComboBox.getSelectedIndex()+1;
+    }
+    private String getIdDocStatus(){
+        return textIdDocStatusComboBox.getSelectedItem().toString();
+    }
+    private int getTypeIdDoc(){
+        return textIdDocTypeComboBox.getSelectedIndex()+1;
+    }
+    private String getAttDocStatus(){
+        return textAttDocStatusComboBox.getSelectedItem().toString();
+    }
+    private int getTypeAttDoc(){
+        return textAttDocTypeComboBox.getSelectedIndex()+1;
     }
 
     private void listenerRowTableSC(){
@@ -299,6 +417,61 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 }
             });
         }
+    private void listenerRowTableSC_IdDoc(){
+        selModelSC_IdDoc.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                getRowTableSC_IdDoc();
+            }
+        });
+    }
+    private void listenerRowTableSC_AttDoc(){
+        selModelSC_AttDoc.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                getRowTableSC_AttDoc();
+            }
+        });
+    }
+
+    String typeIdDoc;
+    String idDocSeries;
+    String idDocNumber;
+    String idDocGivenBy;
+    String idDocDateStart;
+    String idDocStatus;
+    private void getRowTableSC_IdDoc(){
+        selRowSC_IdDoc = tableIdDocument.getSelectedRow();
+        typeIdDoc = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,0).toString();
+        setSelectedValue(typeIdDoc,textIdDocTypeComboBox);
+        idDocSeries = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,1).toString();
+        textIdDocSeries.setText(idDocSeries);
+        idDocNumber = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,2).toString();
+        textIdDocNumber.setText(idDocNumber);
+        idDocGivenBy = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,3).toString();
+        textIdDocGivenBy.setText(idDocGivenBy);
+        idDocDateStart = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,4).toString();
+        textIdDocDateStart.setText(idDocDateStart);
+        idDocStatus = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,5).toString();
+        setSelectedValue(idDocStatus,textIdDocStatusComboBox);
+    }
+
+    String attDocNumber;
+    String attDocType;
+    String attDocName;
+    String attDocDateStart;
+    String attDocStatus;
+    private void getRowTableSC_AttDoc(){
+        selRowSC_AttDoc = tableAttDocument.getSelectedRow();
+        attDocNumber = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc,0).toString();
+        textAttDocNumber.setText(attDocNumber);
+        attDocType = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc,1).toString();
+        setSelectedValue(attDocType,textAttDocTypeComboBox);
+        attDocName = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc,2).toString();
+        textAttDocName.setText(attDocName);
+        attDocDateStart = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc,3).toString();
+        textAttDocDateStart.setText(attDocDateStart);
+        attDocStatus = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc,4).toString();
+        setSelectedValue(attDocStatus,textAttDocStatusComboBox);
+    }
 
     //Персональные данные (Вкладка "Личные дела")
     String[] columnsSocialClient = new String[]
@@ -344,8 +517,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             {"Номер","Тип документа","Название","Дата выдачи","Статус"};
     final Class[] columnClassAttDocument = new Class[]{
             Integer.class, String.class, String.class, String.class, String.class};
-    String sqlQuery3 = "select typeDoc.nameTypeAttachedDocument, attDoc.numberAttachedDocument, attDoc.nameAttachedDocument, " +
-            "attDoc.dateStartAttachedDocument, attDoc.statusAttachedDocument\n" +
+    String sqlQuery3 = "select attDoc.numberAttachedDocument, typeDoc.nameTypeAttachedDocument, attDoc.nameAttachedDocument, " +
+            "DATE_FORMAT(attDoc.dateStartAttachedDocument,'%d.%m.%Y'), attDoc.statusAttachedDocument\n" +
             "from attached_document attDoc inner join social_client sc on attDoc.personalNumber = sc.personalNumber\n" +
             "inner join type_attached_document typeDoc on attDoc.numberTypeAttachedDocument = typeDoc.numberTypeAttachedDocument\n" +
             "where sc.personalNumber=?";

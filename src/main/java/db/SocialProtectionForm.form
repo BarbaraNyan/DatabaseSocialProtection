@@ -41,8 +41,6 @@
               <tabbedpane id="54c01" binding="tabbedPane2" default-binding="true">
                 <constraints>
                   <grid row="3" column="0" row-span="3" col-span="8" vsize-policy="3" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                    <minimum-size width="800" height="100"/>
-                    <preferred-size width="1200" height="200"/>
                     <maximum-size width="1200" height="500"/>
                   </grid>
                 </constraints>
@@ -254,7 +252,7 @@
                       </component>
                     </children>
                   </grid>
-                  <grid id="cc6f6" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="cc6f6" layout-manager="GridLayoutManager" row-count="9" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
                       <tabbedpane title="Уд. личности"/>
@@ -262,19 +260,125 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <scrollpane id="9de55">
+                      <scrollpane id="9030d">
                         <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="0" row-span="9" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                         </constraints>
                         <properties/>
                         <border type="none"/>
                         <children>
-                          <component id="310c6" class="javax.swing.JTable" binding="tableIdDocument">
+                          <component id="11305" class="javax.swing.JTable" binding="tableIdDocument">
                             <constraints/>
                             <properties/>
                           </component>
                         </children>
                       </scrollpane>
+                      <component id="baf5e" class="javax.swing.JLabel" binding="labelIdDocType">
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Тип документа"/>
+                        </properties>
+                      </component>
+                      <component id="1a2d7" class="javax.swing.JLabel" binding="labelIdDocSeries">
+                        <constraints>
+                          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Серия"/>
+                        </properties>
+                      </component>
+                      <component id="82356" class="javax.swing.JLabel" binding="labelIdDocNumber">
+                        <constraints>
+                          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Номер"/>
+                        </properties>
+                      </component>
+                      <component id="8e9a5" class="javax.swing.JLabel" binding="labelIdDocGivenBy">
+                        <constraints>
+                          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Кем выдан"/>
+                        </properties>
+                      </component>
+                      <component id="be21a" class="javax.swing.JLabel" binding="labelIdDocDateStart">
+                        <constraints>
+                          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Дата выдачи"/>
+                        </properties>
+                      </component>
+                      <component id="9b768" class="javax.swing.JLabel" binding="labelIdDocStatus">
+                        <constraints>
+                          <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Статус"/>
+                        </properties>
+                      </component>
+                      <vspacer id="c75ba">
+                        <constraints>
+                          <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                      </vspacer>
+                      <component id="10b05" class="javax.swing.JComboBox" binding="textIdDocTypeComboBox">
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties/>
+                      </component>
+                      <component id="32410" class="javax.swing.JComboBox" binding="textIdDocStatusComboBox">
+                        <constraints>
+                          <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <model>
+                            <item value="действителен"/>
+                            <item value="недействителен"/>
+                          </model>
+                        </properties>
+                      </component>
+                      <component id="3037c" class="javax.swing.JFormattedTextField" binding="textIdDocSeries">
+                        <constraints>
+                          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="150" height="-1"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <editable value="false"/>
+                        </properties>
+                      </component>
+                      <component id="48284" class="javax.swing.JFormattedTextField" binding="textIdDocNumber">
+                        <constraints>
+                          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="150" height="-1"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <editable value="false"/>
+                        </properties>
+                      </component>
+                      <component id="e8c3d" class="javax.swing.JTextField" binding="textIdDocGivenBy">
+                        <constraints>
+                          <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="150" height="-1"/>
+                          </grid>
+                        </constraints>
+                        <properties/>
+                      </component>
+                      <component id="d85e" class="javax.swing.JFormattedTextField" binding="textIdDocDateStart">
+                        <constraints>
+                          <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="150" height="-1"/>
+                          </grid>
+                        </constraints>
+                        <properties/>
+                      </component>
                     </children>
                   </grid>
                   <grid id="9dbe9" layout-manager="GridLayoutManager" row-count="13" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -476,7 +580,7 @@
                       </component>
                     </children>
                   </grid>
-                  <grid id="d8ca4" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="d8ca4" layout-manager="GridLayoutManager" row-count="7" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
                       <tabbedpane title="Документы"/>
@@ -486,7 +590,7 @@
                     <children>
                       <scrollpane id="55bf4">
                         <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="0" row-span="7" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                         </constraints>
                         <properties/>
                         <border type="none"/>
@@ -497,6 +601,94 @@
                           </component>
                         </children>
                       </scrollpane>
+                      <vspacer id="4442a">
+                        <constraints>
+                          <grid row="5" column="1" row-span="2" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                      </vspacer>
+                      <component id="b70e1" class="javax.swing.JLabel" binding="labelAttDocType">
+                        <constraints>
+                          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Тип документа"/>
+                        </properties>
+                      </component>
+                      <component id="8bab8" class="javax.swing.JLabel" binding="labelAttDocName">
+                        <constraints>
+                          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Название"/>
+                        </properties>
+                      </component>
+                      <component id="81d53" class="javax.swing.JLabel" binding="labelAttDocDateStart">
+                        <constraints>
+                          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Дата выдачи"/>
+                        </properties>
+                      </component>
+                      <component id="28b29" class="javax.swing.JLabel" binding="labelAttDocStatus">
+                        <constraints>
+                          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Статус"/>
+                        </properties>
+                      </component>
+                      <component id="b1507" class="javax.swing.JComboBox" binding="textAttDocTypeComboBox">
+                        <constraints>
+                          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties/>
+                      </component>
+                      <component id="a0641" class="javax.swing.JTextField" binding="textAttDocName">
+                        <constraints>
+                          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="150" height="-1"/>
+                          </grid>
+                        </constraints>
+                        <properties/>
+                      </component>
+                      <component id="c487a" class="javax.swing.JFormattedTextField" binding="textAttDocDateStart">
+                        <constraints>
+                          <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="150" height="-1"/>
+                          </grid>
+                        </constraints>
+                        <properties/>
+                      </component>
+                      <component id="96a1" class="javax.swing.JComboBox" binding="textAttDocStatusComboBox">
+                        <constraints>
+                          <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <model>
+                            <item value="действителен"/>
+                            <item value="недействителен"/>
+                          </model>
+                        </properties>
+                      </component>
+                      <component id="505f7" class="javax.swing.JLabel" binding="labelAttDocNumber">
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Номер"/>
+                        </properties>
+                      </component>
+                      <component id="146ef" class="javax.swing.JTextField" binding="textAttDocNumber">
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="150" height="-1"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <editable value="false"/>
+                        </properties>
+                      </component>
                     </children>
                   </grid>
                   <grid id="daa2a" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
