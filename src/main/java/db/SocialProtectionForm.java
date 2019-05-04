@@ -11,10 +11,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.sql.*;
 import javax.swing.JComboBox;
 import java.text.SimpleDateFormat;
@@ -145,11 +142,25 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableIncome;
     private JButton findPayoffButton;
     private JPanel pnPeriodPayoff;
+    private JTextField textRelTypeDoc;
+    private JTextField textRelSeries;
+    private JTextField textRelNumber;
+    private JRadioButton rbRelativeDocStatus1;
+    private JRadioButton rbRelativeDocStatus2;
+    private JLabel lbRelTypeDoc;
+    private JLabel lbRelSeries;
+    private JLabel lbRelNumber;
+    private JLabel lbRelStatus;
+    private JButton addIdDocButton;
+    private JButton addAttDocButton;
+    private JButton addOperAccButton;
+    private JButton addRelativeButton;
+    private JButton addRelativeIdDoc;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
 
-    private JTable []box={tableIndex, tableRegion, tableDistrict, tableLocality, tableStreet,tableIndDoc,tableDoc,tableSCCategory};
+    private JTable []box={tableIndex, tableRegion, tableDistrict, tableLocality, tableStreet,tableIndDoc,tableDoc,tableSCCategory,tableRelation};
     private DefaultTableModel dtmSocialClient;
     private DefaultTableModel dtmIdDocument;
     private DefaultTableModel dtmAttDocument;
@@ -169,6 +180,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private ListSelectionModel selModelSC = tableSocialClients.getSelectionModel();
     private ListSelectionModel selModelSC_IdDoc = tableIdDocument.getSelectionModel();
     private ListSelectionModel selModelSC_AttDoc = tableAttDocument.getSelectionModel();
+    private ListSelectionModel selModelSC_RelativeDoc = tableIdDocRelatives.getSelectionModel();
     private TableModelClients mdtmSocialClient = new TableModelClients();
     private EditClient editClient = new EditClient();
     private com.toedter.calendar.JDateChooser dcPeriodPayoff = new com.toedter.calendar.JDateChooser();
@@ -189,6 +201,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private int selRowSC;
     private int selRowSC_IdDoc;
     private int selRowSC_AttDoc;
+    private int selRowSC_RelativePersNum;
 
     SocialProtectionForm(){
         super("CommonTable");
@@ -200,10 +213,32 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         listenerRowTableSC();
         initModelHandbook();
 
+        JLabel labelIdDoc = new JLabel();
+        JLabel labelAttDoc = new JLabel();
+        JLabel labelOperAcc = new JLabel();
+        JLabel labelRelative = new JLabel();
+        JLabel labelRelativeIdDoc = new JLabel();
+//Установить плюсик на Button
+        ImageIcon icon = new ImageIcon("src\\plus.png");
+        Image image = icon.getImage();
+        Image newimg = image.getScaledInstance(20,20,Image.SCALE_SMOOTH);
+        icon = new ImageIcon(newimg);
+        labelIdDoc.setIcon(icon);
+        labelAttDoc.setIcon(icon);
+        labelOperAcc.setIcon(icon);
+        labelRelative.setIcon(icon);
+        labelRelativeIdDoc.setIcon(icon);
+        addIdDocButton.add(labelIdDoc);
+        addAttDocButton.add(labelAttDoc);
+        addOperAccButton.add(labelOperAcc);
+        addRelativeButton.add(labelRelative);
+        addRelativeIdDoc.add(labelRelativeIdDoc);
+
         getComboBox(comboBoxSCCategory, tableSCCategory);
         setCBMeasure();
 
         openFieldsForEdit(false);
+        editClientButton.setEnabled(false);
         fillComboBox();
         setButtonGroup();
 
@@ -286,10 +321,18 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             public void actionPerformed(ActionEvent e) {
                 openFieldsForEdit(true);
                 listenerRowTableSC_IdDoc();
-                tableIdDocument.setRowSelectionInterval(0,0);
+                if(tableIdDocument.getRowCount()!=0)
+                    tableIdDocument.setRowSelectionInterval(0,0);
                 listenerRowTableSC_AttDoc();
                 if(tableAttDocument.getRowCount()!=0)
                     tableAttDocument.setRowSelectionInterval(0,0);
+                if(tableOperatingAccount.getRowCount()!=0)
+                    tableOperatingAccount.setRowSelectionInterval(0,0);
+                if(tableRelatives.getRowCount()!=0)
+                    tableRelatives.setRowSelectionInterval(0,0);
+                listenerRowTableSC_RelativeDoc();
+                if(tableIdDocRelatives.getRowCount()!=0)
+                    tableIdDocRelatives.setRowSelectionInterval(0,0);
             }
         });
         buttonSave.addActionListener(new ActionListener() {
@@ -324,8 +367,68 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 editClient.update(sqlUpdateAttDoc,paramsAttDoc);
 
                 //Расчётный счёт
+                String[] paramsOperatingAcc = {textDateStartAccount.getText(),getOperAccStatus(),textPersNum.getText()};
+                String sqlUpdateOperAcc = "update operating_account set dateStartAccount=?, statusOperaingAccount=? where personalNumber=?";
+                editClient.update(sqlUpdateOperAcc,paramsOperatingAcc);
+
+                //Документ родственника
+                int colRowSC_Relative = tableRelatives.getRowCount();
+                if(colRowSC_Relative!=0) {
+                    selRowSC_RelativePersNum = tableRelatives.getSelectedRow();
+                    String relativePersNum = tableRelatives.getModel().getValueAt(selRowSC_RelativePersNum, 0).toString();
+                    String[] paramsRelativeDoc = {getRelativeDocStatus(), textPersNum.getText(), relativePersNum};
+                    String sqlUpdateRelativeDoc = "update identification_document set statusIdDocument=? where personalNumber=? and relativePersonalNumber=?";
+                    editClient.update(sqlUpdateRelativeDoc, paramsRelativeDoc);
+                }
+//                openFieldsForEdit(false);
 
                 openFieldsForEdit(false);
+            }
+        });
+        addIdDocButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFrame addIdDoc = new AddIdDoc(textPersNum.getText(),"",box);
+                addIdDoc.pack();
+                addIdDoc.setVisible(true);
+            }
+        });
+        addAttDocButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFrame addAttDoc = new AddAttachedDoc(textPersNum.getText(),box);
+                addAttDoc.pack();
+                addAttDoc.setVisible(true);
+//                addAttDoc.addWindowListener(new WindowAdapter() {
+//                    @Override
+//                    public void windowDeactivated(WindowEvent e) {
+//                        super.windowDeactivated(e);
+//                        dtmAttDocument.fireTableDataChanged();
+//                    }
+//                });
+            }
+        });
+        addOperAccButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFrame addOperAcc = new AddOperatingAcc(textPersNum.getText());
+                addOperAcc.pack();
+                addOperAcc.setVisible(true);
+            }
+        });
+        addRelativeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFrame addRelative = new AddRelative(textPersNum.getText(),box);
+                addRelative.pack();
+                addRelative.setVisible(true);
+            }
+        });
+        addRelativeIdDoc.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int selRow = tableRelatives.getSelectedRow();
+                if(selRow>=0) {
+                    String idRel = tableRelatives.getModel().getValueAt(selRow, 0).toString();
+                    JFrame addRelativeIdDoc = new AddIdDoc(textPersNum.getText(), idRel, box);
+                    addRelativeIdDoc.pack();
+                    addRelativeIdDoc.setVisible(true);
+                }
             }
         });
     }
@@ -344,6 +447,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     //сделать потом через один метод и скрывать и показывать true-false
     private void openFieldsForEdit(boolean yes){
+        buttonSave.setVisible(yes);
+        editClientButton.setEnabled(!yes);
         //Перс.данные
         textSurname.setEditable(yes);
         textName.setEditable(yes);
@@ -381,7 +486,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         textIdDocDateStart.setVisible(yes);
         textIdDocStatusComboBox.setVisible(yes);
 
-
         labelAttDocDateStart.setVisible(yes);
         labelAttDocName.setVisible(yes);
         labelAttDocStatus.setVisible(yes);
@@ -392,6 +496,24 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         textAttDocStatusComboBox.setVisible(yes);
         textAttDocTypeComboBox.setVisible(yes);
         textAttDocNumber.setVisible(yes);
+
+        //Р/C
+        textDateStartAccount.setEditable(yes);
+        rbStatusFalse.setEnabled(yes);
+        rbStatusTrue.setEnabled(yes);
+
+        //Родственник документ +остальные поля там
+        lbRelNumber.setVisible(yes);
+        lbRelSeries.setVisible(yes);
+        lbRelStatus.setVisible(yes);
+        lbRelTypeDoc.setVisible(yes);
+        textRelNumber.setVisible(yes);
+        textRelSeries.setVisible(yes);
+        textRelTypeDoc.setVisible(yes);
+        rbRelativeDocStatus1.setEnabled(yes);
+        rbRelativeDocStatus2.setEnabled(yes);
+        rbRelativeDocStatus2.setVisible(yes);
+        rbRelativeDocStatus1.setVisible(yes);
 
         textGender.setVisible(!yes);
 
@@ -450,11 +572,24 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private int getTypeAttDoc(){
         return textAttDocTypeComboBox.getSelectedIndex()+1;
     }
+    private String getOperAccStatus(){
+        if(rbStatusTrue.isSelected())
+            return "действителен";
+        else
+            return "недействителен";
+    }
+    private String getRelativeDocStatus(){
+        if(rbRelativeDocStatus1.isSelected())
+            return "действителен";
+        else
+            return "недействителен";
+    }
 
     private void listenerRowTableSC(){
         selModelSC.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     getRowTableSC();
+                    editClientButton.setEnabled(true);
                 }
             });
         }
@@ -472,6 +607,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             }
         });
     }
+    private void listenerRowTableSC_RelativeDoc(){
+        selModelSC_RelativeDoc.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                getRowTableSC_RelativeDocStatus();
+            }
+        });
+    }
 
     String typeIdDoc;
     String idDocSeries;
@@ -480,6 +622,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String idDocDateStart;
     String idDocStatus;
     private void getRowTableSC_IdDoc(){
+        tableIdDocument.setRowSelectionInterval(0,0);
         selRowSC_IdDoc = tableIdDocument.getSelectedRow();
         typeIdDoc = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,0).toString();
         setSelectedValue(typeIdDoc,textIdDocTypeComboBox);
@@ -514,6 +657,28 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         setSelectedValue(attDocStatus,textAttDocStatusComboBox);
     }
 
+    String relativeDocStatus;
+    String relativeTypeDoc;
+    String relativeSeries;
+    String relativeNumber;
+    private void getRowTableSC_RelativeDocStatus(){
+        int rowCol = tableIdDocRelatives.getRowCount();
+        if(rowCol!=0) {
+            relativeTypeDoc = tableIdDocRelatives.getModel().getValueAt(0, 0).toString();
+            textRelTypeDoc.setText(relativeTypeDoc);
+            relativeSeries = tableIdDocRelatives.getModel().getValueAt(0, 1).toString();
+            textRelSeries.setText(relativeSeries);
+            relativeNumber = tableIdDocRelatives.getModel().getValueAt(0, 2).toString();
+            textRelNumber.setText(relativeNumber);
+//        selRowSC_RelativeDoc = tableIdDocRelatives.getSelectedRow();
+            relativeDocStatus = tableIdDocRelatives.getModel().getValueAt(0, 5).toString();
+            if (relativeDocStatus.equals("действителен")) {
+                rbRelativeDocStatus1.setSelected(true);
+            } else {
+                rbRelativeDocStatus2.setSelected(true);
+            }
+        }
+    }
     //Персональные данные (Вкладка "Личные дела")
     String[] columnsSocialClient = new String[]
             {"Личный счёт", "Фамилия", "Имя", "Отчество", "Пол", "Дата рождения","СНИЛС","Телефон","Email" };

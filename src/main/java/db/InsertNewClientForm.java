@@ -72,6 +72,7 @@ public class InsertNewClientForm extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 insertClientTable();
                 setVisible(false);
+
             }
         });
         //передача данных из справочников в списки
