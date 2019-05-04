@@ -127,6 +127,22 @@ import javax.swing.table.DefaultTableModel;
         public String[] columnsCatMeasure;
         public Class[] columnClassCatMeasure;
 
+        //для таблицы(справочнка) сотрудники
+        public String[] columnsEmployee;
+        public Class[] columnClassEmployee;
+
+        // для таблицы отдел
+        public String[] columnsDepartment;
+        public Class[] columnClassDepartment;
+
+        //для таблицы должность
+        public String[] columnsJob;
+        public Class[] columnClassJob;
+
+        //для таблицы поиска выплат
+        public String[] columnsFindRequest;
+        public Class[] columnClassFindRequest;
+
         public String sqlQuery;
         public String sqlPreparedStatement;
         public int persNum;
@@ -234,6 +250,22 @@ import javax.swing.table.DefaultTableModel;
             }
         }
 
+        public DefaultTableModel MyTableModelFindRequest(String date){
+            try{
+                ps = conn.prepareStatement(sqlPreparedStatement);
+                ps.setString(1,date);
+                rs = ps.executeQuery();
+
+                createTable(rs,columnsFindRequest,columnClassFindRequest);
+
+                mdbc.close(stmt);
+                return dtm;
+            }
+            catch(SQLException e){
+                return null;
+            }
+        }
+
         public DefaultTableModel MyTableModelHandbook(int type){
             try{
                 stmt= conn.createStatement();
@@ -278,6 +310,15 @@ import javax.swing.table.DefaultTableModel;
                         break;
                     case 13: // Документ
                         createTable(rs,columnsTypeDoc,columnClassTypeDoc);
+                        break;
+                    case 14: // Сотрудники
+                        createTable(rs,columnsEmployee,columnClassEmployee);
+                        break;
+                    case 15: // Отдел
+                        createTable(rs,columnsDepartment,columnClassDepartment);
+                        break;
+                    case 16: // Должность
+                        createTable(rs,columnsJob,columnClassJob);
                         break;
                 }
 
@@ -347,6 +388,22 @@ import javax.swing.table.DefaultTableModel;
                 return par;
             } catch (SQLException e) {
                 return null;
+            }
+        }
+
+        public int getMonthIncome(String sqlQ){
+            try{
+                ps = conn.prepareStatement(sqlQ);
+                ps.setInt(1,persNum);
+                rs = ps.executeQuery();
+                int kol=0;
+                if(rs.next())
+                    kol=Integer.parseInt(rs.getString(1));
+                mdbc.close(stmt);
+                return kol;
+            }
+            catch(SQLException e){
+                return -1;
             }
         }
 

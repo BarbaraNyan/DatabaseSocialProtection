@@ -966,7 +966,7 @@
                           <grid id="762c3" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                             <margin top="0" left="0" bottom="0" right="0"/>
                             <constraints>
-                              <tabbedpane title="Лицевой счет?"/>
+                              <tabbedpane title="Лицевой счет"/>
                             </constraints>
                             <properties/>
                             <border type="none"/>
@@ -1162,7 +1162,10 @@
                     <preferred-size width="200" height="200"/>
                   </grid>
                 </constraints>
-                <properties/>
+                <properties>
+                  <enabled value="true"/>
+                  <font size="16"/>
+                </properties>
                 <border type="none"/>
                 <children>
                   <grid id="6ea90" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -1180,6 +1183,7 @@
                           </grid>
                         </constraints>
                         <properties>
+                          <font size="14"/>
                           <model/>
                           <toolTipText value=""/>
                         </properties>
@@ -1191,6 +1195,7 @@
                           </grid>
                         </constraints>
                         <properties>
+                          <font size="14"/>
                           <text value="Категория льготы"/>
                         </properties>
                       </component>
@@ -1200,7 +1205,9 @@
                             <preferred-size width="175" height="30"/>
                           </grid>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <font size="14"/>
+                        </properties>
                       </component>
                       <component id="bc395" class="javax.swing.JButton" binding="findClientButton">
                         <constraints>
@@ -1209,6 +1216,7 @@
                           </grid>
                         </constraints>
                         <properties>
+                          <font size="14"/>
                           <text value="Найти льготников"/>
                         </properties>
                       </component>
@@ -1219,6 +1227,7 @@
                           </grid>
                         </constraints>
                         <properties>
+                          <font size="14"/>
                           <text value="Категория льготника"/>
                         </properties>
                       </component>
@@ -1242,12 +1251,14 @@
                           </grid>
                         </constraints>
                         <properties>
+                          <enabled value="false"/>
+                          <font size="14"/>
                           <text value="Назначить выплату"/>
                         </properties>
                       </component>
                     </children>
                   </grid>
-                  <grid id="80d19" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="80d19" layout-manager="GridLayoutManager" row-count="3" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
                       <tabbedpane title="Выплаты"/>
@@ -1257,24 +1268,64 @@
                     <children>
                       <scrollpane id="2e94c">
                         <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                          <grid row="1" column="0" row-span="1" col-span="4" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                         </constraints>
                         <properties/>
                         <border type="none"/>
                         <children>
-                          <component id="ded2f" class="javax.swing.JTable" binding="tablePayoff">
+                          <component id="ded2f" class="javax.swing.JTable" binding="tableFindRequest">
                             <constraints/>
                             <properties/>
                           </component>
                         </children>
                       </scrollpane>
-                      <component id="dd746" class="javax.swing.JButton" binding="PayoffButton">
+                      <grid id="d36bd" binding="pnPeriodPayoff" layout-manager="BorderLayout" hgap="0" vgap="0">
                         <constraints>
-                          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
-                            <preferred-size width="145" height="30"/>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                            <preferred-size width="170" height="-1"/>
+                            <maximum-size width="170" height="-1"/>
                           </grid>
                         </constraints>
                         <properties>
+                          <font size="14"/>
+                        </properties>
+                        <border type="none"/>
+                        <children/>
+                      </grid>
+                      <component id="48714" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font size="14"/>
+                          <text value="Период выплат"/>
+                        </properties>
+                      </component>
+                      <hspacer id="3529a">
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                      </hspacer>
+                      <component id="c0860" class="javax.swing.JButton" binding="findPayoffButton">
+                        <constraints>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                            <preferred-size width="175" height="30"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <font size="14"/>
+                          <text value="Найти выплаты"/>
+                        </properties>
+                      </component>
+                      <component id="dd746" class="javax.swing.JButton" binding="payoffButton">
+                        <constraints>
+                          <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+                            <preferred-size width="175" height="30"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <enabled value="false"/>
+                          <font size="14"/>
                           <text value="Выплатить"/>
                         </properties>
                       </component>

@@ -6,17 +6,19 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.*;
-import java.util.Date;
-import java.text.*;
 import javax.swing.JComboBox;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class SocialProtectionForm extends JFrame implements TreeSelectionListener{
     private JTabbedPane tabbedPane1;
@@ -55,8 +57,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTabbedPane tabbedPane3;
     private JTable tableChargeRequest;
     private JButton chargeButton;
-    private JTable tablePayoff;
-    private JButton PayoffButton;
+    private JTable tableFindRequest;
+    private JButton payoffButton;
     private JTabbedPane reportsPane;
     private JPanel otherReports;
     private JComboBox periodCombox;
@@ -110,6 +112,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableStreet=new JTable();
     private JTable tableRelation=new JTable();
     private JTable tableTypeIncome=new JTable();
+    private JTable tableEmployee=new JTable();
+    private JTable tableDepartament=new JTable();
+    private JTable tableJob=new JTable();
     private JTable tableCategoryMeasure;
     private JTabbedPane tabbedPane4;
     private JTable tableRequest;
@@ -138,6 +143,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTextField textAttDocNumber;
     private JLabel labelAttDocNumber;
     private JTable tableIncome;
+    private JButton findPayoffButton;
+    private JPanel pnPeriodPayoff;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -155,13 +162,18 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private DefaultTableModel dtmRequest;
     private DefaultTableModel dtmPayoff;
     private DefaultTableModel dtmPersAcc;
+    private DefaultTableModel dtmClientCategoryMeasure;
     private DefaultTableModel dtmHandbook;
     private DefaultTableModel dtmSaldoReport;
+    private DefaultTableModel dtmFindRequest;
     private ListSelectionModel selModelSC = tableSocialClients.getSelectionModel();
     private ListSelectionModel selModelSC_IdDoc = tableIdDocument.getSelectionModel();
     private ListSelectionModel selModelSC_AttDoc = tableAttDocument.getSelectionModel();
     private TableModelClients mdtmSocialClient = new TableModelClients();
     private EditClient editClient = new EditClient();
+    private com.toedter.calendar.JDateChooser dcPeriodPayoff = new com.toedter.calendar.JDateChooser();
+
+
 
     private DatabaseConnection mdbc;
     private Statement stmt;
@@ -189,6 +201,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         initModelHandbook();
 
         getComboBox(comboBoxSCCategory, tableSCCategory);
+        setCBMeasure();
 
         openFieldsForEdit(false);
         fillComboBox();
@@ -199,6 +212,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         listenerRowTableOpAcc();
 
         listenerRowTableRelatives();
+        dcPeriodPayoff.setDate(new Date());
+        pnPeriodPayoff.add(dcPeriodPayoff);
+        dcPeriodPayoff.setFont(new Font("Times New Roman", Font.PLAIN, 14));
 
         addClientButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -218,15 +234,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
         comboBoxSCCategory.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent itemEvent) {
-                comboBoxMeasure.removeAllItems();
-                String item;
-                int k=tableMeasure.getColumnCount()-1;
-                for (int i = 0;i<tableMeasure.getRowCount();i++){
-                    if(Integer.valueOf(tableMeasure.getValueAt(i, 1).toString())==comboBoxSCCategory.getSelectedIndex()+1) {
-                        item = tableMeasure.getModel().getValueAt(i, 2).toString();
-                        comboBoxMeasure.addItem(item);
-                    }
-                }
+                setCBMeasure();
             }
         });
 
@@ -238,15 +246,33 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
         findClientButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                initModelPayoff();
+                initModelClientCategoryMeasure();
+                if(tableChargeRequest.getRowCount()>0)
+                    chargeButton.setEnabled(true);
+                else
+                    chargeButton.setEnabled(false);
             }
         });
 
-        /*chargeButton.addActionListener(new ActionListener() {
+        chargeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                setPayoff();
+                TableModel[] boxTM ={tableChargeRequest.getModel(), tableEmployee.getModel()};
+                JFrame insertRequest = new InsertRequset(boxTM);
+                insertRequest.setTitle("Добавление новой заявки на выплату");
+                insertRequest.pack();
+                insertRequest.setVisible(true);
             }
-        });*/
+        });
+
+        findPayoffButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                initModelFindRequest();
+                if(tableFindRequest.getRowCount()>0)
+                    payoffButton.setEnabled(true);
+                else
+                    payoffButton.setEnabled(false);
+            }
+        });
 //        tabbedPane2.addChangeListener(new ChangeListener() {
 //            public void stateChanged(ChangeEvent e) {
 //                if(tabbedPane2.getSelectedIndex()==1)
@@ -302,6 +328,18 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 openFieldsForEdit(false);
             }
         });
+    }
+
+    private void setCBMeasure(){
+        comboBoxMeasure.removeAllItems();
+        String item;
+        int k=tableMeasure.getColumnCount()-1;
+        for (int i = 0;i<tableMeasure.getRowCount();i++){
+            if(Integer.valueOf(tableMeasure.getValueAt(i, 1).toString())==comboBoxSCCategory.getSelectedIndex()+1) {
+                item = tableMeasure.getModel().getValueAt(i, 2).toString();
+                comboBoxMeasure.addItem(item);
+            }
+        }
     }
 
     //сделать потом через один метод и скрывать и показывать true-false
@@ -861,13 +899,16 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         dtmIncome=mdtmSocialClient.MyTableModelDocument(6);
         tableIncome.setModel(dtmIncome);
         dtmIncome.fireTableDataChanged();
-        int row=tableIncome.getRowCount();
+        String sqlQueryCount = "select count(DISTINCT i.periodIncome)\n" +
+                "from income i inner join social_client sc on i.personalNumber=sc.personalNumber\n" +
+                "where sc.personalNumber=?";
+        int row=mdtmSocialClient.getMonthIncome(sqlQueryCount);
         double sum=0;
-        for (int i=0; i<row; i++){
+        for (int i=0; i<tableIncome.getRowCount(); i++){
             sum+=Double.valueOf(tableIncome.getModel().getValueAt(i,2).toString());
         }
         if(row!=0)
-            lbSum.setText(String.valueOf(sum/row));
+            lbSum.setText(String.valueOf(sum/row/(tableRelatives.getRowCount()+1)));
         else
             lbSum.setText("");
     }
@@ -898,62 +939,61 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     }
 
     // Начисления (Вкладка 'Начисления и выплаты')
-    String[] columnsChargeReq = new String[] {"Номер личного счета", "Фамилия", "Имя", "Отчество", "Категория гражданина", "Категория льготы"};
-    final Class[] columnClassChargeReq = new Class[] {Integer.class, String.class, String.class, String.class, String.class, String.class};
-    String sqlQueryChargeReq="select sc.personalNumber, sc.surname, sc.name, sc.patronymic, scc.nameClientCategory, bc.nameBenefitCategory " +
-            "from social_client sc inner join client_category cc on sc.personalNumber=cc.personalNumber " +
-            "inner join social_client_category scc on cc.numberClientCategory=scc.numberClientCategory " +
-            "inner join benefit_category bc on scc.numberClientCategory=bc.numberClientCategory " +
-            "where scc.nameClientCategory=? and bc.nameBenefitCategory=?";
+    String[] columnsChargeReq = new String[] {"Номер личного счета", "Фамилия", "Имя", "Отчество", "Категория гражданина", "Мера социальной поддержки", "Сумма"};
+    final Class[] columnClassChargeReq = new Class[] {Integer.class, String.class, String.class, String.class, String.class, String.class, Double.class};
+    String sqlQueryChargeReq="select sc.personalNumber, sc.surname, sc.name, sc.patronymic, scc.nameClientCategory, moss.nameSocialMeasure, moss.amountOfSupport " +
+            "from social_client sc inner join client_measure cm on sc.personalNumber=cm.personalNumber " +
+            "inner join measure_of_social_support moss on (cm.codeSocialMeasure=moss.codeSocialMeasure and cm.codeClientCategory=moss.codeClientCategory) " +
+            "inner join social_client_category scc on moss.codeClientCategory=scc.codeClientCategory " +
+            "where scc.nameClientCategory=? and moss.nameSocialMeasure=?";
 
-    public void initModelPayoff() {
+    public void initModelClientCategoryMeasure() {
         mdtmSocialClient.columnsChargeReq = columnsChargeReq;
         mdtmSocialClient.columnClassChargeReq = columnClassChargeReq;
         mdtmSocialClient.cat = comboBoxSCCategory.getItemAt(comboBoxSCCategory.getSelectedIndex()).toString();
         mdtmSocialClient.ben = comboBoxMeasure.getItemAt(comboBoxMeasure.getSelectedIndex()).toString();
         mdtmSocialClient.sqlPreparedStatement=sqlQueryChargeReq;
-        dtmHandbook = mdtmSocialClient.MyTableModelPayoff(1);
-        tableChargeRequest.setModel(dtmHandbook);
-        dtmHandbook.fireTableDataChanged();
+        dtmClientCategoryMeasure = mdtmSocialClient.MyTableModelPayoff(1);
+        tableChargeRequest.setModel(dtmClientCategoryMeasure);
+        tableChargeRequest.removeColumn(tableChargeRequest.getColumnModel().getColumn(6));
+        dtmClientCategoryMeasure.fireTableDataChanged();
     }
 
-    /*public void setPayoff(){
-        try {
-            mdbc=new DatabaseConnection();
-            Connection conn=mdbc.getMyConnection();
-            stmt= conn.createStatement();
-            String amount="";
-            String date;
-            String persNum="";
+    String[] columnsFindRequest = new String[] {"Номер личного счета", "Фамилия", "Имя", "Отчество", "Номер заявки", "Дата начала", "Дата окончания", "Сумма", "Состояние"};
+    final Class[] columnClassFindRequest = new Class[] {Integer.class, String.class, String.class, String.class, Integer.class, String.class, String.class, Double.class, String.class};
+    String sqlQueryFindRequest="select sc.personalNumber, sc.surname, sc.name, sc.patronymic, rfcs.requestNumber, rfcs.periodFrom, rfcs.periodTo, rfcs.totalAmount, rfcs.stateRequest " +
+            "from social_client sc inner join operating_account oa on sc.personalNumber=oa.personalNumber " +
+            "inner join request_for_cash_settlement rfcs on oa.numberOperatingAccount=rfcs.numberOperatingAccount " +
+            "where oa.statusOperaingAccount='Действителен' and rfcs.stateRequest='Назначено' and ? between rfcs.periodFrom and rfcs.periodTo";
 
-            Date dateNow = new Date();
-            SimpleDateFormat formatForDateNow = new SimpleDateFormat("yyyy-MM-dd");
-            date=formatForDateNow.format(dateNow).toString();
+    public void initModelFindRequest(){
+        mdtmSocialClient.columnsFindRequest = columnsFindRequest;
+        mdtmSocialClient.columnClassFindRequest = columnClassFindRequest;
+        mdtmSocialClient.sqlPreparedStatement=sqlQueryFindRequest;
+        SimpleDateFormat formatForSql= new SimpleDateFormat("yyyy-MM-dd");
+        dtmFindRequest = mdtmSocialClient.MyTableModelFindRequest(formatForSql.format(dcPeriodPayoff.getDate()));
+        tableFindRequest.setModel(dtmFindRequest);
+        dtmFindRequest.fireTableDataChanged();
+    }
 
-            String ben=comboBoxBenefitCategory.getItemAt(comboBoxBenefitCategory.getSelectedIndex()).toString();
-            String sqlAm="select vota.payoutAmount from version_of_the_article vota " +
-                    "inner join law l on vota.numberLaw=l.numberLaw " +
-                    "inner join benefit_law bl on l.numberLaw=bl.numberLaw " +
-                    "inner join benefit_category bc on bl.codeBenefitCategory=bc.codeBenefitCategory " +
-                    "where bc.nameBenefitCategory='"+ben+"'";
-            ResultSet rs = stmt.executeQuery(sqlAm);
-            if(rs.next())
-                amount = rs.getString(1);
-
-            for(int i=0; i<tableChargeRequest.getRowCount(); i++){
-                persNum=tableChargeRequest.getModel().getValueAt(i,0).toString();
-                String sqlPayoff="insert into payoff(amountPayoff, datePayoff, numberPersonalAccount)" +
-                        "values ('"+amount+"', '"+date+"', '"+persNum+"')";
-                stmt.executeUpdate(sqlPayoff);
-            }
-
-            mdbc.close(stmt);
-        }
-        catch(Exception e){
-            System.out.println("Failed to set payoff");
-            mdbc.close(stmt);
-        }
-    }*/
+    public void getPayoff(){
+        SimpleDateFormat formatForSql= new SimpleDateFormat("yyyy-MM-dd");
+        String sqlQueryPayoff1="select sc.personalNumber, sum(rfcs.totalAmount)\n" +
+                "    from social_client sc inner join operating_account oa on sc.personalNumber=oa.personalNumber\n" +
+                "    inner join request_for_cash_settlement rfcs on oa.numberOperatingAccount=rfcs.numberOperatingAccount\n" +
+                "    where oa.statusOperaingAccount='Действителен' and rfcs.stateRequest='Назначено' and '"+formatForSql.format(dcPeriodPayoff.getDate())+"' between rfcs.periodFrom and rfcs.periodTo";
+        String sqlQueryPayoff2="select p.numberPayoff from payoff p inner join request_for_cash_settlement rfcs on p.numberPayoff=rfcs.numberPayoff " +
+                "inner join operating_account oa on rfcs.numberOperatingAccount=oa.numberOperatingAccount " +
+                "inner join social_client on oa.personalNumber=sc.personalNumber " +
+                "where sc.personalNumber=? and p.datePayoff between rfcs.periodFrom and rfcs.periodTo";
+        String sqlQueryPayoff3="select amountPayoff, numberPersonalAccount from payoff where numberPayoff=?";
+        String sqlQueryPayoff4="update payoff set amountPayoff=? where numberPayoff=?";
+        String sqlQueryPayoff5="update personal_account set accrued=?, paid=? where numberPersonalAccount=?";
+        String sqlQueryPayoff6="select max(numberPersonalAccount) as maxNumPA from personal_account";
+        String sqlQueryPayoff7="insert into personal_account (numberPersonalAccount, periodPayoff, inputBalance, accrued, paid, outputBalance) " +
+                "values (?, '"+formatForSql.format(dcPeriodPayoff.getDate())+"', 0, ?, ?, 0)";
+        String sqlQueryPayoff8="insert into payoff ";
+    }
 
     String persNum;
     String surname;
@@ -1105,6 +1145,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String[] columnsArticle = new String[] {"Код статьи", "Код закона", "№ статьи", "Название статьи", "Дата принятия"};
     final Class[] columnClassArticle = new Class[] {Integer.class, Integer.class, Double.class, String.class, String.class};
 
+    String[] columnsEmployee = new String[] {"Табельный номер", "Фамилия", "Имя", "Отчество", "Код должности", "Номер отдела"};
+    final Class[] columnClassEmployee = new Class[] {Integer.class, String.class, String.class, String.class, Integer.class, Integer.class};
+
     String sqlQuerySCCat="select * from social_client_category";
     String sqlQueryMeasure="select * from measure_of_social_support";
     String sqlQueryLaw="select codeOfLaw, numberLaw, nameLaw, DATE_FORMAT(certifiedDateLaw, '%d.%m.%Y') from law";
@@ -1120,6 +1163,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String sqlQueryInc="select * from type_income";
     String sqlQueryIdDoc="select * from type_identification_document";
     String sqlQueryDoc="select * from type_attached_document";
+
+    String sqlQueryEmp="select * from employee";
+    String sqlQueryDep="select * from department_employee";
+    String sqlQueryJob="select * from job_position_employee";
 
     //запонение справочников (Вкладка 'НСИ')
     public void initModelHandbook(){
@@ -1213,6 +1260,27 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             dtmHandbook = mdtmSocialClient.MyTableModelHandbook(13);
             tableDoc.setModel(dtmHandbook);
             dtmHandbook.fireTableDataChanged();
+
+        mdtmSocialClient.columnsEmployee = columnsEmployee;
+        mdtmSocialClient.columnClassEmployee = columnClassEmployee;
+        mdtmSocialClient.sqlQuery = sqlQueryEmp;
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(14);
+        tableEmployee.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+
+        mdtmSocialClient.columnsDepartment = columnsHandbook;
+        mdtmSocialClient.columnClassDepartment = columnClassHandbook;
+        mdtmSocialClient.sqlQuery = sqlQueryDep;
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(15);
+        tableDepartament.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+
+        mdtmSocialClient.columnsJob = columnsHandbook;
+        mdtmSocialClient.columnClassJob = columnClassHandbook;
+        mdtmSocialClient.sqlQuery = sqlQueryJob;
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(16);
+        tableJob.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
 
     }
 
