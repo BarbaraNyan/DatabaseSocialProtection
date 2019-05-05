@@ -175,6 +175,18 @@ import javax.swing.table.DefaultTableModel;
             }
         }
 
+        public DefaultTableModel deleteRow() {
+            try {
+                stmt= conn.createStatement();
+                rs = stmt.executeQuery(sqlQuery);
+                mdbc.close(stmt);
+                return dtm;
+            }
+            catch(SQLException e){
+                return null;
+            }
+        }
+
         public DefaultTableModel MyTableModelMeasure(){
             try {
                 stmt= conn.createStatement();
@@ -263,6 +275,73 @@ import javax.swing.table.DefaultTableModel;
             }
             catch(SQLException e){
                 return null;
+            }
+        }
+
+        public int setClientPayoff(String [] queryPayoff){
+            try{
+                String[] columnsPayoff = new String[] {"Номер личного счета", "Сумма", "Дата начала", "Дата окончания"};
+                Class[] columnClassPayoff = new Class[] {Integer.class, Double.class, String.class, String.class};
+                stmt= conn.createStatement();
+                rs = stmt.executeQuery(queryPayoff[0]);
+                createTable(rs, columnsPayoff, columnClassPayoff);
+                String numP="";
+                int numPA=-1;
+
+                for(int i=0; i<dtm.getRowCount(); i++){
+                    String amountPayoff=dtm.getValueAt(i, 1).toString();
+                    ps=conn.prepareStatement(queryPayoff[1]);
+                    ps.setString(1, dtm.getValueAt(i, 0).toString());
+                    ps.setString(2, dtm.getValueAt(i, 2).toString());
+                    ps.setString(3, dtm.getValueAt(i, 3).toString());
+                    rs = ps.executeQuery();
+                    if(rs.next()){
+                        double amount=Double.valueOf(rs.getString("amountPayoff"))+Double.valueOf(amountPayoff);
+                        numPA=rs.getInt("numberPersonalAccount");
+
+                        ps=conn.prepareStatement(queryPayoff[2]);
+                        ps.setDouble(1, amount);
+                        ps.setDouble(2, amount);
+                        ps.setInt(3, numPA);
+                        ps.executeUpdate();
+                    }else{
+                        rs=stmt.executeQuery(queryPayoff[3]);
+                        if(rs.next()){
+                            numPA=rs.getInt("maxNumPA")+1;
+                            ps=conn.prepareStatement(queryPayoff[4]);
+                            ps.setInt(1, numPA);
+                            ps.setString(2, amountPayoff);
+                            ps.setString(3, amountPayoff);
+                            ps.executeUpdate();
+                        }
+                    }
+                    ps=conn.prepareStatement(queryPayoff[5]);
+                    ps.setString(1, amountPayoff);
+                    ps.setInt(2, numPA);
+                    ps.executeUpdate();
+
+                    rs=stmt.executeQuery("select max(numberPayoff) as maxNumP from payoff");
+                    if(rs.next())
+                        numP=rs.getString("maxNumP");
+
+                    String queryNumRequest = "select rfcs.requestNumber from request_for_cash_settlement rfcs " +
+                            "inner join operating_account oa on rfcs.numberOperatingAccount=oa.numberOperatingAccount " +
+                            "inner join social_client sc on oa.personalNumber=sc.personalNumber " +
+                            "where sc.personalNumber='"+dtm.getValueAt(i, 0).toString()+"' and rfcs.stateRequest='Назначено'";
+                    Statement stmt1= conn.createStatement();
+                    ResultSet rs1=stmt1.executeQuery(queryNumRequest);
+                    while(rs1.next()){
+                        String reqNum=rs1.getString(1);
+                        Statement stmt2= conn.createStatement();
+                        stmt2.executeUpdate("update request_for_cash_settlement set stateRequest='Выплачено', numberPayoff='"+numP+"' where requestNumber='"+reqNum+"'");
+                    }
+                }
+
+                mdbc.close(stmt);
+                return 1;
+            }
+            catch(SQLException e){
+                return 0;
             }
         }
 

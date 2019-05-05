@@ -18,6 +18,7 @@ public class AddRelative extends JFrame{
     private JButton saveButton;
     private JTextField textPatronymic;
     private JPanel panelDateBirth;
+    private JButton canselButton;
     private com.toedter.calendar.JDateChooser dcDateBirth = new com.toedter.calendar.JDateChooser();
 
     private DatabaseConnection mdbc;
@@ -33,6 +34,13 @@ public class AddRelative extends JFrame{
                 JOptionPane.showMessageDialog(AddRelative.this,"Успешно добавлено!","Добавление",JOptionPane.INFORMATION_MESSAGE);
                 setVisible(false);
                 dispose();
+            }
+        });
+        canselButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                int rezult = JOptionPane.showConfirmDialog(AddRelative.this, "Вы уверены, что хотите отменить добавление члена семьи?", "Отмена добавления члена семьи", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if(rezult==JOptionPane.YES_OPTION)
+                    setVisible(false);
             }
         });
     }

@@ -22,6 +22,7 @@ public class AddIdDoc extends JFrame{
     private JPanel rootPanel;
     private JButton saveButton;
     private JPanel panelDateStart;
+    private JButton canselButton;
 
     private DatabaseConnection mdbc;
     private Statement stmt;
@@ -41,6 +42,14 @@ public class AddIdDoc extends JFrame{
 //                dispatchEvent(new WindowEvent(AddIdDoc.this,WindowEvent.WINDOW_CLOSING));
             }
         });
+
+        canselButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                int rezult = JOptionPane.showConfirmDialog(AddIdDoc.this, "Вы уверены, что хотите отменить добавление документа?", "Отмена добавления документа", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if(rezult==JOptionPane.YES_OPTION)
+                    setVisible(false);
+            }
+        });
     }
 
     private void addIdDoc(String personalNumber,String relPersonalNumber) {
@@ -48,7 +57,7 @@ public class AddIdDoc extends JFrame{
         String series = textSeries.getText();
         String number = textNumber.getText();
         String givenBy = textGivenBy.getText();
-        String status = "действителен";
+        String status = "Действителен";
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateStart = dateFormat.format(dcDateStart.getDate());

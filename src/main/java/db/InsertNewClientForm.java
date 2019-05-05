@@ -53,6 +53,7 @@ public class InsertNewClientForm extends JFrame{
     private JComboBox textCategoryClientComboBox;
     private JComboBox textCategoryMeasureComboBox;
     private JTable tableCategoryMeasure;
+    private JButton canselButton;
     private TableModelClients mdtm = new TableModelClients();
     private DefaultTableModel dtm;
     private int rowTable;
@@ -73,6 +74,14 @@ public class InsertNewClientForm extends JFrame{
                 insertClientTable();
                 setVisible(false);
 
+            }
+        });
+
+        canselButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                int rezult = JOptionPane.showConfirmDialog(InsertNewClientForm.this, "Вы уверены, что хотите отменить добавление клиента?", "Отмена добавления клиента", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if(rezult==JOptionPane.YES_OPTION)
+                    setVisible(false);
             }
         });
         //передача данных из справочников в списки
@@ -287,17 +296,17 @@ public class InsertNewClientForm extends JFrame{
         idDocNumber = textIdDocNumber.getText();
         idDocGivenBy = textIdDocGivenBy.getText();
         idDocDateStart = textIdDocDateStart.getText();
-        idDocStatus = "действителен";
+        idDocStatus = "Действителен";
 
         attDocNumber = textAttDocNumber.getText();
         attDocType = Integer.toString(getTypeAttDoc());
         attDocName = textAttDocName.getText();
         attDocDateStart = textAttDocDateStart.getText();
-        attDocStatus = "действителен";
+        attDocStatus = "Действителен";
 
         operAccNumber = textOperAccNumber.getText();
         operAccDateStart = textOperAccDateStart.getText();
-        operAccStatus = "действителен";
+        operAccStatus = "Действителен";
 
         String addressId ="1";
         String persNum = "1";

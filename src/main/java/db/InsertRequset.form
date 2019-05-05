@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="db.InsertRequset">
-  <grid id="27dc6" binding="rootPanel" layout-manager="GridLayoutManager" row-count="8" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-    <margin top="0" left="0" bottom="0" right="0"/>
+  <grid id="27dc6" binding="rootPanel" layout-manager="GridLayoutManager" row-count="6" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="20" left="20" bottom="20" right="20"/>
     <constraints>
       <xy x="20" y="20" width="504" height="223"/>
     </constraints>
@@ -10,149 +10,117 @@
     <children>
       <component id="8b410" class="javax.swing.JLabel">
         <constraints>
-          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font name="Times New Roman" size="14"/>
+          <font size="14"/>
           <text value="Дата составления"/>
         </properties>
       </component>
       <component id="971a3" class="javax.swing.JLabel">
         <constraints>
-          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font name="Times New Roman" size="14"/>
+          <font size="14"/>
           <text value="Сумма выплаты"/>
         </properties>
       </component>
       <component id="48bfd" class="javax.swing.JTextField" binding="textTotalAmount">
         <constraints>
-          <grid row="2" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="1" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
         <properties>
-          <font name="Times New Roman" size="14"/>
+          <font size="14"/>
         </properties>
       </component>
       <component id="50bda" class="javax.swing.JLabel">
         <constraints>
-          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font name="Times New Roman" size="14"/>
+          <font size="14"/>
           <text value="Дата начала выплаты"/>
         </properties>
       </component>
       <component id="b6c0c" class="javax.swing.JLabel">
         <constraints>
-          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font name="Times New Roman" size="14"/>
+          <font size="14"/>
           <text value="Дата окончания выплаты"/>
         </properties>
       </component>
       <component id="61e35" class="javax.swing.JButton" binding="resetButton">
         <constraints>
-          <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+          <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
             <preferred-size width="80" height="-1"/>
             <maximum-size width="100" height="-1"/>
           </grid>
         </constraints>
         <properties>
-          <font name="Times New Roman" size="14"/>
+          <font size="14"/>
           <text value="Отмена"/>
         </properties>
       </component>
       <component id="11450" class="javax.swing.JButton" binding="addButton">
         <constraints>
-          <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
+          <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false">
             <preferred-size width="80" height="24"/>
             <maximum-size width="100" height="-1"/>
           </grid>
         </constraints>
         <properties>
-          <font name="Times New Roman" size="14"/>
+          <font size="14"/>
           <text value="Добавить"/>
         </properties>
       </component>
-      <hspacer id="65451">
-        <constraints>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="10" height="-1"/>
-            <maximum-size width="10" height="-1"/>
-          </grid>
-        </constraints>
-      </hspacer>
-      <vspacer id="4ae80">
-        <constraints>
-          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
-            <preferred-size width="10" height="15"/>
-            <maximum-size width="10" height="15"/>
-          </grid>
-        </constraints>
-      </vspacer>
-      <hspacer id="343a1">
-        <constraints>
-          <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="10" height="-1"/>
-            <maximum-size width="10" height="-1"/>
-          </grid>
-        </constraints>
-      </hspacer>
-      <vspacer id="d0542">
-        <constraints>
-          <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
-            <preferred-size width="10" height="15"/>
-            <maximum-size width="10" height="15"/>
-          </grid>
-        </constraints>
-      </vspacer>
       <component id="dc2a4" class="javax.swing.JLabel">
         <constraints>
-          <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font name="Times New Roman" size="14"/>
+          <font size="14"/>
           <text value="Составил сотрудник"/>
         </properties>
       </component>
       <component id="bfa70" class="javax.swing.JComboBox" binding="comboBoxEmployee">
         <constraints>
-          <grid row="5" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="4" column="1" row-span="1" col-span="3" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font name="Times New Roman" size="14"/>
+          <font size="14"/>
         </properties>
       </component>
       <grid id="66c00" binding="pnDate" layout-manager="BorderLayout" hgap="0" vgap="0">
         <constraints>
-          <grid row="1" column="2" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="1" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font name="Times New Roman" size="14"/>
+          <font size="14"/>
         </properties>
         <border type="none"/>
         <children/>
       </grid>
       <grid id="5d76" binding="pnPeriodFrom" layout-manager="BorderLayout" hgap="0" vgap="0">
         <constraints>
-          <grid row="3" column="2" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="1" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font name="Times New Roman" size="14"/>
+          <font size="14"/>
         </properties>
         <border type="none"/>
         <children/>
       </grid>
       <grid id="263a0" binding="pnPeriodTo" layout-manager="BorderLayout" hgap="0" vgap="0">
         <constraints>
-          <grid row="4" column="2" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="3" column="1" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font name="Times New Roman" size="14"/>
+          <font size="14"/>
         </properties>
         <border type="none"/>
         <children/>

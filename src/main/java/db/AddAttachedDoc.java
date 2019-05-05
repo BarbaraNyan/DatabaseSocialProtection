@@ -20,6 +20,7 @@ public class AddAttachedDoc extends JFrame{
     private JPanel rootPanel;
     private JButton saveButton;
     private JPanel panelDateStart;
+    private JButton canselButton;
     private com.toedter.calendar.JDateChooser dcDateStart = new com.toedter.calendar.JDateChooser();
 
     private DatabaseConnection mdbc;
@@ -37,13 +38,20 @@ public class AddAttachedDoc extends JFrame{
                 dispose();
             }
         });
+        canselButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                int rezult = JOptionPane.showConfirmDialog(AddAttachedDoc.this, "Вы уверены, что хотите отменить добавление документа?", "Отмена добавления документа", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if(rezult==JOptionPane.YES_OPTION)
+                    setVisible(false);
+            }
+        });
     }
     private void addAttDoc(String personalNumber){
         String typeDoc = String.valueOf(getTypeAttDoc());
         String number = textNumber.getText();
         String name = textName.getText();
 //        String dateStart = textDateStart.getText();
-        String status = "действителен";
+        String status = "Действителен";
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateStart = dateFormat.format(dcDateStart.getDate());
@@ -53,9 +61,9 @@ public class AddAttachedDoc extends JFrame{
             Connection conn = mdbc.getMyConnection();
             stmt = conn.createStatement();
 
-            String sqlQuery = "insert into attached_document(numberAttachedDocument, nameAttachedDocument," +
-                    " dateStartAttachedDocument, statusAttachedDocument, numberTypeAttachedDocument, personalNumber) VALUES (+" +
-                     quotate(number)+","+quotate(name)+","+quotate(dateStart)+","+quotate(status)+","+quotate(typeDoc)+","+quotate(personalNumber)+")";
+            String sqlQuery = "insert into attached_document(numberAttachedDocument, nameAttachedDocument, " +
+                    "dateStartAttachedDocument, statusAttachedDocument, numberTypeAttachedDocument, personalNumber) VALUES " +
+                    "("+quotate(number)+","+quotate(name)+","+quotate(dateStart)+","+quotate(status)+","+quotate(typeDoc)+","+quotate(personalNumber)+")";
             stmt.executeUpdate(sqlQuery);
         } catch (SQLException e) {
             e.printStackTrace();

@@ -17,6 +17,7 @@ public class AddOperatingAcc extends JFrame {
     private JComboBox textOrgComboBox;
     private JButton saveButton;
     private JPanel panelDateStart;
+    private JButton canselButton;
     private com.toedter.calendar.JDateChooser dcDateStart = new com.toedter.calendar.JDateChooser();
 
     private DatabaseConnection mdbc;
@@ -28,16 +29,23 @@ public class AddOperatingAcc extends JFrame {
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 addOperAcc(persNum);
-                JOptionPane.showMessageDialog(AddOperatingAcc.this,"Успешно добавлено!","Добавление",JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(AddOperatingAcc.this,"Успешно добавлено","Добавление",JOptionPane.INFORMATION_MESSAGE);
                 setVisible(false);
                 dispose();
+            }
+        });
+        canselButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                int rezult = JOptionPane.showConfirmDialog(AddOperatingAcc.this, "Вы уверены, что хотите отменить добавление расчетного счета?", "Отмена добавления расчетного счета", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if(rezult==JOptionPane.YES_OPTION)
+                    setVisible(false);
             }
         });
     }
     private void addOperAcc(String personalNumber){
         String number = textNumber.getText();
 //        String dateStart = textDateStart.getText();
-        String status = "действителен";
+        String status = "Действителен";
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateStart = dateFormat.format(dcDateStart.getDate());
 
