@@ -157,6 +157,15 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JButton addRequestButton;
     private JButton deleteCategoryMeasureButton;
     private JButton deleteRequestButton;
+    private JLabel lbRelGivenBy;
+    private JLabel lbRelDateStart;
+    private JTextField textRelGivenBy;
+    private JTextField textRelDateStart;
+    private JButton deleteIdDocButton;
+    private JButton deleteAttDocButton;
+    private JButton deleteOperAccButton;
+    private JButton deleteRelativeButton;
+    private JButton deleteRelativeIdDoc;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -183,6 +192,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private ListSelectionModel selModelSC_AttDoc = tableAttDocument.getSelectionModel();
     private ListSelectionModel selModelSC_RelativeDoc = tableIdDocRelatives.getSelectionModel();
     private TableModelClients mdtmSocialClient = new TableModelClients();
+    private DeleteClient deleteClient;
     private EditClient editClient = new EditClient();
     private com.toedter.calendar.JDateChooser dcPeriodPayoff = new com.toedter.calendar.JDateChooser();
 
@@ -205,6 +215,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private int selRowSC_RelativePersNum;
     private int selRowCatMeasure;
     private int selRowRequest;
+    private int selRowIdDoc;
+    private int selRowAttDoc;
+    private int selRowRel;
 
     SimpleDateFormat formatForSql= new SimpleDateFormat("yyyy-MM-dd");
 
@@ -221,32 +234,53 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         deleteCategoryMeasureButton.setVisible(false);
         deleteRequestButton.setVisible(false);
 
-        JLabel labelIdDoc = new JLabel();
-        JLabel labelAttDoc = new JLabel();
-        JLabel labelOperAcc = new JLabel();
-        JLabel labelRelative = new JLabel();
-        JLabel labelRelativeIdDoc = new JLabel();
-        JLabel labelCategoryMeasure = new JLabel();
-        JLabel labelRequest = new JLabel();
+        JLabel labelIdDocPlus = new JLabel();
+        JLabel labelAttDocPlus = new JLabel();
+        JLabel labelOperAccPlus = new JLabel();
+        JLabel labelRelativePlus = new JLabel();
+        JLabel labelRelativeIdDocPlus = new JLabel();
+        JLabel labelIdDocMinus= new JLabel();
+        JLabel labelAttDocMinus = new JLabel();
+        JLabel labelOperAccMinus = new JLabel();
+        JLabel labelRelativeMinus = new JLabel();
+        JLabel labelRelativeIdDocMinus = new JLabel();
+        JLabel labelCategoryMeasurePlus = new JLabel();
+        JLabel labelRequestPlus = new JLabel();
 //Установить плюсик на Button
-        ImageIcon icon = new ImageIcon("src\\plus.png");
-        Image image = icon.getImage();
-        Image newimg = image.getScaledInstance(20,20,Image.SCALE_SMOOTH);
-        icon = new ImageIcon(newimg);
-        labelIdDoc.setIcon(icon);
-        labelAttDoc.setIcon(icon);
-        labelOperAcc.setIcon(icon);
-        labelRelative.setIcon(icon);
-        labelRelativeIdDoc.setIcon(icon);
-        labelCategoryMeasure.setIcon(icon);
-        labelRequest.setIcon(icon);
-        addIdDocButton.add(labelIdDoc);
-        addAttDocButton.add(labelAttDoc);
-        addOperAccButton.add(labelOperAcc);
-        addRelativeButton.add(labelRelative);
-        addRelativeIdDoc.add(labelRelativeIdDoc);
-        addCategoryMeasureButton.add(labelCategoryMeasure);
-        addRequestButton.add(labelRequest);
+        ImageIcon iconPlus = new ImageIcon("src\\plus.png");
+        Image imagePlus = iconPlus.getImage();
+        Image newimgPlus = imagePlus.getScaledInstance(20,20,Image.SCALE_SMOOTH);
+        iconPlus = new ImageIcon(newimgPlus);
+        ImageIcon iconMinus = new ImageIcon("src\\minus.png");
+        Image imageMinus = iconMinus.getImage();
+        Image newimgMinus = imageMinus.getScaledInstance(20,20,Image.SCALE_SMOOTH);
+        iconMinus = new ImageIcon(newimgMinus);
+
+        labelIdDocPlus.setIcon(iconPlus);
+        labelAttDocPlus.setIcon(iconPlus);
+        labelOperAccPlus.setIcon(iconPlus);
+        labelRelativePlus.setIcon(iconPlus);
+        labelRelativeIdDocPlus.setIcon(iconPlus);
+        labelCategoryMeasurePlus.setIcon(iconPlus);
+        labelRequestPlus.setIcon(iconPlus);
+        addIdDocButton.add(labelIdDocPlus);
+        addAttDocButton.add(labelAttDocPlus);
+        addOperAccButton.add(labelOperAccPlus);
+        addRelativeButton.add(labelRelativePlus);
+        addRelativeIdDoc.add(labelRelativeIdDocPlus);
+        addCategoryMeasureButton.add(labelCategoryMeasurePlus);
+        addRequestButton.add(labelRequestPlus);
+
+        labelIdDocMinus.setIcon(iconMinus);
+        labelAttDocMinus.setIcon(iconMinus);
+        labelOperAccMinus.setIcon(iconMinus);
+        labelRelativeMinus.setIcon(iconMinus);
+        labelRelativeIdDocMinus.setIcon(iconMinus);
+        deleteAttDocButton.add(labelAttDocMinus);
+        deleteIdDocButton.add(labelIdDocMinus);
+        deleteOperAccButton.add(labelOperAccMinus);
+        deleteRelativeButton.add(labelRelativeMinus);
+        deleteRelativeIdDoc.add(labelRelativeIdDocMinus);
 
         getComboBox(comboBoxSCCategory, tableSCCategory);
         setCBMeasure();
@@ -499,6 +533,44 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 mdtmSocialClient.deleteRow();
             }
         });
+        deleteClientButton1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить клиента?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                if(res==JOptionPane.YES_OPTION){
+//                    deleteClient = new DeleteClient(textPersNum.getText());
+                    deleteClient.delete();
+                }
+            }
+        });
+        deleteIdDocButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TableModel tm = tableIdDocument.getModel();
+                deleteClient.deleteIdDoc(tm.getValueAt(selRowIdDoc,1).toString(),tm.getValueAt(selRowIdDoc,2).toString());
+            }
+        });
+        deleteAttDocButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TableModel tm = tableAttDocument.getModel();
+                deleteClient.deleteAttDoc(tm.getValueAt(selRowAttDoc,0).toString());
+            }
+        });
+//        deleteOperAccButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                deleteClient.deleteOperAcc();
+//            }
+//        });
+        deleteRelativeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                TableModel tm = tableRelatives.getModel();
+                deleteClient.deleteRelative(tm.getValueAt(selRowRel,0).toString());
+            }
+        });
+        deleteRelativeIdDoc.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                deleteClient.deleteRelIdDoc(relativeNumber);
+            }
+        });
     }
 
     private void setCBMeasure(){
@@ -575,9 +647,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         lbRelSeries.setVisible(yes);
         lbRelStatus.setVisible(yes);
         lbRelTypeDoc.setVisible(yes);
+        lbRelDateStart.setVisible(yes);
+        lbRelGivenBy.setVisible(yes);
         textRelNumber.setVisible(yes);
         textRelSeries.setVisible(yes);
         textRelTypeDoc.setVisible(yes);
+        textRelDateStart.setVisible(yes);
+        textRelGivenBy.setVisible(yes);
         rbRelativeDocStatus1.setEnabled(yes);
         rbRelativeDocStatus2.setEnabled(yes);
         rbRelativeDocStatus2.setVisible(yes);
@@ -656,29 +732,39 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private void listenerRowTableSC(){
         selModelSC.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
-                    getRowTableSC();
-                    editClientButton.setEnabled(true);
+                    if (e.getValueIsAdjusting() == false) {
+                        getRowTableSC();
+                        editClientButton.setEnabled(true);
+                        deleteClientButton1.setEnabled(true);
+                        deleteClient = new DeleteClient(textPersNum.getText());
+                    }
                 }
             });
         }
     private void listenerRowTableSC_IdDoc(){
         selModelSC_IdDoc.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                getRowTableSC_IdDoc();
+                if (e.getValueIsAdjusting() == false) {
+                    getRowTableSC_IdDoc();
+                }
             }
         });
     }
     private void listenerRowTableSC_AttDoc(){
         selModelSC_AttDoc.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                getRowTableSC_AttDoc();
+                if (e.getValueIsAdjusting() == false) {
+                    getRowTableSC_AttDoc();
+                }
             }
         });
     }
     private void listenerRowTableSC_RelativeDoc(){
         selModelSC_RelativeDoc.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                getRowTableSC_RelativeDocStatus();
+                if (e.getValueIsAdjusting() == false) {
+                    getRowTableSC_RelativeDocStatus();
+                }
             }
         });
     }
@@ -690,20 +776,23 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String idDocDateStart;
     String idDocStatus;
     private void getRowTableSC_IdDoc(){
-        tableIdDocument.setRowSelectionInterval(0,0);
-        selRowSC_IdDoc = tableIdDocument.getSelectedRow();
-        typeIdDoc = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,0).toString();
-        setSelectedValue(typeIdDoc,textIdDocTypeComboBox);
-        idDocSeries = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,1).toString();
-        textIdDocSeries.setText(idDocSeries);
-        idDocNumber = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,2).toString();
-        textIdDocNumber.setText(idDocNumber);
-        idDocGivenBy = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,3).toString();
-        textIdDocGivenBy.setText(idDocGivenBy);
-        idDocDateStart = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,4).toString();
-        textIdDocDateStart.setText(idDocDateStart);
-        idDocStatus = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc,5).toString();
-        setSelectedValue(idDocStatus,textIdDocStatusComboBox);
+        int selRow = tableIdDocument.getSelectedRow();
+        if(selRow>=0) {
+            tableIdDocument.setRowSelectionInterval(0, 0);
+            selRowSC_IdDoc = tableIdDocument.getSelectedRow();
+            typeIdDoc = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc, 0).toString();
+            setSelectedValue(typeIdDoc, textIdDocTypeComboBox);
+            idDocSeries = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc, 1).toString();
+            textIdDocSeries.setText(idDocSeries);
+            idDocNumber = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc, 2).toString();
+            textIdDocNumber.setText(idDocNumber);
+            idDocGivenBy = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc, 3).toString();
+            textIdDocGivenBy.setText(idDocGivenBy);
+            idDocDateStart = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc, 4).toString();
+            textIdDocDateStart.setText(idDocDateStart);
+            idDocStatus = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc, 5).toString();
+            setSelectedValue(idDocStatus, textIdDocStatusComboBox);
+        }
     }
 
     String attDocNumber;
@@ -712,32 +801,41 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String attDocDateStart;
     String attDocStatus;
     private void getRowTableSC_AttDoc(){
-        selRowSC_AttDoc = tableAttDocument.getSelectedRow();
-        attDocNumber = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc,0).toString();
-        textAttDocNumber.setText(attDocNumber);
-        attDocType = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc,1).toString();
-        setSelectedValue(attDocType,textAttDocTypeComboBox);
-        attDocName = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc,2).toString();
-        textAttDocName.setText(attDocName);
-        attDocDateStart = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc,3).toString();
-        textAttDocDateStart.setText(attDocDateStart);
-        attDocStatus = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc,4).toString();
-        setSelectedValue(attDocStatus,textAttDocStatusComboBox);
+        int selRow = tableAttDocument.getSelectedRow();
+        if(selRow>=0) {
+            selRowSC_AttDoc = tableAttDocument.getSelectedRow();
+            attDocNumber = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc, 0).toString();
+            textAttDocNumber.setText(attDocNumber);
+            attDocType = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc, 1).toString();
+            setSelectedValue(attDocType, textAttDocTypeComboBox);
+            attDocName = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc, 2).toString();
+            textAttDocName.setText(attDocName);
+            attDocDateStart = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc, 3).toString();
+            textAttDocDateStart.setText(attDocDateStart);
+            attDocStatus = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc, 4).toString();
+            setSelectedValue(attDocStatus, textAttDocStatusComboBox);
+        }
     }
 
     String relativeDocStatus;
     String relativeTypeDoc;
     String relativeSeries;
     String relativeNumber;
+    String relativeGivenBy;
+    String relativeDateStart;
     private void getRowTableSC_RelativeDocStatus(){
-        int rowCol = tableIdDocRelatives.getRowCount();
-        if(rowCol!=0) {
+        int selRow = tableIdDocRelatives.getSelectedRow();
+        if(selRow>=0) {
             relativeTypeDoc = tableIdDocRelatives.getModel().getValueAt(0, 0).toString();
             textRelTypeDoc.setText(relativeTypeDoc);
             relativeSeries = tableIdDocRelatives.getModel().getValueAt(0, 1).toString();
             textRelSeries.setText(relativeSeries);
             relativeNumber = tableIdDocRelatives.getModel().getValueAt(0, 2).toString();
             textRelNumber.setText(relativeNumber);
+            relativeGivenBy = tableIdDocRelatives.getModel().getValueAt(0, 3).toString();
+            textRelGivenBy.setText(relativeGivenBy);
+            relativeDateStart = tableIdDocRelatives.getModel().getValueAt(0, 4).toString();
+            textRelDateStart.setText(relativeDateStart);
 //        selRowSC_RelativeDoc = tableIdDocRelatives.getSelectedRow();
             relativeDocStatus = tableIdDocRelatives.getModel().getValueAt(0, 5).toString();
             if (relativeDocStatus.equals("Действителен")) {
@@ -975,6 +1073,36 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         });
     }
 
+    private void listenerRowTableIdDocument(){
+        tableIdDocument.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() == false) {
+                    deleteIdDocButton.setVisible(true);
+                    selRowIdDoc = tableIdDocument.getSelectedRow();
+                }
+            }
+        });
+    }
+    private void listenerRowTableAttDocument(){
+        tableAttDocument.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() == false) {
+                    deleteAttDocButton.setVisible(true);
+                    selRowAttDoc = tableAttDocument.getSelectedRow();
+                }
+            }
+        });
+    }
+    private void listenerRowTableRel(){
+        tableRelatives.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() == false) {
+                    deleteRelativeButton.setVisible(true);
+                    selRowRel = tableRelatives.getSelectedRow();
+                }
+            }
+        });
+    }
     private void listenerRowTableRequest() {
         tableRequest.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {

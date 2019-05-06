@@ -13,6 +13,8 @@ import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Date;
 
 public class InsertNewClientForm extends JFrame{
     private JPanel rootPanel;
@@ -43,9 +45,9 @@ public class InsertNewClientForm extends JFrame{
     private JFormattedTextField textIdDocNumber;
     private JTextField textIdDocGivenBy;
     private JFormattedTextField textIdDocDateStart;
-    private JFormattedTextField textAttDocNumber;
-    private JComboBox textAttDocTypeComboBox;
-    private JTextField textAttDocName;
+    private JFormattedTextField textAttDocNumber1;
+    private JComboBox textAttDocTypeComboBox1;
+    private JTextField textAttDocName1;
     private JFormattedTextField textAttDocDateStart;
     private JComboBox textOperAccOrgComboBox;
     private JFormattedTextField textOperAccDateStart;
@@ -53,10 +55,40 @@ public class InsertNewClientForm extends JFrame{
     private JComboBox textCategoryClientComboBox;
     private JComboBox textCategoryMeasureComboBox;
     private JTable tableCategoryMeasure;
-    private JButton canselButton;
+    private JButton cancelButton;
+    private JPanel panelDateBirth;
+    private JPanel panelIdDocDateStart;
+    private JPanel panelAttDocDateStart1;
+    private JPanel panelOperAccDateStart;
+    private JTabbedPane tabbedPane2;
+    private JFormattedTextField textAttDocNumber2;
+    private JComboBox textAttDocTypeComboBox2;
+    private JTextField textAttDocName2;
+    private JPanel panelAttDocDateStart2;
+    private JFormattedTextField textAttDocNumber3;
+    private JComboBox textAttDocTypeComboBox3;
+    private JTextField textAttDocName3;
+    private JPanel panelAttDocDateStart3;
+    private JPanel panelTabAttDoc1;
+    private JPanel panelTabAttDoc2;
+    private JPanel panelTabAttDoc3;
+    private JButton addNewAttDoc;
     private TableModelClients mdtm = new TableModelClients();
     private DefaultTableModel dtm;
     private int rowTable;
+    JLabel labelPlusAttDoc = new JLabel();
+    //Установить плюсик на Button
+    ImageIcon icon = new ImageIcon("src\\plus.png");
+    Image image = icon.getImage();
+    Image newimg = image.getScaledInstance(20,20,Image.SCALE_SMOOTH);
+
+    private com.toedter.calendar.JDateChooser dcDateBirth = new com.toedter.calendar.JDateChooser();
+    private com.toedter.calendar.JDateChooser dcIdDocDateStart = new com.toedter.calendar.JDateChooser();
+    private com.toedter.calendar.JDateChooser dcAttDocDateStart1 = new com.toedter.calendar.JDateChooser();
+    private com.toedter.calendar.JDateChooser dcAttDocDateStart2 = new com.toedter.calendar.JDateChooser();
+    private com.toedter.calendar.JDateChooser dcAttDocDateStart3 = new com.toedter.calendar.JDateChooser();
+    private com.toedter.calendar.JDateChooser dcOperAccDateStart = new com.toedter.calendar.JDateChooser();
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private DatabaseConnection mdbc;
     private Statement stmt;
@@ -64,8 +96,31 @@ public class InsertNewClientForm extends JFrame{
     InsertNewClientForm(JTable [] t){
         setContentPane(rootPanel);
         setPreferredSize(new Dimension(900,600));
+        //передача данных из справочников в списки
+        getComboBox(comboBoxIndex, t[0]);
+        getComboBox(comboBoxRegion, t[1]);
+        getComboBox(comboBoxDistrict, t[2]);
+        getComboBox(comboBoxInhabitedLoc, t[3]);
+        getComboBox(comboBoxStreet, t[4]);
+        getComboBox(comboBoxTypeIdDoc, t[5]);
+        getComboBox(textAttDocTypeComboBox1,t[6]);
+        getComboBox(textAttDocTypeComboBox2,t[6]);
+        getComboBox(textAttDocTypeComboBox3,t[6]);
+        getComboBox(textCategoryClientComboBox,t[7]);
+
         setButtonGroup();
         setMasks();
+        panelDateBirth.add(dcDateBirth);
+        panelIdDocDateStart.add(dcIdDocDateStart);
+        panelAttDocDateStart1.add(dcAttDocDateStart1);
+        panelAttDocDateStart2.add(dcAttDocDateStart2);
+        panelAttDocDateStart3.add(dcAttDocDateStart3);
+        panelOperAccDateStart.add(dcOperAccDateStart);
+        tabbedPane2.setEnabledAt(1,false);
+        tabbedPane2.setEnabledAt(2,false);
+        icon = new ImageIcon(newimg);
+        labelPlusAttDoc.setIcon(icon);
+        addNewAttDoc.add(labelPlusAttDoc);
 
         initModelCategoryMeasure();
 
@@ -77,22 +132,14 @@ public class InsertNewClientForm extends JFrame{
             }
         });
 
-        canselButton.addActionListener(new ActionListener() {
+        cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                int rezult = JOptionPane.showConfirmDialog(InsertNewClientForm.this, "Вы уверены, что хотите отменить добавление клиента?", "Отмена добавления клиента", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if(rezult==JOptionPane.YES_OPTION)
+                int result = JOptionPane.showConfirmDialog(InsertNewClientForm.this, "Вы уверены, что хотите отменить добавление клиента?", "Отмена добавления клиента", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if(result==JOptionPane.YES_OPTION)
                     setVisible(false);
             }
         });
-        //передача данных из справочников в списки
-        getComboBox(comboBoxIndex, t[0]);
-        getComboBox(comboBoxRegion, t[1]);
-        getComboBox(comboBoxDistrict, t[2]);
-        getComboBox(comboBoxInhabitedLoc, t[3]);
-        getComboBox(comboBoxStreet, t[4]);
-        getComboBox(comboBoxTypeIdDoc, t[5]);
-        getComboBox(textAttDocTypeComboBox,t[6]);
-        getComboBox(textCategoryClientComboBox,t[7]);
+
 
         textCategoryClientComboBox.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -107,136 +154,17 @@ public class InsertNewClientForm extends JFrame{
             }
         });
         textCategoryClientComboBox.setSelectedIndex(1);
-    }
 
-
-    String[] columnsCategoryMeasure = new String[]
-            {"Код кат.клиента", "Название кат.льготы" };
-    final Class[] columnClassCategoryMeasure = new Class[] {Integer.class, String.class};
-    String sqlCreateTable="select moss.codeClientCategory as code, moss.nameSocialMeasure as name from measure_of_social_support moss";
-
-    public void initModelCategoryMeasure(){
-        mdtm.columnsCatMeasure=columnsCategoryMeasure;
-        mdtm.columnClassCatMeasure=columnClassCategoryMeasure;
-        mdtm.sqlQuery=sqlCreateTable;
-        dtm=mdtm.MyTableModelMeasure();
-        tableCategoryMeasure.setModel(dtm);
-        dtm.fireTableDataChanged();
-        rowTable = tableCategoryMeasure.getRowCount();
-    }
-
-    private void setMasks(){
-        try {
-            MaskFormatter phoneFormatter = new MaskFormatter("+7-###-###-##-##");
-            phoneFormatter.setPlaceholderCharacter('0');
-            DefaultFormatterFactory phoneFactory = new DefaultFormatterFactory(phoneFormatter);
-
-            MaskFormatter dateFormatter = new MaskFormatter("##.##.####");
-            dateFormatter.setPlaceholderCharacter('*');
-            DefaultFormatterFactory dateFactory = new DefaultFormatterFactory(dateFormatter);
-
-            MaskFormatter snilsFormatter = new MaskFormatter("###-###-### ##");
-            snilsFormatter.setPlaceholderCharacter('*');
-            DefaultFormatterFactory snilsFactory = new DefaultFormatterFactory(snilsFormatter);
-
-            MaskFormatter seriesDocFormatter = new MaskFormatter("####");
-            seriesDocFormatter.setPlaceholderCharacter('*');
-            DefaultFormatterFactory seriesDocFactory = new DefaultFormatterFactory(seriesDocFormatter);
-
-            MaskFormatter numberDocFormatter = new MaskFormatter("######");
-            numberDocFormatter.setPlaceholderCharacter('*');
-            DefaultFormatterFactory numberDocFactory = new DefaultFormatterFactory(numberDocFormatter);
-
-            textDateBirth.setFormatterFactory(dateFactory);
-            textIdDocDateStart.setFormatterFactory(dateFactory);
-            textTelephone.setFormatterFactory(phoneFactory);
-            textIdDocSeries.setFormatterFactory(seriesDocFactory);
-            textIdDocNumber.setFormatterFactory(numberDocFactory);
-            textSNILS.setFormatterFactory(snilsFactory);
-            textAttDocDateStart.setFormatterFactory(dateFactory);
-            textOperAccDateStart.setFormatterFactory(dateFactory);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void getComboBox(JComboBox cb, JTable tl){
-        String item;
-        int k=tl.getColumnCount()-1;
-        for (int i = 0;i<tl.getRowCount();i++){
-            item = tl.getModel().getValueAt(i, k).toString();
-            cb.addItem(item);
-        }
-    }
-
-//    public void setSelectedValueCategory(String value){
-//        String item;
-//        for (int i = 0;i<comboBoxCategory.getItemCount();i++){
-//            item = comboBoxCategory.getItemAt(i).toString();
-//            if (item.equalsIgnoreCase(value)) {
-//                comboBoxCategory.setSelectedIndex(i);
-//                break;
-//            }
-//        }
-//    }
-
-    private void setButtonGroup(){
-        radioButtonGender = new ButtonGroup();
-        radioButtonGender.add(radioButtonM);
-        radioButtonGender.add(radioButtonF);
-    }
-    private String getGender(){
-        if(radioButtonF.isSelected())
-            return "1";
-        else
-            return "2";
-    }
-
-    private String getIndex(){
-        return comboBoxIndex.getSelectedItem().toString();
-    }
-    private int getRegion(){
-        return comboBoxRegion.getSelectedIndex()+1;
-    }
-    private int getDistrict(){
-        return comboBoxDistrict.getSelectedIndex()+1;
-    }
-    private int getInhabitedLoc(){
-        return comboBoxInhabitedLoc.getSelectedIndex()+1;
-    }
-    private int getStreet(){
-        return comboBoxStreet.getSelectedIndex()+1;
-    }
-
-    private int getTypeIdDoc() {
-        return comboBoxTypeIdDoc.getSelectedIndex()+1;
-    }
-    private int getTypeAttDoc(){
-        return textAttDocTypeComboBox.getSelectedIndex()+1;
-    }
-    private int getOperAccOrg(){
-        return textOperAccOrgComboBox.getSelectedIndex()+1;
-    }
-
-    private int getCategoryClient(){
-        return textCategoryClientComboBox.getSelectedIndex()+1;
-    }
-    private String getCategoryMeasure(){
-        return textCategoryMeasureComboBox.getSelectedItem().toString();
-    }
-
-    public String quotate(String content){
-        return "'"+content+"'";
-    }
-
-    public boolean fieldIsNull(String [] strs){
-        boolean b = false;
-        for(String str:strs){
-            if(str == null || str.trim().length() == 0)
-                b=true;
-        }
-        return b;
+        addNewAttDoc.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(tabbedPane2.isEnabledAt(1)==false)
+                    tabbedPane2.setEnabledAt(1,true);
+                else {
+                    tabbedPane2.setEnabledAt(2, true);
+                    addNewAttDoc.setEnabled(false);
+                }
+            }
+        });
     }
 
     public void insertClientTable(){
@@ -264,21 +192,34 @@ public class InsertNewClientForm extends JFrame{
         String idDocDateStart;
         String idDocStatus;
 
-        String attDocNumber;
-        String attDocType;
-        String attDocName;
-        String attDocDateStart;
-        String attDocStatus;
+        String attDocNumber1;
+        String attDocType1;
+        String attDocName1;
+        String attDocDateStart1;
+        String attDocStatus1;
+        String attDocNumber2="";
+        String attDocType2="";
+        String attDocName2="";
+        String attDocDateStart2="";
+        String attDocStatus2="";
+        String attDocNumber3="";
+        String attDocType3="";
+        String attDocName3="";
+        String attDocDateStart3="";
+        String attDocStatus3="";
 
         String operAccNumber;
         String operAccDateStart;
         String operAccStatus;
+        String dateStartMeasure;
+        String dateEndMeasure;
+        String statusMeasure="Назначено";
 
         surname = textSurname.getText();
         name = textName.getText();
         patronymic = textPatronymic.getText();
         gender = getGender();
-        dateBirth = textDateBirth.getText();
+        dateBirth = dateFormat.format(dcDateBirth.getDate());
         snils = textSNILS.getText();
         telephone = textTelephone.getText();
         email = textEmail.getText();
@@ -295,17 +236,31 @@ public class InsertNewClientForm extends JFrame{
         idDocSeries = textIdDocSeries.getText();
         idDocNumber = textIdDocNumber.getText();
         idDocGivenBy = textIdDocGivenBy.getText();
-        idDocDateStart = textIdDocDateStart.getText();
+        idDocDateStart = dateFormat.format(dcIdDocDateStart.getDate());
         idDocStatus = "Действителен";
 
-        attDocNumber = textAttDocNumber.getText();
-        attDocType = Integer.toString(getTypeAttDoc());
-        attDocName = textAttDocName.getText();
-        attDocDateStart = textAttDocDateStart.getText();
-        attDocStatus = "Действителен";
+        attDocNumber1 = textAttDocNumber1.getText();
+        attDocType1 = Integer.toString(getTypeAttDoc());
+        attDocName1 = textAttDocName1.getText();
+        attDocDateStart1 = dateFormat.format(dcAttDocDateStart1.getDate());
+        attDocStatus1 = "Действителен";
+        if(tabbedPane2.isEnabledAt(1)) {
+            attDocNumber2 = textAttDocNumber2.getText();
+            attDocType2 = Integer.toString(getTypeAttDoc());
+            attDocName2 = textAttDocName2.getText();
+            attDocDateStart2 = dateFormat.format(dcAttDocDateStart2.getDate());
+            attDocStatus2 = "Действителен";
+        }
+        if(tabbedPane2.isEnabledAt(2)) {
+            attDocNumber3 = textAttDocNumber3.getText();
+            attDocType3 = Integer.toString(getTypeAttDoc());
+            attDocName3 = textAttDocName3.getText();
+            attDocDateStart3 = dateFormat.format(dcAttDocDateStart3.getDate());
+            attDocStatus3 = "Действителен";
+        }
 
         operAccNumber = textOperAccNumber.getText();
-        operAccDateStart = textOperAccDateStart.getText();
+        operAccDateStart = dateFormat.format(dcOperAccDateStart.getDate());
         operAccStatus = "Действителен";
 
         String addressId ="1";
@@ -331,22 +286,32 @@ public class InsertNewClientForm extends JFrame{
             }
 
             String sqlQuery2 = "insert into social_client(surname, name, patronymic, dateBirth, snils, telephone, email, numberGender, idAddress) values"+
-                    "("+quotate(surname)+","+quotate(name)+","+quotate(patronymic)+","+quotate(stringToDate(dateBirth))+
+                    "("+quotate(surname)+","+quotate(name)+","+quotate(patronymic)+","+quotate(dateBirth)+
                     ","+quotate(snils)+","+quotate(telephone)+","+quotate(email)+","+
                     quotate(gender)+","+quotate(addressId)+")";
             stmt.executeUpdate(sqlQuery2);
 
             String sqlQuery3 = "insert into identification_document(docSeries, docNumber, givenBy, dateStartIdDocument, statusIdDocument, numberTypeIdDocument, personalNumber) values" +
-                    "("+quotate(idDocSeries)+","+quotate(idDocNumber)+","+quotate(idDocGivenBy)+","+quotate(stringToDate(idDocDateStart))+","+
+                    "("+quotate(idDocSeries)+","+quotate(idDocNumber)+","+quotate(idDocGivenBy)+","+quotate(idDocDateStart)+","+
                     quotate(idDocStatus)+","+quotate(typeIdDoc)+","+quotate(persNum)+")";
             stmt.executeUpdate(sqlQuery3);
 
-            String sqlQuery4 = "insert into attached_document(numberAttachedDocument, nameAttachedDocument, dateStartAttachedDocument, statusAttachedDocument, numberTypeAttachedDocument, personalNumber) \n" +
-                    " values ("+quotate(attDocNumber)+","+quotate(attDocName)+","+quotate(stringToDate(attDocDateStart))+","+quotate(attDocStatus)+","+quotate(attDocType)+","+quotate(persNum)+")";
-            stmt.executeUpdate(sqlQuery4);
+            String sqlQuery4_1 = "insert into attached_document(numberAttachedDocument, nameAttachedDocument, dateStartAttachedDocument, statusAttachedDocument, numberTypeAttachedDocument, personalNumber) \n" +
+                    " values ("+quotate(attDocNumber1)+","+quotate(attDocName1)+","+quotate(attDocDateStart1)+","+quotate(attDocStatus1)+","+quotate(attDocType1)+","+quotate(persNum)+")";
+            stmt.executeUpdate(sqlQuery4_1);
+            if(tabbedPane2.isEnabledAt(1)) {
+                String sqlQuery4_2 = "insert into attached_document(numberAttachedDocument, nameAttachedDocument, dateStartAttachedDocument, statusAttachedDocument, numberTypeAttachedDocument, personalNumber) \n" +
+                        " values (" + quotate(attDocNumber2) + "," + quotate(attDocName2) + "," + quotate(attDocDateStart2) + "," + quotate(attDocStatus2) + "," + quotate(attDocType2) + "," + quotate(persNum) + ")";
+                stmt.executeUpdate(sqlQuery4_2);
+            }
+            if(tabbedPane2.isEnabledAt(2)) {
+                String sqlQuery4_3 = "insert into attached_document(numberAttachedDocument, nameAttachedDocument, dateStartAttachedDocument, statusAttachedDocument, numberTypeAttachedDocument, personalNumber) \n" +
+                        " values (" + quotate(attDocNumber3) + "," + quotate(attDocName3) + "," + quotate(attDocDateStart3) + "," + quotate(attDocStatus3) + "," + quotate(attDocType3) + "," + quotate(persNum) + ")";
+                stmt.executeUpdate(sqlQuery4_3);
+            }
 
             String sqlQuery5 = "insert into operating_account(numberOperatingAccount, dateStartAccount, statusOperaingAccount, personalNumber) VALUES "+
-                    "("+quotate(operAccNumber)+","+quotate(stringToDate(operAccDateStart))+","+quotate(operAccStatus)+","+quotate(persNum)+")";
+                    "("+quotate(operAccNumber)+","+quotate(operAccDateStart)+","+quotate(operAccStatus)+","+quotate(persNum)+")";
             stmt.executeUpdate(sqlQuery5);
 
             String sqlQuery6 = operAccTypeOrg(operAccNumber);
@@ -360,8 +325,39 @@ public class InsertNewClientForm extends JFrame{
             if(rs3.next()) {
                 codeMeasure = rs3.getInt("codeSocialMeasure");
             }
-            String sqlQuery8 = "insert into client_measure(personalNumber, codeSocialMeasure, codeClientCategory) VALUES ("+
-                    quotate(persNum)+","+quotate(String.valueOf(codeMeasure))+","+quotate(String.valueOf(getCategoryClient()))+")";
+            String sqlQuery9 = "select moss.termOfMeasure from measure_of_social_support moss where codeSocialMeasure=? and codeClientCategory=?";
+            PreparedStatement ps2 = conn.prepareStatement(sqlQuery9);
+            ps2.setInt(1,codeMeasure);
+            ps2.setInt(2,getCategoryClient());
+            ResultSet rs4 = ps2.executeQuery();
+            int termOfMeasure=0;
+            if(rs4.next()) {
+                termOfMeasure=rs4.getInt("termOfMeasure");
+            }
+            Date dateForTerm = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            dateStartMeasure = dateFormat.format(dateForTerm);
+
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(dateForTerm);
+
+            switch(termOfMeasure){
+                case 1:
+                    calendar.add(Calendar.MONTH,1);
+                    break;
+                case 2:
+                    calendar.add(Calendar.YEAR,1);
+                    break;
+                case 3:
+                    calendar.add(Calendar.YEAR,50);
+                    break;
+            }
+            dateEndMeasure = dateFormat.format(calendar.getTime());
+
+            String sqlQuery8 = "insert into client_measure(personalNumber, codeSocialMeasure, codeClientCategory," +
+                    " dateStartMeasure, dateEndMeasure, statusMeasure) VALUES ("+
+                    quotate(persNum)+","+quotate(codeMeasure)+","+quotate(getCategoryClient())+
+                    "," + quotate(dateStartMeasure)+","+quotate(dateEndMeasure)+","+quotate(statusMeasure)+")";
             stmt.executeUpdate(sqlQuery8);
             mdbc.close(stmt);
         }
@@ -370,12 +366,113 @@ public class InsertNewClientForm extends JFrame{
             mdbc.close(stmt);
         }
     }
-    private String stringToDate(String param){
-//        String date = new SimpleDateFormat("yyyy-MM-dd").format(param);
-//        return date;
-        String [] date = param.split("\\.");
-        String newDate = date[2]+"-"+date[1]+"-"+date[0];
-        return newDate;
+
+    String[] columnsCategoryMeasure = new String[]
+            {"Код кат.клиента", "Название кат.льготы" };
+    final Class[] columnClassCategoryMeasure = new Class[] {Integer.class, String.class};
+    String sqlCreateTable="select moss.codeClientCategory as code, moss.nameSocialMeasure as name from measure_of_social_support moss";
+
+    public void initModelCategoryMeasure(){
+        mdtm.columnsCatMeasure=columnsCategoryMeasure;
+        mdtm.columnClassCatMeasure=columnClassCategoryMeasure;
+        mdtm.sqlQuery=sqlCreateTable;
+        dtm=mdtm.MyTableModelMeasure();
+        tableCategoryMeasure.setModel(dtm);
+        dtm.fireTableDataChanged();
+        rowTable = tableCategoryMeasure.getRowCount();
+    }
+    private void setMasks(){
+        try {
+            MaskFormatter phoneFormatter = new MaskFormatter("+7-###-###-##-##");
+            phoneFormatter.setPlaceholderCharacter('0');
+            DefaultFormatterFactory phoneFactory = new DefaultFormatterFactory(phoneFormatter);
+
+            MaskFormatter snilsFormatter = new MaskFormatter("###-###-### ##");
+            snilsFormatter.setPlaceholderCharacter('*');
+            DefaultFormatterFactory snilsFactory = new DefaultFormatterFactory(snilsFormatter);
+
+            MaskFormatter seriesDocFormatter = new MaskFormatter("####");
+            seriesDocFormatter.setPlaceholderCharacter('*');
+            DefaultFormatterFactory seriesDocFactory = new DefaultFormatterFactory(seriesDocFormatter);
+
+            MaskFormatter numberDocFormatter = new MaskFormatter("######");
+            numberDocFormatter.setPlaceholderCharacter('*');
+            DefaultFormatterFactory numberDocFactory = new DefaultFormatterFactory(numberDocFormatter);
+
+            textTelephone.setFormatterFactory(phoneFactory);
+            textIdDocSeries.setFormatterFactory(seriesDocFactory);
+            textIdDocNumber.setFormatterFactory(numberDocFactory);
+            textSNILS.setFormatterFactory(snilsFactory);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+    public void getComboBox(JComboBox cb, JTable tl){
+        String item;
+        int k=tl.getColumnCount()-1;
+        for (int i = 0;i<tl.getRowCount();i++){
+            item = tl.getModel().getValueAt(i, k).toString();
+            cb.addItem(item);
+        }
+    }
+    private void setButtonGroup(){
+        radioButtonGender = new ButtonGroup();
+        radioButtonGender.add(radioButtonM);
+        radioButtonGender.add(radioButtonF);
+    }
+    private String getGender(){
+        if(radioButtonF.isSelected())
+            return "1";
+        else
+            return "2";
+    }
+    private String getIndex(){
+        return comboBoxIndex.getSelectedItem().toString();
+    }
+    private int getRegion(){
+        return comboBoxRegion.getSelectedIndex()+1;
+    }
+    private int getDistrict(){
+        return comboBoxDistrict.getSelectedIndex()+1;
+    }
+    private int getInhabitedLoc(){
+        return comboBoxInhabitedLoc.getSelectedIndex()+1;
+    }
+    private int getStreet(){
+        return comboBoxStreet.getSelectedIndex()+1;
+    }
+    private int getTypeIdDoc() {
+        return comboBoxTypeIdDoc.getSelectedIndex()+1;
+    }
+    private int getTypeAttDoc(){
+        return textAttDocTypeComboBox1.getSelectedIndex()+1;
+    }
+    private int getOperAccOrg(){
+        return textOperAccOrgComboBox.getSelectedIndex()+1;
+    }
+    private int getCategoryClient(){
+        return textCategoryClientComboBox.getSelectedIndex()+1;
+    }
+
+    private String getCategoryMeasure(){
+        return textCategoryMeasureComboBox.getSelectedItem().toString();
+    }
+    public String quotate(String content){
+        return "'"+content+"'";
+    }
+
+    public String quotate(int content){
+        return "'"+content+"'";
+    }
+
+    public boolean fieldIsNull(String [] strs){
+        boolean b = false;
+        for(String str:strs){
+            if(str == null || str.trim().length() == 0)
+                b=true;
+        }
+        return b;
     }
 
     private String operAccTypeOrg(String operAccNumber) throws SQLException {
