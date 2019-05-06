@@ -166,6 +166,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JButton deleteOperAccButton;
     private JButton deleteRelativeButton;
     private JButton deleteRelativeIdDoc;
+    private JButton buttonFind;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -225,7 +226,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         super("CommonTable");
         setContentPane(rootPanel);
         tableAddress.setVisible(false);
-        initModelSocialClient();
+        initModelSocialClient(sqlQuery1);
         glossaryJTree.setModel( new DefaultTreeModel(setGlossaryJTree()) );
         glossaryJTree.addTreeSelectionListener(this);
         listenerRowTableSC();
@@ -246,6 +247,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         JLabel labelRelativeIdDocMinus = new JLabel();
         JLabel labelCategoryMeasurePlus = new JLabel();
         JLabel labelRequestPlus = new JLabel();
+        JLabel labelCategoryMeasureMinus = new JLabel();
+        JLabel labelRequestMinus = new JLabel();
 //Установить плюсик на Button
         ImageIcon iconPlus = new ImageIcon("src\\plus.png");
         Image imagePlus = iconPlus.getImage();
@@ -276,11 +279,15 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         labelOperAccMinus.setIcon(iconMinus);
         labelRelativeMinus.setIcon(iconMinus);
         labelRelativeIdDocMinus.setIcon(iconMinus);
+        labelCategoryMeasureMinus.setIcon(iconMinus);
+        labelRequestMinus.setIcon(iconMinus);
         deleteAttDocButton.add(labelAttDocMinus);
         deleteIdDocButton.add(labelIdDocMinus);
         deleteOperAccButton.add(labelOperAccMinus);
         deleteRelativeButton.add(labelRelativeMinus);
         deleteRelativeIdDoc.add(labelRelativeIdDocMinus);
+        deleteCategoryMeasureButton.add(labelCategoryMeasureMinus);
+        deleteRequestButton.add(labelRequestMinus);
 
         getComboBox(comboBoxSCCategory, tableSCCategory);
         setCBMeasure();
@@ -310,7 +317,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
         updateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                initModelSocialClient();
+                initModelSocialClient(sqlQuery1);
                 selModelSC = tableSocialClients.getSelectionModel();
                 selModelSC.setSelectionInterval(rowTableSC-1, rowTableSC-1);
             }
@@ -501,7 +508,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             }
         });
 
-        //listenerRowTableCategoryMeasure();
+        listenerRowTableCategoryMeasure();
 
         addRequestButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
@@ -513,13 +520,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             }
         });
 
-        //listenerRowTableRequest();
+        listenerRowTableRequest();
 
         deleteCategoryMeasureButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 TableModel tm=tableCategoryMeasure.getModel();
                 String sqlDeleteMeasure="delete from client_measure where personalNumber='"+tm.getValueAt(selRowCatMeasure, 0)+"' and " +
-                        "codeSocialMeasure='"+tm.getValueAt(selRowCatMeasure, 2)+"' and codeClientCategory='"+tm.getValueAt(selRowCatMeasure, 0)+"'";
+                        "codeSocialMeasure='"+tm.getValueAt(selRowCatMeasure, 2)+"' and codeClientCategory='"+tm.getValueAt(selRowCatMeasure, 1)+"'";
                 mdtmSocialClient.sqlQuery=sqlDeleteMeasure;
                 mdtmSocialClient.deleteRow();
             }
@@ -569,6 +576,17 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         deleteRelativeIdDoc.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 deleteClient.deleteRelIdDoc(relativeNumber);
+            }
+        });
+
+        buttonFind.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                TableModel [] tm={tableIndex.getModel(), tableRegion.getModel(), tableDistrict.getModel(),
+                        tableLocality.getModel(), tableStreet.getModel(), tableSCCategory.getModel(), tableMeasure.getModel()};
+                JFrame findClient = new FilterClient(tm, SocialProtectionForm.this);
+                findClient.setTitle("Поиск клиента");
+                findClient.pack();
+                findClient.setVisible(true);
             }
         });
     }
@@ -853,10 +871,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             String.class, String.class, String.class, String.class, String.class, String.class};
     String sqlQuery1="select sc.personalNumber, sc.surname, sc.name, sc.patronymic, g.nameGender, DATE_FORMAT(sc.dateBirth,'%d.%m.%Y'), sc.snils, sc.telephone, sc.email from social_client sc inner join gender g on g.numberGender=sc.numberGender";
 
-    public void initModelSocialClient(){
+    public void initModelSocialClient(String sql){
         mdtmSocialClient.columnsSC=columnsSocialClient;
         mdtmSocialClient.columnClassSC=columnClassSocialClient;
-        mdtmSocialClient.sqlQuery=sqlQuery1;
+        mdtmSocialClient.sqlQuery=sql;
         dtmSocialClient=mdtmSocialClient.MyTableModelClients(1);
         tableSocialClients.setModel(dtmSocialClient);
         dtmSocialClient.fireTableDataChanged();
@@ -1156,7 +1174,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String [] columnsRequest = new String []
             {"Номер заявки", "Дата составления", "Дата начала", "Дата окончания", "Сумма", "Состояние"};
     final Class[] columnClassRequest = new Class[]
-            {String.class, String.class, String.class, Double.class, String.class};
+            {Integer.class, String.class, String.class, String.class, Double.class, String.class};
     String sqlQueryRequest = "select rfcs.requestNumber, DATE_FORMAT(rfcs.dateOfPreparation, '%d.%m.%Y'), DATE_FORMAT(rfcs.periodFrom, '%d.%m.%Y'), DATE_FORMAT(rfcs.periodTo, '%d.%m.%Y'), rfcs.totalAmount, rfcs.stateRequest " +
             "from request_for_cash_settlement rfcs inner join operating_account oa on rfcs.numberOperatingAccount=oa.numberOperatingAccount " +
             "inner join social_client sc on oa.personalNumber=sc.personalNumber " +

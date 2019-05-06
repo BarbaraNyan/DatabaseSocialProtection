@@ -178,7 +178,7 @@ import javax.swing.table.DefaultTableModel;
         public DefaultTableModel deleteRow() {
             try {
                 stmt= conn.createStatement();
-                rs = stmt.executeQuery(sqlQuery);
+                stmt.executeUpdate(sqlQuery);
                 mdbc.close(stmt);
                 return dtm;
             }
