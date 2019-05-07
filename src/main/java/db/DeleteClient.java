@@ -36,68 +36,25 @@ public class DeleteClient {
         }
     }
 
-    public void delete(){
-        deleteOperAccOrg();
+    public void delete(String numberOperAcc){
+        deleteOperAccOrg(numberOperAcc);
         deleteClient();
-//        try {
-
-//            String sqlDeleteBankOperAcc = "delete from bank_operating_account where numberOperatingAccount =\n" +
-//                    "  (select oa.numberOperatingAccount from operating_account oa\n" +
-//                    "  where oa.personalNumber=?)";
-//            String sqlDeletePostOperAcc ="delete from post_operating_account where numberOperatingAccount=" +
-//                    "(select oa.numberOperatingAccount from operating_account oa where oa.personalNumber=?)";
-//            String sqlDeleteCashOperAcc ="delete from cash_operating_account where numberOperatingAccount =" +
-//                    " (select oa.numberOperatingAccount from operating_account oa where oa.personalNumber=?)";
-//            String checkBankOperAcc = "select exists(select numberOperatingAccount from bank_operating_account " +
-//                    "where numberOperatingAccount=(select oa.numberOperatingAccount from operating_account oa where oa.personalNumber=?))";
-//            String checkPostOperAcc = "select exists(select numberOperatingAccount from post_operating_account " +
-//                    "where numberOperatingAccount=(select oa.numberOperatingAccount from operating_account oa where oa.personalNumber=?))";
-//            String checkCashOperAcc = "select exists(select numberOperatingAccount  from cash_operating_account " +
-//                    "where numberOperatingAccount=(select oa.numberOperatingAccount from operating_account oa where oa.personalNumber=?))";
-
-//            if(checkOperAcc(checkBankOperAcc) == 1) {
-//                PreparedStatement psBank = conn.prepareStatement(sqlDeleteBankOperAcc);
-//                psBank.setString(1, personalNumber);
-//                psBank.executeUpdate();
-//            }
-//            if(checkOperAcc(checkPostOperAcc)==1) {
-//                PreparedStatement psPost = conn.prepareStatement(sqlDeletePostOperAcc);
-//                psPost.setString(1, personalNumber);
-//                psPost.executeUpdate();
-//            }
-//            if(checkOperAcc(checkCashOperAcc)==1) {
-//                PreparedStatement psCash = conn.prepareStatement(sqlDeleteCashOperAcc);
-//                psCash.setString(1, personalNumber);
-//                psCash.executeUpdate();
-//            }
-//            initializeSql();
-//            String sqlDeleteOperAcc = "delete from operating_account where personalNumber=?";
-//            String sqlDeleteIdDoc = "delete from identification_document where personalNumber=?";
-//            String sqlDeleteAttDoc = "delete from attached_document where personalNumber=?";
-//            String sqlDeleteIncome = "delete from income where personalNumber=?";
-//            String sqlDeleteRelatives = "delete from relatives where personalNumber=?";
-//            String sqlDeleteClientMeasure = "delete from client_measure where personalNumber=?";
-//            String sqlDeleteClient = "delete from social_client where personalNumber=?";
-//            String [] sqlDelete = {sqlDeleteOperAcc,sqlDeleteIdDoc,sqlDeleteAttDoc,sqlDeleteIncome,sqlDeleteRelatives,sqlDeleteClientMeasure,sqlDeleteClient};
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
     }
-    private void deleteOperAccOrg(){
+    private void deleteOperAccOrg(String numOperAcc){
         try {
-            if (checkOperAcc(checkBankOperAcc) == 1) {
+            if (checkOperAcc(checkBankOperAcc,numOperAcc) == 1) {
                 PreparedStatement psBank = conn.prepareStatement(sqlDeleteBankOperAcc);
-                psBank.setString(1, personalNumber);
+                psBank.setString(1, numOperAcc);
                 psBank.executeUpdate();
             }
-            if (checkOperAcc(checkPostOperAcc) == 1) {
+            if (checkOperAcc(checkPostOperAcc,numOperAcc) == 1) {
                 PreparedStatement psPost = conn.prepareStatement(sqlDeletePostOperAcc);
-                psPost.setString(1, personalNumber);
+                psPost.setString(1, numOperAcc);
                 psPost.executeUpdate();
             }
-            if (checkOperAcc(checkCashOperAcc) == 1) {
+            if (checkOperAcc(checkCashOperAcc,numOperAcc) == 1) {
                 PreparedStatement psCash = conn.prepareStatement(sqlDeleteCashOperAcc);
-                psCash.setString(1, personalNumber);
+                psCash.setString(1, numOperAcc);
                 psCash.executeUpdate();
             }
         }
@@ -106,12 +63,12 @@ public class DeleteClient {
         }
     }
 
-    private int checkOperAcc(String sqlCheck){
+    private int checkOperAcc(String sqlCheck,String numOperAcc){
         int check = 0;
         ResultSet rs;
         try {
             PreparedStatement psCheck = conn.prepareStatement(sqlCheck);
-            psCheck.setString(1,personalNumber);
+            psCheck.setString(1,numOperAcc);
             rs = psCheck.executeQuery();
             if(rs.next())
                 check = rs.getInt(1);
@@ -137,17 +94,17 @@ public class DeleteClient {
     private void initializeSql(){
         sqlDeleteBankOperAcc = "delete from bank_operating_account where numberOperatingAccount =\n" +
                 "  (select oa.numberOperatingAccount from operating_account oa\n" +
-                "  where oa.personalNumber=?)";
+                "  where oa.numberOperatingAccount=?)";
         sqlDeletePostOperAcc ="delete from post_operating_account where numberOperatingAccount=" +
-                "(select oa.numberOperatingAccount from operating_account oa where oa.personalNumber=?)";
+                "(select oa.numberOperatingAccount from operating_account oa where oa.numberOperatingAccount=?)";
         sqlDeleteCashOperAcc ="delete from cash_operating_account where numberOperatingAccount =" +
-                " (select oa.numberOperatingAccount from operating_account oa where oa.personalNumber=?)";
+                " (select oa.numberOperatingAccount from operating_account oa where oa.numberOperatingAccount=?)";
         checkBankOperAcc = "select exists(select numberOperatingAccount from bank_operating_account " +
-                "where numberOperatingAccount=(select oa.numberOperatingAccount from operating_account oa where oa.personalNumber=?))";
+                "where numberOperatingAccount=(select oa.numberOperatingAccount from operating_account oa where oa.numberOperatingAccount=?))";
         checkPostOperAcc = "select exists(select numberOperatingAccount from post_operating_account " +
-                "where numberOperatingAccount=(select oa.numberOperatingAccount from operating_account oa where oa.personalNumber=?))";
+                "where numberOperatingAccount=(select oa.numberOperatingAccount from operating_account oa where oa.numberOperatingAccount=?))";
         checkCashOperAcc = "select exists(select numberOperatingAccount  from cash_operating_account " +
-                "where numberOperatingAccount=(select oa.numberOperatingAccount from operating_account oa where oa.personalNumber=?))";
+                "where numberOperatingAccount=(select oa.numberOperatingAccount from operating_account oa where oa.numberOperatingAccount=?))";
 
         sqlDeleteOperAcc = "delete from operating_account where personalNumber=?";
         sqlDeleteIdDoc = "delete from identification_document where personalNumber=?";
@@ -187,19 +144,20 @@ public class DeleteClient {
         deleteOnce(1,sqlDelAttDoc,params);
     }
     public void deleteOperAcc(String numberOperAcc){
-        deleteOperAccOrg();
-        String sqlDelAttDoc = "delete from operating_account where numberOperatingAccount=?";
+        initializeSql();
+        deleteOperAccOrg(numberOperAcc);
+        String sqlDelOperAcc = "delete from operating_account where numberOperatingAccount=?";
         params = new String [] {numberOperAcc};
-        deleteOnce(1,sqlDelAttDoc,params);
+        deleteOnce(1,sqlDelOperAcc,params);
     }
     public void deleteRelative(String relPersNum){
         String sqlDelRel = "delete from relatives where personalNumber=? and relativePersonalNumber=?";
         params = new String[]{personalNumber,relPersNum};
         deleteOnce(2,sqlDelRel,params);
     }
-    public void deleteRelIdDoc(String relNum){
-        String sqlDelRelIdDoc = "delete from identification_document where personalNumber=? and relativePersonalNumber=?";
-        params = new String [] {personalNumber,relNum};
-        deleteOnce(2,sqlDelRelIdDoc,params);
-    }
+//    public void deleteRelIdDoc(String relNum){
+//        String sqlDelRelIdDoc = "delete from identification_document where personalNumber=? and relativePersonalNumber=?";
+//        params = new String [] {personalNumber,relNum};
+//        deleteOnce(2,sqlDelRelIdDoc,params);
+//    }
 }

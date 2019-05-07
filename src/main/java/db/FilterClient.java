@@ -289,4 +289,5 @@ public class FilterClient extends JFrame{
         sf.initModelSocialClient(sqlQuery);
 
     }
+
 }

@@ -13,6 +13,7 @@ import java.sql.*;
 import javax.swing.JComboBox;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class SocialProtectionForm extends JFrame implements TreeSelectionListener{
     private JTabbedPane tabbedPane1;
@@ -219,12 +220,17 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private int selRowIdDoc;
     private int selRowAttDoc;
     private int selRowRel;
+    private int selRowRelIdDoc;
+    private int selRowOperAcc;
+//    private Object [] namedJOptionPane = {"Да","Нет","Отмена"};
+
 
     SimpleDateFormat formatForSql= new SimpleDateFormat("yyyy-MM-dd");
 
     SocialProtectionForm(){
         super("CommonTable");
         setContentPane(rootPanel);
+        setExtendedState(MAXIMIZED_BOTH);
         tableAddress.setVisible(false);
         initModelSocialClient(sqlQuery1);
         glossaryJTree.setModel( new DefaultTreeModel(setGlossaryJTree()) );
@@ -249,15 +255,22 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         JLabel labelRequestPlus = new JLabel();
         JLabel labelCategoryMeasureMinus = new JLabel();
         JLabel labelRequestMinus = new JLabel();
+        JLabel labelSearch = new JLabel();
 //Установить плюсик на Button
         ImageIcon iconPlus = new ImageIcon("src\\plus.png");
         Image imagePlus = iconPlus.getImage();
         Image newimgPlus = imagePlus.getScaledInstance(20,20,Image.SCALE_SMOOTH);
         iconPlus = new ImageIcon(newimgPlus);
+
         ImageIcon iconMinus = new ImageIcon("src\\minus.png");
         Image imageMinus = iconMinus.getImage();
         Image newimgMinus = imageMinus.getScaledInstance(20,20,Image.SCALE_SMOOTH);
         iconMinus = new ImageIcon(newimgMinus);
+
+        ImageIcon iconSearch = new ImageIcon("src\\pupa.png");
+        Image imageSearch = iconSearch.getImage();
+        Image newimgSearch = imageSearch.getScaledInstance(20,20,Image.SCALE_SMOOTH);
+        iconSearch = new ImageIcon(newimgSearch);
 
         labelIdDocPlus.setIcon(iconPlus);
         labelAttDocPlus.setIcon(iconPlus);
@@ -289,17 +302,27 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         deleteCategoryMeasureButton.add(labelCategoryMeasureMinus);
         deleteRequestButton.add(labelRequestMinus);
 
+        labelSearch.setIcon(iconSearch);
+        buttonFind.add(labelSearch);
+
         getComboBox(comboBoxSCCategory, tableSCCategory);
         setCBMeasure();
 
         openFieldsForEdit(false);
         editClientButton.setEnabled(false);
+        deleteClientButton1.setEnabled(false);
         fillComboBox();
         setButtonGroup();
 
         hideOperAcc();
         setButtonGroupStatus();
         listenerRowTableOpAcc();
+        listenerRowTableIdDocument();
+        listenerRowTableAttDocument();
+        listenerRowTableRel();
+        listenerRowTableRelIdDoc();
+        listenerRowTableOperAcc();
+//        listenerRowTableIdDocument();
 
         listenerRowTableRelatives();
         dcPeriodPayoff.setDate(new Date());
@@ -312,14 +335,14 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 insertNewClientForm.setTitle("Добавление нового клиента");
                 insertNewClientForm.pack();
                 insertNewClientForm.setVisible(true);
+                getRowTableSC();
             }
         });
 
         updateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 initModelSocialClient(sqlQuery1);
-                selModelSC = tableSocialClients.getSelectionModel();
-                selModelSC.setSelectionInterval(rowTableSC-1, rowTableSC-1);
+                tableSocialClients.setRowSelectionInterval(0,0);
             }
         });
 
@@ -443,6 +466,12 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     editClient.update(sqlUpdateRelativeDoc, paramsRelativeDoc);
                 }
 //                openFieldsForEdit(false);
+                initModelSocialClient(sqlQuery1);
+                initModelIdDocument(textPersNum.getText());
+                initModelAttDocument(textPersNum.getText());
+                initModelAddress(textPersNum.getText());
+                initModelOperAcc(textPersNum.getText());
+                initModelIdDocRelatives(textRelNumber.getText());
 
                 openFieldsForEdit(false);
             }
@@ -453,6 +482,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 addIdDoc.setTitle("Добавление нового документа, удостоверяющего личность");
                 addIdDoc.pack();
                 addIdDoc.setVisible(true);
+                addIdDoc.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        super.windowClosed(e);
+                        initModelIdDocument(textPersNum.getText());
+                    }
+                });
             }
         });
         addAttDocButton.addActionListener(new ActionListener() {
@@ -461,13 +497,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 addAttDoc.setTitle("Добавление нового документа");
                 addAttDoc.pack();
                 addAttDoc.setVisible(true);
-//                addAttDoc.addWindowListener(new WindowAdapter() {
-//                    @Override
-//                    public void windowDeactivated(WindowEvent e) {
-//                        super.windowDeactivated(e);
-//                        dtmAttDocument.fireTableDataChanged();
-//                    }
-//                });
+                addAttDoc.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        super.windowClosed(e);
+                        initModelAttDocument(textPersNum.getText());
+                    }
+                });
             }
         });
         addOperAccButton.addActionListener(new ActionListener() {
@@ -476,6 +512,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 addOperAcc.setTitle("Добавление нового расчетного счета");
                 addOperAcc.pack();
                 addOperAcc.setVisible(true);
+                addOperAcc.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        super.windowClosed(e);
+                        initModelOperAcc(textPersNum.getText());
+                    }
+                });
             }
         });
         addRelativeButton.addActionListener(new ActionListener() {
@@ -484,6 +527,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 addRelative.setTitle("Добавление нового члена семьи");
                 addRelative.pack();
                 addRelative.setVisible(true);
+                addRelative.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        super.windowClosed(e);
+                        initModelRelatives(textPersNum.getText());
+                    }
+                });
             }
         });
         addRelativeIdDoc.addActionListener(new ActionListener() {
@@ -495,6 +545,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     addRelativeIdDoc.setTitle("Добавление нового документа, удостоверяющего личность");
                     addRelativeIdDoc.pack();
                     addRelativeIdDoc.setVisible(true);
+                    addRelativeIdDoc.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosed(WindowEvent e) {
+                            super.windowClosed(e);
+                            initModelIdDocRelatives(textRelNumber.getText());
+                        }
+                    });
                 }
             }
         });
@@ -505,6 +562,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 addCatMeasure.setTitle("Добавление новой меры социальной поддержки");
                 addCatMeasure.pack();
                 addCatMeasure.setVisible(true);
+                addCatMeasure.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        super.windowClosed(e);
+                        initModelCategoryMeasure(textPersNum.getText());
+                    }
+                });
             }
         });
 
@@ -517,6 +581,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 insertOneRequest.setTitle("Добавление новой заявки на выплату");
                 insertOneRequest.pack();
                 insertOneRequest.setVisible(true);
+                insertOneRequest.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        super.windowClosed(e);
+                        initModelRequest(textPersNum.getText());
+                    }
+                });
             }
         });
 
@@ -524,11 +595,16 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
         deleteCategoryMeasureButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                TableModel tm=tableCategoryMeasure.getModel();
-                String sqlDeleteMeasure="delete from client_measure where personalNumber='"+tm.getValueAt(selRowCatMeasure, 0)+"' and " +
-                        "codeSocialMeasure='"+tm.getValueAt(selRowCatMeasure, 2)+"' and codeClientCategory='"+tm.getValueAt(selRowCatMeasure, 1)+"'";
-                mdtmSocialClient.sqlQuery=sqlDeleteMeasure;
-                mdtmSocialClient.deleteRow();
+                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить клиента?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                if(res==JOptionPane.YES_OPTION) {
+                    TableModel tm = tableCategoryMeasure.getModel();
+                    String sqlDeleteMeasure = "delete from client_measure where personalNumber='" + tm.getValueAt(selRowCatMeasure, 0) + "' and " +
+                            "codeSocialMeasure='" + tm.getValueAt(selRowCatMeasure, 2) + "' and codeClientCategory='" + tm.getValueAt(selRowCatMeasure, 1) + "'";
+                    mdtmSocialClient.sqlQuery = sqlDeleteMeasure;
+                    mdtmSocialClient.deleteRow();
+                    initModelCategoryMeasure(textPersNum.getText());
+                }
             }
         });
 
@@ -538,44 +614,87 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 String sqlDeleteMeasure="delete from request_for_cash_settlement where requestNumber='"+tm.getValueAt(selRowRequest, 0)+"'";
                 mdtmSocialClient.sqlQuery=sqlDeleteMeasure;
                 mdtmSocialClient.deleteRow();
+                initModelRequest(textPersNum.getText());
             }
         });
         deleteClientButton1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+//                JOptionPane.setDefaultLocale(new Locale("ru","RU"));
                 int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить клиента?",
                         "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
                 if(res==JOptionPane.YES_OPTION){
-//                    deleteClient = new DeleteClient(textPersNum.getText());
-                    deleteClient.delete();
+                    deleteClient = new DeleteClient(textPersNum.getText());
+                    TableModel tm = tableOperatingAccount.getModel();
+                    deleteClient.delete(tm.getValueAt(selRowOperAcc,0).toString());
+                    initModelSocialClient(sqlQuery1);
+                    tableSocialClients.setRowSelectionInterval(0,0);
+//                    getRowTableSC();
                 }
             }
         });
         deleteIdDocButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                TableModel tm = tableIdDocument.getModel();
-                deleteClient.deleteIdDoc(tm.getValueAt(selRowIdDoc,1).toString(),tm.getValueAt(selRowIdDoc,2).toString());
+                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить документ?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                if(res==JOptionPane.YES_OPTION){
+                    deleteClient = new DeleteClient(textPersNum.getText());
+                    TableModel tm = tableIdDocument.getModel();
+                    deleteClient.deleteIdDoc(tm.getValueAt(selRowIdDoc,1).toString(),
+                            tm.getValueAt(selRowIdDoc,2).toString());
+                    initModelIdDocument(textPersNum.getText());
+                }
+//                listenerRowTableIdDocument();
+//                TableModel tm = tableIdDocument.getModel();
             }
         });
         deleteAttDocButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                TableModel tm = tableAttDocument.getModel();
-                deleteClient.deleteAttDoc(tm.getValueAt(selRowAttDoc,0).toString());
+//                listenerRowTableAttDocument();
+                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить документ?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                if(res==JOptionPane.YES_OPTION) {
+                    deleteClient = new DeleteClient(textPersNum.getText());
+                    TableModel tm = tableAttDocument.getModel();
+                    deleteClient.deleteAttDoc(tm.getValueAt(selRowAttDoc, 0).toString());
+                    initModelAttDocument(textPersNum.getText());
+                }
             }
         });
-//        deleteOperAccButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                deleteClient.deleteOperAcc();
-//            }
-//        });
+        deleteOperAccButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить Р/С?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                if(res==JOptionPane.YES_OPTION) {
+                    deleteClient = new DeleteClient(textPersNum.getText());
+                    TableModel tm = tableOperatingAccount.getModel();
+                    deleteClient.deleteOperAcc(tm.getValueAt(selRowOperAcc,0).toString());
+                    initModelOperAcc(textPersNum.getText());
+                }
+            }
+        });
         deleteRelativeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                TableModel tm = tableRelatives.getModel();
-                deleteClient.deleteRelative(tm.getValueAt(selRowRel,0).toString());
+                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить родственника?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                if(res==JOptionPane.YES_OPTION) {
+                    deleteClient = new DeleteClient(textPersNum.getText());
+                    TableModel tm = tableRelatives.getModel();
+                    deleteClient.deleteRelative(tm.getValueAt(selRowRel, 0).toString());
+                    initModelRelatives(textPersNum.getText());
+                }
             }
         });
         deleteRelativeIdDoc.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                deleteClient.deleteRelIdDoc(relativeNumber);
+                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить документ родственника?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                if(res==JOptionPane.YES_OPTION) {
+                    deleteClient = new DeleteClient(textPersNum.getText());
+                    TableModel tm = tableIdDocRelatives.getModel();
+                    deleteClient.deleteIdDoc(tm.getValueAt(selRowRelIdDoc,1).toString(),
+                            tm.getValueAt(selRowRelIdDoc,2).toString());
+                    initModelIdDocRelatives(textRelNumber.getText());
+                }
             }
         });
 
@@ -754,7 +873,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                         getRowTableSC();
                         editClientButton.setEnabled(true);
                         deleteClientButton1.setEnabled(true);
-                        deleteClient = new DeleteClient(textPersNum.getText());
+//                        deleteClient = new DeleteClient(textPersNum.getText());
                     }
                 }
             });
@@ -1095,8 +1214,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         tableIdDocument.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting() == false) {
-                    deleteIdDocButton.setVisible(true);
-                    selRowIdDoc = tableIdDocument.getSelectedRow();
+                    int selRow = tableIdDocument.getSelectedRow();
+                    if(selRow>=0) {
+                        deleteIdDocButton.setEnabled(true);
+                        selRowIdDoc = tableIdDocument.getSelectedRow();
+                    }
                 }
             }
         });
@@ -1105,8 +1227,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         tableAttDocument.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting() == false) {
-                    deleteAttDocButton.setVisible(true);
-                    selRowAttDoc = tableAttDocument.getSelectedRow();
+                    int selRow = tableAttDocument.getSelectedRow();
+                    if(selRow>=0) {
+                        deleteAttDocButton.setEnabled(true);
+                        selRowAttDoc = tableAttDocument.getSelectedRow();
+                    }
                 }
             }
         });
@@ -1115,8 +1240,37 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         tableRelatives.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting() == false) {
-                    deleteRelativeButton.setVisible(true);
-                    selRowRel = tableRelatives.getSelectedRow();
+                    int selRow = tableRelatives.getSelectedRow();
+                    if(selRow>=0) {
+                        deleteRelativeButton.setEnabled(true);
+                        selRowRel = tableRelatives.getSelectedRow();
+                    }
+                }
+            }
+        });
+    }
+    private void listenerRowTableRelIdDoc(){
+        tableIdDocRelatives.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() == false) {
+                    int selRow = tableRelatives.getSelectedRow();
+                    if(selRow>=0) {
+                        deleteRelativeIdDoc.setEnabled(true);
+                        selRowRelIdDoc = tableIdDocRelatives.getSelectedRow();
+                    }
+                    }
+            }
+        });
+    }
+    private void listenerRowTableOperAcc(){
+        tableOperatingAccount.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() == false) {
+                    int selRow = tableOperatingAccount.getSelectedRow();
+                    if(selRow>=0) {
+                        deleteOperAccButton.setEnabled(true);
+                        selRowOperAcc = tableOperatingAccount.getSelectedRow();
+                    }
                 }
             }
         });
@@ -1125,7 +1279,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         tableRequest.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 if (listSelectionEvent.getValueIsAdjusting() == false) {
-                    deleteRequestButton.setVisible(true);
+                    deleteRequestButton.setEnabled(true);
                     selRowRequest = tableRequest.getSelectedRow();
                 }
             }
@@ -1136,7 +1290,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         tableCategoryMeasure.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 if (listSelectionEvent.getValueIsAdjusting() == false) {
-                    addRequestButton.setVisible(true);
+                    addRequestButton.setEnabled(true);
                     deleteCategoryMeasureButton.setVisible(true);
                     selRowCatMeasure = tableCategoryMeasure.getSelectedRow();
                 }
@@ -1431,65 +1585,68 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     //Отображение даннных во вкладках Перс.данные, Адрес, Уд. личнсоти, Доп.документы
     public void getRowTableSC(){
-        selRowSC = tableSocialClients.getSelectedRow();
-        persNum = tableSocialClients.getModel().getValueAt(selRowSC,0).toString();
-        textPersNum.setText(persNum);
-        surname = tableSocialClients.getModel().getValueAt(selRowSC,1).toString();
-        textSurname.setText(surname);
-        name = tableSocialClients.getModel().getValueAt(selRowSC,2).toString();
-        textName.setText(name);
-        patronymic = tableSocialClients.getModel().getValueAt(selRowSC,3).toString();
-        textPatronymic.setText(patronymic);
-        gender = tableSocialClients.getModel().getValueAt(selRowSC,4).toString();
-        textGender.setText(gender);
-        setSelectedGender(gender);
-        dateBirth = tableSocialClients.getModel().getValueAt(selRowSC,5).toString();
-        textDateBirth.setText(dateBirth);
-        snils = tableSocialClients.getModel().getValueAt(selRowSC,6).toString();
-        textSNILS.setText(snils);
-        telephone = tableSocialClients.getModel().getValueAt(selRowSC,7).toString();
-        textTelephone.setText(telephone);
-        email = tableSocialClients.getModel().getValueAt(selRowSC,8).toString();
-        textEmail.setText(email);
+        int selRow = tableSocialClients.getSelectedRow();
+        if(selRow>=0) {
+            selRowSC = tableSocialClients.getSelectedRow();
+            persNum = tableSocialClients.getModel().getValueAt(selRowSC, 0).toString();
+            textPersNum.setText(persNum);
+            surname = tableSocialClients.getModel().getValueAt(selRowSC, 1).toString();
+            textSurname.setText(surname);
+            name = tableSocialClients.getModel().getValueAt(selRowSC, 2).toString();
+            textName.setText(name);
+            patronymic = tableSocialClients.getModel().getValueAt(selRowSC, 3).toString();
+            textPatronymic.setText(patronymic);
+            gender = tableSocialClients.getModel().getValueAt(selRowSC, 4).toString();
+            textGender.setText(gender);
+            setSelectedGender(gender);
+            dateBirth = tableSocialClients.getModel().getValueAt(selRowSC, 5).toString();
+            textDateBirth.setText(dateBirth);
+            snils = tableSocialClients.getModel().getValueAt(selRowSC, 6).toString();
+            textSNILS.setText(snils);
+            telephone = tableSocialClients.getModel().getValueAt(selRowSC, 7).toString();
+            textTelephone.setText(telephone);
+            email = tableSocialClients.getModel().getValueAt(selRowSC, 8).toString();
+            textEmail.setText(email);
 
-        initModelAddress(persNum);
+            initModelAddress(persNum);
 
-        region = tableAddress.getModel().getValueAt(0,1).toString();
-        textRegion.setText(region);
-        setSelectedValue(region,textRegionComboBox);
-        district = tableAddress.getModel().getValueAt(0,2).toString();
-        textDistrict.setText(district);
-        setSelectedValue(district,textDistrictComboBox);
-        inhabitedLocality = tableAddress.getModel().getValueAt(0,3).toString();
-        textInhabitedLocality.setText(inhabitedLocality);
-        setSelectedValue(inhabitedLocality,textInhabitedLocalityComboBox);
-        street = tableAddress.getModel().getValueAt(0,4).toString();
-        textStreet.setText(street);
-        setSelectedValue(street,textStreetComboBox);
-        house = tableAddress.getModel().getValueAt(0,5).toString();
-        textHouse.setText(house);
-        flat = tableAddress.getModel().getValueAt(0,6).toString();
-        textFlat.setText(flat);
-        index = tableAddress.getModel().getValueAt(0,0).toString();
-        textIndex.setText(index);
-        setSelectedValue(index,textIndexComboBox);
+            region = tableAddress.getModel().getValueAt(0, 1).toString();
+            textRegion.setText(region);
+            setSelectedValue(region, textRegionComboBox);
+            district = tableAddress.getModel().getValueAt(0, 2).toString();
+            textDistrict.setText(district);
+            setSelectedValue(district, textDistrictComboBox);
+            inhabitedLocality = tableAddress.getModel().getValueAt(0, 3).toString();
+            textInhabitedLocality.setText(inhabitedLocality);
+            setSelectedValue(inhabitedLocality, textInhabitedLocalityComboBox);
+            street = tableAddress.getModel().getValueAt(0, 4).toString();
+            textStreet.setText(street);
+            setSelectedValue(street, textStreetComboBox);
+            house = tableAddress.getModel().getValueAt(0, 5).toString();
+            textHouse.setText(house);
+            flat = tableAddress.getModel().getValueAt(0, 6).toString();
+            textFlat.setText(flat);
+            index = tableAddress.getModel().getValueAt(0, 0).toString();
+            textIndex.setText(index);
+            setSelectedValue(index, textIndexComboBox);
 
-        initModelIdDocument(persNum);
-        initModelAttDocument(persNum);
-        initModelOperAcc(persNum);
-        hideOperAcc();
-        initModelIncome(persNum);
-        initModelRelatives(persNum);
-        initModelCategoryMeasure(persNum);
-        initModelRequest(persNum);
-        initModelPayoffClient(persNum);
-        initModelPersAcc(persNum);
+            initModelIdDocument(persNum);
+            initModelAttDocument(persNum);
+            initModelOperAcc(persNum);
+            hideOperAcc();
+            initModelIncome(persNum);
+            initModelRelatives(persNum);
+            initModelCategoryMeasure(persNum);
+            initModelRequest(persNum);
+            initModelPayoffClient(persNum);
+            initModelPersAcc(persNum);
 
-        addRequestButton.setVisible(false);
-        deleteCategoryMeasureButton.setVisible(false);
-        deleteRequestButton.setVisible(false);
-        selRowCatMeasure=-2;
-        selRowRequest=-2;
+            addRequestButton.setVisible(false);
+//        deleteCategoryMeasureButton.setVisible(false);
+//        deleteRequestButton.setVisible(false);
+            selRowCatMeasure = -2;
+            selRowRequest = -2;
+        }
     }
 
         private void setSelectedValue(String value,JComboBox comboBox) {

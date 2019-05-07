@@ -34,6 +34,7 @@ public class AddCategoryMeasure extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 insertClientMeasure(persNum, handbook);
                 setVisible(false);
+                dispose();
             }
         });
 

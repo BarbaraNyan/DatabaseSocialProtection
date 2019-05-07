@@ -288,12 +288,13 @@ public class InsertNewClientForm extends JFrame{
             String sqlQuery2 = "insert into social_client(surname, name, patronymic, dateBirth, snils, telephone, email, numberGender, idAddress) values"+
                     "("+quotate(surname)+","+quotate(name)+","+quotate(patronymic)+","+quotate(dateBirth)+
                     ","+quotate(snils)+","+quotate(telephone)+","+quotate(email)+","+
+                    ","+quotate(snils)+","+quotate(telephone)+","+quotate(email)+","+
                     quotate(gender)+","+quotate(addressId)+")";
             stmt.executeUpdate(sqlQuery2);
 
-            String sqlQuery3 = "insert into identification_document(docSeries, docNumber, givenBy, dateStartIdDocument, statusIdDocument, numberTypeIdDocument, personalNumber) values" +
+            String sqlQuery3 = "insert into identification_document(docSeries, docNumber, givenBy, dateStartIdDocument, statusIdDocument, numberTypeIdDocument,relativePersonalNumber, personalNumber) values" +
                     "("+quotate(idDocSeries)+","+quotate(idDocNumber)+","+quotate(idDocGivenBy)+","+quotate(idDocDateStart)+","+
-                    quotate(idDocStatus)+","+quotate(typeIdDoc)+","+quotate(persNum)+")";
+                    quotate(idDocStatus)+","+quotate(typeIdDoc)+","+"NULL"+","+quotate(persNum)+")";
             stmt.executeUpdate(sqlQuery3);
 
             String sqlQuery4_1 = "insert into attached_document(numberAttachedDocument, nameAttachedDocument, dateStartAttachedDocument, statusAttachedDocument, numberTypeAttachedDocument, personalNumber) \n" +
