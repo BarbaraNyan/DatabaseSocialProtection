@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="rootPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="1170" height="676"/>
+      <xy x="20" y="20" width="1170" height="827"/>
     </constraints>
     <properties>
       <background color="-5594625"/>
@@ -1743,10 +1743,30 @@
                         </constraints>
                         <properties>
                           <model>
-                            <item value="Матери-одиночки"/>
-                            <item value="Ветераны ВОВ"/>
+                            <item value="Инвалиды ВОВ и инвалиды боевых действий"/>
+                            <item value="Участники ВОВ"/>
+                            <item value="Ветераны боевых действий"/>
+                            <item value="Военнослужащие"/>
+                            <item value="Жители блокадного Ленинграда"/>
+                            <item value="Члены семьи погибшего (умершего)"/>
+                            <item value="Лица, проработавшие в тылу"/>
+                            <item value="Лица, род. на терр. СССР в 1928-1945 г."/>
+                            <item value="Ветераны труда"/>
+                            <item value="Ветераны военной службы"/>
+                            <item value="Ветераны труда РК"/>
+                            <item value="Граждане пожилого возраста"/>
+                            <item value="Лица, пострадавшие от политических репрессий"/>
                             <item value="Инвалиды"/>
-                            <item value="Многодетные"/>
+                            <item value="Почетные доноры РК"/>
+                            <item value="Почетные граждане"/>
+                            <item value="Беременные женщины"/>
+                            <item value="Лица, страдающи онкологическими заболеваниями"/>
+                            <item value="Лица, удостоенные почетных званий РК"/>
+                            <item value="Многодетная семья"/>
+                            <item value="Лица, награжд. орденом &quot;Родительская слава&quot;"/>
+                            <item value="Специалисты государственных учреждений"/>
+                            <item value="Лица, усыновившие (удочерившие) ребенка"/>
+                            <item value="Малоимущие граждане с детьми"/>
                           </model>
                         </properties>
                       </component>
@@ -1756,8 +1776,9 @@
                         </constraints>
                         <properties>
                           <model>
-                            <item value="Сотрудник 1"/>
-                            <item value="Сотрудник 2"/>
+                            <item value="Иванов Николай Иванович"/>
+                            <item value="Мармеладова Софья Семёновна"/>
+                            <item value="Машнов Владислав Валерьевич"/>
                           </model>
                         </properties>
                       </component>

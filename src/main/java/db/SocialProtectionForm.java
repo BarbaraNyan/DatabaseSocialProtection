@@ -1,5 +1,14 @@
 package db;
 
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.util.CellRangeAddress;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
@@ -9,9 +18,14 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.*;
 import javax.swing.JComboBox;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -222,6 +236,14 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private int selRowRel;
     private int selRowRelIdDoc;
     private int selRowOperAcc;
+
+    // это для отчета в Эксель
+    private ArrayList<Integer> persAc;
+    private ArrayList<String> s_name;
+    private ArrayList<String> my_name;
+    private ArrayList<String> p_mic;
+    private ArrayList<Integer> in_saldo;
+    private ArrayList<Integer> acc;
 //    private Object [] namedJOptionPane = {"Да","Нет","Отмена"};
 
 
@@ -355,6 +377,12 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         createSaldoReport.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 initModelSaldoReport();
+            }
+        });
+
+        saveReportBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveReportToExcel();
             }
         });
 
@@ -720,6 +748,120 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 comboBoxMeasure.addItem(item);
             }
         }
+    }
+
+    private void saveReportToExcel() {
+        String date = (String) periodCombox.getSelectedItem();
+        String employee = (String) employeeCombox.getSelectedItem();
+        String category = (String) categoryCombox.getSelectedItem();
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("Оборотная ведомость");
+        int column = 0; // текущий столбец
+        int row = 0;// текущая строка
+        HSSFRow newRow = sheet.createRow(row);
+        Cell cell = newRow.createCell(column, CellType.STRING);
+        cell.setCellValue("ГБУ РК \"Центр по предоставению государственных услуг в сфере социальной защиты населения города Ухты\"");
+
+        row++; // row = 1
+        newRow = sheet.createRow(row);
+        cell = newRow.createCell(column, CellType.STRING);
+        cell.setCellValue("ОБОРОТНАЯ ВЕДОМОСТЬ по проводкам за период: " + date);
+        // HSSFCellStyle styleForReport = createStyleForReport(workbook);
+        CellRangeAddress region;
+        region = new CellRangeAddress(0, 0, 0, 5);
+        sheet.addMergedRegion(region);
+        region = new CellRangeAddress(1, 1, 0, 5);
+        sheet.addMergedRegion(region);
+
+        row++; // row = 2
+        newRow = sheet.createRow(row);
+        cell = newRow.createCell(column, CellType.STRING);
+        cell.setCellValue("Соц.выплата: ");
+        cell = newRow.createCell(column + 1, CellType.STRING);
+        cell.setCellValue(category);
+        region = new CellRangeAddress(2, 2, 1, 5);
+        sheet.addMergedRegion(region);
+
+        row++; // row = 3
+        newRow = sheet.createRow(row);
+        cell = newRow.createCell(column, CellType.STRING);
+        cell.setCellValue("Составлено сотрудником: ");
+        cell = newRow.createCell(column + 1, CellType.STRING);
+        cell.setCellValue(employee);
+        region = new CellRangeAddress(3, 3, 1, 5);
+        sheet.addMergedRegion(region);
+
+
+        row++; // row = 4
+        newRow = sheet.createRow(row);
+        cell = newRow.createCell(column, CellType.STRING);
+        cell.setCellValue("Л/с");
+        cell = newRow.createCell(column + 1, CellType.STRING);
+        cell.setCellValue("Фамилия");
+        cell = newRow.createCell(column + 2, CellType.STRING);
+        cell.setCellValue("Имя");
+        cell = newRow.createCell(column + 3, CellType.STRING);
+        cell.setCellValue("Отчество");
+        cell = newRow.createCell(column + 4, CellType.STRING);
+        cell.setCellValue("Вх.сальдо");
+        cell = newRow.createCell(column + 5, CellType.STRING);
+        cell.setCellValue("Начислено");
+
+//        System.out.println(persAc);
+//        System.out.println(s_name);
+//        System.out.println(my_name);
+//        System.out.println(p_mic);
+//        System.out.println(in_saldo);
+//        System.out.println(acc);
+
+        for (int i = 0; i < persAc.size(); i++) {
+            row++;
+            newRow = sheet.createRow(row);
+            cell = newRow.createCell(column, CellType.NUMERIC); // лицевой счет
+            cell.setCellValue(persAc.get(i));
+            cell = newRow.createCell(column + 1, CellType.STRING);
+            cell.setCellValue(s_name.get(i)); //
+            cell = newRow.createCell(column + 2, CellType.STRING);
+            cell.setCellValue(my_name.get(i)); // Имя
+            cell = newRow.createCell(column + 3, CellType.STRING);
+            cell.setCellValue(p_mic.get(i)); //Отчество
+            cell = newRow.createCell(column + 4, CellType.STRING);
+            cell.setCellValue(in_saldo.get(i)); // Вх.сальдо
+            cell = newRow.createCell(column + 5, CellType.STRING);
+            cell.setCellValue(acc.get(i)); // Начислено
+        }
+        region = new CellRangeAddress(row+1, row+1, 0,3);
+        sheet.addMergedRegion(region);
+        row++;
+        newRow = sheet.createRow(row);
+        cell = newRow.createCell(column, CellType.STRING);
+        HSSFCellStyle style = workbook.createCellStyle();
+        style.setAlignment(HorizontalAlignment.RIGHT);
+        cell.setCellStyle(style);
+        cell.setCellValue("ИТОГО: ");
+        cell = newRow.createCell(column+4, CellType.FORMULA);
+        String sumFormula1 = "SUM(E6:E"+row+")";
+        cell.setCellFormula(sumFormula1);
+        cell = newRow.createCell(column+5, CellType.FORMULA);
+        String sumFormula2 = "SUM(F6:F"+row+")";
+        cell.setCellFormula(sumFormula2);
+
+
+        File file = new File("C:/test repos/Оборотная ведомость-"+date+"-"+category+".xls");
+        if(file.exists()) file.delete();
+        file.getParentFile().mkdirs();
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            workbook.write(fos);
+            System.out.println("Created file: "+file.getAbsolutePath());
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     //сделать потом через один метод и скрывать и показывать true-false
@@ -1481,21 +1623,45 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             Integer.class, String.class,String.class,String.class, Integer.class, Integer.class
     };
 
-    String sqlQuerySaldoReport ="select pa.numberPersonalAccount, sc.surname, sc.name,sc.patronymic, pa.inputBalance, pa.accrued\n" +
-            "from personal_account pa inner join payoff p on pa.numberPersonalAccount = p.numberPersonalAccount\n" +
-            "inner join request_for_cash_settlement rfcs on p.numberPayoff = rfcs.numberPayoff\n" +
-            "inner join operating_account oa on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
-            "inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
-            "where sc.personalNumber = pa.numberPersonalAccount;";
+//    String sqlQuerySaldoReport ="select pa.numberPersonalAccount, sc.surname, sc.name,sc.patronymic, pa.inputBalance, pa.accrued\n" +
+//            "from personal_account pa inner join payoff p on pa.numberPersonalAccount = p.numberPersonalAccount\n" +
+//            "inner join request_for_cash_settlement rfcs on p.numberPayoff = rfcs.numberPayoff\n" +
+//            "inner join operating_account oa on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
+//            "inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
+//            "where sc.personalNumber = pa.numberPersonalAccount;";
 
     public void initModelSaldoReport() {
+        String[] columnsSaldoReport = new String[]
+                {"Личный счет","Фамилия","Имя","Отчество", "Входное сальдо", "Начислено"};
+        final Class[] columnClassSaldoReport =  new Class[] {
+                Integer.class, String.class,String.class,String.class, Integer.class, Integer.class
+        };
+
+        String sqlQueryFirst = "select cm.personalNumber from client_measure cm where codeClientCategory=?";
+        String sqlQuerySaldoReport ="select pa.numberPersonalAccount, sc.surname, sc.name,sc.patronymic, pa.inputBalance, pa.accrued\n" +
+                "from personal_account pa inner join payoff p on pa.numberPersonalAccount = p.numberPersonalAccount\n" +
+                "inner join request_for_cash_settlement rfcs on p.numberPayoff = rfcs.numberPayoff\n" +
+                "inner join operating_account oa on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
+                "inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
+                "where pa.numberPersonalAccount in (?";
+
+        int categoryCode = categoryCombox.getSelectedIndex()+1;
         mdtmSocialClient.columnsSalRep = columnsSaldoReport;
         mdtmSocialClient.columnClassSalRep = columnClassSaldoReport;
-        mdtmSocialClient.sqlQuery = sqlQuerySaldoReport;
-        dtmSaldoReport=mdtmSocialClient.MyTableModelReports(1);
+        mdtmSocialClient.sqlQuery = sqlQueryFirst;
+        mdtmSocialClient.sqlPreparedStatement=sqlQuerySaldoReport;
+        dtmSaldoReport = mdtmSocialClient.MyTableModelReports(categoryCode);
         tableSaldoReport.setModel(dtmSaldoReport);
         dtmSocialClient.fireTableDataChanged();
         rowTableSC = tableSocialClients.getRowCount();
+
+        // для отправки данных в эксель
+        persAc = mdtmSocialClient.persAcc;
+        s_name = mdtmSocialClient.surname;
+        my_name = mdtmSocialClient.name;
+        p_mic = mdtmSocialClient.patronimyc;
+        in_saldo = mdtmSocialClient.inSaldo;
+        acc = mdtmSocialClient.accrued;
     }
 
     // Начисления (Вкладка 'Начисления и выплаты')

@@ -1,6 +1,7 @@
 package db;
 
 import java.sql.*;
+import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 
     public class TableModelClients extends DefaultTableModel {
@@ -147,6 +148,18 @@ import javax.swing.table.DefaultTableModel;
         public String sqlPreparedStatement;
         public int persNum;
 
+
+        // для оборотной ведомости
+        private ArrayList<Integer> index = new ArrayList<Integer>();
+        private  ArrayList sqlArray;
+
+        ArrayList<Integer> persAcc = new ArrayList<Integer>();
+        ArrayList<String> surname = new ArrayList<String>();
+        ArrayList<String> name = new ArrayList<String>();
+        ArrayList<String> patronimyc = new ArrayList<String>();
+        ArrayList<Integer> inSaldo = new ArrayList<Integer>();
+        ArrayList<Integer> accrued = new ArrayList<Integer>();
+
         public TableModelClients(){
             try {
                 mdbc=new DatabaseConnection();
@@ -200,17 +213,67 @@ import javax.swing.table.DefaultTableModel;
             }
         }
 
-        public DefaultTableModel MyTableModelReports(int type) {
+        // получаем массив личных номеров клиентов
+        public ArrayList createIndexArray(int catCode) throws SQLException {
+            PreparedStatement ps =conn.prepareStatement(sqlQuery);
+            ps.setInt(1,catCode);
+            rs = ps.executeQuery();
+            while(rs.next()) {
+                index.add(rs.getInt("personalNumber"));
+            }
+            return index;
+        }
+
+        // преобразуем sql запрос согласно количеству элементов в массиве
+        public String cheatCode(int num) {
+            String sqlNew="";
+            sqlNew = sqlPreparedStatement;
+            String str = "";
+            for(int i=0; i<num-1;i++) {
+                str +=",?";
+            }
+            str = str + ")";
+            sqlNew=sqlNew.concat(str);
+            return sqlNew;
+        }
+
+        public DefaultTableModel MyTableModelReports(int catCode) {
+            persAcc.clear();
+            surname.clear();
+            name.clear();
+            patronimyc.clear();
+            inSaldo.clear();
+            accrued.clear();
             try {
-                stmt = conn.createStatement();
-                rs = stmt.executeQuery(sqlQuery);
+                sqlArray = createIndexArray(catCode);
+                String cheatSql = cheatCode(index.size());
+                ps = conn.prepareStatement(cheatSql);
+                for(int i=0; i<index.size();i++ ){
+                    ps.setInt(i+1, index.get(i));
+                }
+                rs = ps.executeQuery();
+                createTable(rs, columnsSalRep, columnClassSalRep);
+
+                rs = ps.executeQuery();
+                ResultSetMetaData meta = ps.getMetaData();
+                int numOfCol = meta.getColumnCount();
+                int i=0;
+                while(rs.next()) {
+                    persAcc.add(rs.getInt(1));
+                    surname.add(rs.getString(2));
+                    name.add(rs.getString(3));
+                    patronimyc.add(rs.getString(4));
+                    inSaldo.add(rs.getInt(5));
+                    accrued.add(rs.getInt(6));
+                    i++;
+                    System.out.println("i = "+i);
+                }
+
+                sqlArray.clear();
+
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            switch(type) {
-                case 1: createTable(rs, columnsSalRep, columnClassSalRep);
-            }
-
             mdbc.close(stmt);
             return dtm;
         }
