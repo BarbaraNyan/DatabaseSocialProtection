@@ -257,7 +257,6 @@ import javax.swing.table.DefaultTableModel;
                 rs = ps.executeQuery();
                 ResultSetMetaData meta = ps.getMetaData();
                 int numOfCol = meta.getColumnCount();
-                int i=0;
                 while(rs.next()) {
                     persAcc.add(rs.getInt(1));
                     surname.add(rs.getString(2));
@@ -265,8 +264,6 @@ import javax.swing.table.DefaultTableModel;
                     patronimyc.add(rs.getString(4));
                     inSaldo.add(rs.getInt(5));
                     accrued.add(rs.getInt(6));
-                    i++;
-                    System.out.println("i = "+i);
                 }
 
                 sqlArray.clear();

@@ -868,6 +868,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private void openFieldsForEdit(boolean yes){
         buttonSave.setVisible(yes);
         editClientButton.setEnabled(!yes);
+        editClientButton.setVisible(!yes);
         //Перс.данные
         textSurname.setEditable(yes);
         textName.setEditable(yes);

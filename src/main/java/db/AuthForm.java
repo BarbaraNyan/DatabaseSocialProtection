@@ -3,6 +3,8 @@ package db;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +30,14 @@ public class AuthForm extends JFrame{
                         JFrame socialProtection = new SocialProtectionForm();
                         socialProtection.setVisible(true);
                         setVisible(false);
+
+                        socialProtection.addWindowListener(new WindowAdapter() {
+                            @Override
+                            public void windowClosing(WindowEvent e) {
+                                super.windowClosing(e);
+                                System.exit(0);
+                            }
+                        });
                     } else {
                         JOptionPane.showMessageDialog(AuthForm.this,
                                 "Неправильно введены логин или пароль!", "Ошибка входа", JOptionPane.INFORMATION_MESSAGE);

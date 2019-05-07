@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.table.TableModel;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
+import java.awt.*;
 import java.awt.event.*;
 import java.sql.Statement;
 import java.text.ParseException;
@@ -55,6 +56,7 @@ public class FilterClient extends JFrame{
     FilterClient(final TableModel[] tm, SocialProtectionForm spf){
         sf=spf;
         setContentPane(rootPanel);
+        setPreferredSize(new Dimension(1200,700));
         pnDateBirth.add(dcDateBirth);
 
         JCheckBox []b1={surnameCheckBox, nameCheckBox, patronymicCheckBox, dateBirthChecBox, genderCheckBox};
