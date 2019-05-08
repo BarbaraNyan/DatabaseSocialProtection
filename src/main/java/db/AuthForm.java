@@ -13,12 +13,14 @@ public class AuthForm extends JFrame{
     private JTextField loginTextField;
     private JPasswordField passwordField;
     private JButton logInButton;
+    private JLabel labelOne;
 
     Map <String,String> auth = new HashMap<String, String>();
     String login;
     String password;
 
     AuthForm(){
+
         setContentPane(rootPanel);
         auth.put("admin","admin");
         logInButton.addActionListener(new ActionListener() {
@@ -57,6 +59,18 @@ public class AuthForm extends JFrame{
         jFrame.setTitle("База данных");
         jFrame.setResizable(false);
         jFrame.setLocationRelativeTo(null);
+        try {
+            //here you can put the selected theme class name in JTattoo
+            UIManager.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(AuthForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(AuthForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(AuthForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(AuthForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
         jFrame.pack();
         jFrame.setVisible(true);
     }

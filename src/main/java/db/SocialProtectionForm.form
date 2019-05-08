@@ -1472,12 +1472,12 @@
               </component>
               <component id="e06fa" class="javax.swing.JButton" binding="addClientButton">
                 <constraints>
-                  <grid row="2" column="4" row-span="2" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <enabled value="true"/>
                   <font size="18"/>
-                  <text value="Добавить"/>
+                  <text value="Добавить клиента"/>
                 </properties>
               </component>
               <component id="fae0f" class="javax.swing.JButton" binding="buttonFind">
@@ -1520,11 +1520,11 @@
               </hspacer>
               <component id="5ec8c" class="javax.swing.JButton" binding="deleteClientButton1">
                 <constraints>
-                  <grid row="2" column="6" row-span="2" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <font size="18"/>
-                  <text value="Удалить"/>
+                  <text value="Удалить клиента"/>
                 </properties>
               </component>
               <hspacer id="6fe48">

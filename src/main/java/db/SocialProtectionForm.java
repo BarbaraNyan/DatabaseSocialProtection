@@ -250,9 +250,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     SimpleDateFormat formatForSql= new SimpleDateFormat("yyyy-MM-dd");
 
     SocialProtectionForm(){
-        super("CommonTable");
+        super("АИС 'Социальная защита населения'");
         setContentPane(rootPanel);
         setExtendedState(MAXIMIZED_BOTH);
+        setResizable(false);
+
         tableAddress.setVisible(false);
         initModelSocialClient(sqlQuery1);
         glossaryJTree.setModel( new DefaultTreeModel(setGlossaryJTree()) );
@@ -868,7 +870,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private void openFieldsForEdit(boolean yes){
         buttonSave.setVisible(yes);
         editClientButton.setEnabled(!yes);
-        editClientButton.setVisible(!yes);
+//        editClientButton.setVisible(!yes);
         //Перс.данные
         textSurname.setEditable(yes);
         textName.setEditable(yes);
@@ -2081,4 +2083,5 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             tableHandbook.setModel(new DefaultTableModel());
 
     }
+
 }
