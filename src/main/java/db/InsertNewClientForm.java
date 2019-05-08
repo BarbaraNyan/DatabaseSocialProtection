@@ -96,6 +96,8 @@ public class InsertNewClientForm extends JFrame{
     InsertNewClientForm(JTable [] t){
         setContentPane(rootPanel);
         setPreferredSize(new Dimension(1000,600));
+//        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+//        setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
         //передача данных из справочников в списки
         getComboBox(comboBoxIndex, t[0]);
         getComboBox(comboBoxRegion, t[1]);

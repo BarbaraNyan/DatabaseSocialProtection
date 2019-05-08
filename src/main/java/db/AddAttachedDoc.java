@@ -3,6 +3,7 @@ package db;
 import javax.swing.*;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -28,6 +29,8 @@ public class AddAttachedDoc extends JFrame{
 
     AddAttachedDoc(final String persNum, JTable [] handbook){
         setContentPane(rootPanel);
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
         panelDateStart.add(dcDateStart);
         getComboBox(textTypeDocComboBox,handbook[6]);
         saveButton.addActionListener(new ActionListener() {

@@ -262,7 +262,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         listenerRowTableSC();
         initModelHandbook();
         addRequestButton.setVisible(false);
-        deleteCategoryMeasureButton.setVisible(false);
+//        deleteCategoryMeasureButton.setVisible(false);
         deleteRequestButton.setVisible(false);
 
         JLabel labelIdDocPlus = new JLabel();
@@ -1019,6 +1019,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                         editClientButton.setEnabled(true);
                         deleteClientButton1.setEnabled(true);
 //                        deleteClient = new DeleteClient(textPersNum.getText());
+
                     }
                 }
             });
@@ -1388,6 +1389,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     int selRow = tableRelatives.getSelectedRow();
                     if(selRow>=0) {
                         deleteRelativeButton.setEnabled(true);
+                        addRelativeIdDoc.setVisible(true);
+                        deleteRelativeIdDoc.setVisible(true);
                         selRowRel = tableRelatives.getSelectedRow();
                     }
                 }
@@ -1435,8 +1438,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         tableCategoryMeasure.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 if (listSelectionEvent.getValueIsAdjusting() == false) {
-                    addRequestButton.setEnabled(true);
-                    deleteCategoryMeasureButton.setVisible(true);
+//                    addRequestButton.setEnabled(true);
+                    deleteCategoryMeasureButton.setEnabled(true);
+                    addRequestButton.setVisible(true);
+                    deleteRequestButton.setVisible(true);
                     selRowCatMeasure = tableCategoryMeasure.getSelectedRow();
                 }
             }
@@ -1811,8 +1816,21 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             initModelPersAcc(persNum);
 
             addRequestButton.setVisible(false);
+            deleteRequestButton.setVisible(false);
+            addRelativeIdDoc.setVisible(false);
+            deleteRelativeIdDoc.setVisible(false);
+            deleteIdDocButton.setEnabled(false);
+            deleteAttDocButton.setEnabled(false);
+            deleteOperAccButton.setEnabled(false);
+            deleteCategoryMeasureButton.setEnabled(false);
+            deleteRequestButton.setEnabled(false);
+            //соц выплаты другие кнопки
+            deleteRelativeButton.setEnabled(false);
+            addRelativeIdDoc.setVisible(false);
+            deleteRelativeIdDoc.setVisible(false);
+            deleteRelativeIdDoc.setEnabled(false);
+
 //        deleteCategoryMeasureButton.setVisible(false);
-//        deleteRequestButton.setVisible(false);
             selRowCatMeasure = -2;
             selRowRequest = -2;
         }

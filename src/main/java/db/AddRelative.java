@@ -1,6 +1,7 @@
 package db;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -26,6 +27,8 @@ public class AddRelative extends JFrame{
 
     public AddRelative(final String persNum, JTable [] handbook){
         setContentPane(rootPanel);
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
         panelDateBirth.add(dcDateBirth);
         getComboBox(textRelDegreeComboBox,handbook[8]);
         saveButton.addActionListener(new ActionListener() {

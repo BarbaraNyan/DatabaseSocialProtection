@@ -1,6 +1,7 @@
 package db;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -25,6 +26,8 @@ public class AddOperatingAcc extends JFrame {
 
     public AddOperatingAcc(final String persNum){
         setContentPane(rootPanel);
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
         panelDateStart.add(dcDateStart);
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

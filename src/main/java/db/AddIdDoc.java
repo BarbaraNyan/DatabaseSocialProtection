@@ -3,6 +3,7 @@ package db;
 import javax.swing.*;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -30,6 +31,8 @@ public class AddIdDoc extends JFrame{
 
     AddIdDoc(final String persNum, final String relPersNum, JTable [] handbook){
         setContentPane(rootPanel);
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
         panelDateStart.add(dcDateStart);
         setMasks();
         getComboBox(typeDocComboBox,handbook[5]);

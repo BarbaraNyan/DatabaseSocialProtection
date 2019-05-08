@@ -29,6 +29,8 @@ public class AddCategoryMeasure extends JFrame{
 
     AddCategoryMeasure(final String persNum, final TableModel[] handbook){
         setContentPane(rootPanel);
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
