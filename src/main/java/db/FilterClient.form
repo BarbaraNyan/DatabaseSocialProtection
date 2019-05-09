@@ -15,7 +15,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Имя:"/>
         </properties>
       </component>
@@ -25,7 +25,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
       </component>
       <component id="33ee2" class="javax.swing.JCheckBox" binding="patronymicCheckBox">
@@ -35,7 +35,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Отчество:"/>
         </properties>
       </component>
@@ -45,7 +45,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
       </component>
       <component id="59c33" class="javax.swing.JCheckBox" binding="dateBirthChecBox">
@@ -55,7 +55,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Дата рождения:"/>
         </properties>
       </component>
@@ -66,7 +66,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Регион:"/>
         </properties>
       </component>
@@ -77,7 +77,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Район:"/>
         </properties>
       </component>
@@ -88,7 +88,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Населенный пункт:"/>
         </properties>
       </component>
@@ -99,7 +99,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Улица:"/>
         </properties>
       </component>
@@ -110,7 +110,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Индекс:"/>
         </properties>
       </component>
@@ -121,6 +121,7 @@
         <properties>
           <editable value="true"/>
           <enabled value="false"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
       </component>
       <component id="7ced9" class="javax.swing.JComboBox" binding="comboBoxRegion">
@@ -129,6 +130,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
       </component>
       <component id="22062" class="javax.swing.JComboBox" binding="comboBoxDistrict">
@@ -137,6 +139,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
       </component>
       <component id="7a657" class="javax.swing.JComboBox" binding="comboBoxLocality">
@@ -145,6 +148,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
       </component>
       <component id="93778" class="javax.swing.JComboBox" binding="comboBoxStreet">
@@ -153,6 +157,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
       </component>
       <component id="d3a5c" class="javax.swing.JComboBox" binding="comboBoxCategory">
@@ -161,6 +166,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
       </component>
       <component id="1a570" class="javax.swing.JComboBox" binding="comboBoxMeasure">
@@ -169,6 +175,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
       </component>
       <component id="f5542" class="javax.swing.JTextField" binding="textSurname">
@@ -178,7 +185,7 @@
         <properties>
           <editable value="true"/>
           <enabled value="false"/>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
       </component>
       <component id="8f8a6" class="javax.swing.JCheckBox" binding="personalCheckBox">
@@ -188,7 +195,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="По личным данным:"/>
         </properties>
       </component>
@@ -199,7 +206,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Фамилия:"/>
         </properties>
       </component>
@@ -210,7 +217,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="По адресу:"/>
         </properties>
       </component>
@@ -221,7 +228,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="По документу:"/>
         </properties>
       </component>
@@ -232,7 +239,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Серия:"/>
         </properties>
       </component>
@@ -243,7 +250,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Номер:"/>
         </properties>
       </component>
@@ -254,7 +261,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Мера социальной поддержки:"/>
         </properties>
       </component>
@@ -264,6 +271,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
       </component>
       <component id="7a876" class="javax.swing.JFormattedTextField" binding="textNumber">
@@ -272,6 +280,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
       </component>
       <component id="8829c" class="javax.swing.JCheckBox" binding="categoryClientCheckBox">
@@ -281,7 +290,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Категория гражданина:"/>
         </properties>
       </component>
@@ -290,7 +299,7 @@
           <grid row="18" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="По категории"/>
         </properties>
       </component>
@@ -300,7 +309,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Мужской"/>
         </properties>
       </component>
@@ -310,6 +319,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
+          <font name="Microsoft Sans Serif" size="18"/>
         </properties>
         <border type="none"/>
         <children/>
@@ -321,7 +331,7 @@
           </grid>
         </constraints>
         <properties>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Пол"/>
         </properties>
       </component>
@@ -348,7 +358,7 @@
           <grid row="22" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font size="18"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Поиск"/>
         </properties>
       </component>
@@ -358,7 +368,7 @@
         </constraints>
         <properties>
           <enabled value="false"/>
-          <font name="Microsoft Sans Serif" size="14"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Женский"/>
         </properties>
       </component>
@@ -367,7 +377,7 @@
           <grid row="22" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <font size="18"/>
+          <font name="Microsoft Sans Serif" size="18"/>
           <text value="Отмена"/>
         </properties>
       </component>

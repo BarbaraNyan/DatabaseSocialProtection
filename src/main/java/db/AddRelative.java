@@ -41,7 +41,9 @@ public class AddRelative extends JFrame{
         });
         canselButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                int rezult = JOptionPane.showConfirmDialog(AddRelative.this, "Вы уверены, что хотите отменить добавление члена семьи?", "Отмена добавления члена семьи", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                int rezult = JOptionPane.showOptionDialog(AddRelative.this, "Вы уверены, что хотите отменить добавление члена семьи?", "Отмена добавления члена семьи", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,
+                        new Object[]{"Да", "Нет"},
+                        "Да");
                 if(rezult==JOptionPane.YES_OPTION)
                     setVisible(false);
             }

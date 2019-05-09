@@ -19,7 +19,7 @@ public class HeadName extends JFrame{
         setContentPane(rootPanel);
         icon = new ImageIcon("src\\headWindow.jpg");
         Image image = icon.getImage();
-        Image newimg = image.getScaledInstance(1300,700,Image.SCALE_SMOOTH);
+        Image newimg = image.getScaledInstance(1300,650,Image.SCALE_SMOOTH);
         icon = new ImageIcon(newimg);
         label.setIcon(icon);
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
@@ -66,7 +66,7 @@ public class HeadName extends JFrame{
         }
         jFrame.pack();
         jFrame.setVisible(true);
-        jFrame.setPreferredSize(new Dimension(1200,700));
+        jFrame.setPreferredSize(new Dimension(1200,650));
 
     }
 }

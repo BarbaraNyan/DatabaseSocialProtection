@@ -60,7 +60,9 @@ public class InsertRequset extends JFrame{
 
         resetButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int rezult = JOptionPane.showConfirmDialog(InsertRequset.this, "Вы уверены, что хотите отменить назначение выплаты?", "Отменить назначение выплаты", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                int rezult = JOptionPane.showOptionDialog(InsertRequset.this, "Вы уверены, что хотите отменить назначение выплаты?", "Отменить назначение выплаты", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,
+                        new Object[]{"Да", "Нет"},
+                        "Да");
                 if(rezult==JOptionPane.YES_OPTION)
                     setVisible(false);
             }

@@ -26,6 +26,7 @@ import java.sql.*;
 import javax.swing.JComboBox;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -182,6 +183,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JButton deleteRelativeButton;
     private JButton deleteRelativeIdDoc;
     private JButton buttonFind;
+    private JSpinner spinnerYear;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -261,9 +263,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         glossaryJTree.addTreeSelectionListener(this);
         listenerRowTableSC();
         initModelHandbook();
-        addRequestButton.setVisible(false);
-//        deleteCategoryMeasureButton.setVisible(false);
-        deleteRequestButton.setVisible(false);
 
         JLabel labelIdDocPlus = new JLabel();
         JLabel labelAttDocPlus = new JLabel();
@@ -351,7 +350,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         listenerRowTableRelatives();
         dcPeriodPayoff.setDate(new Date());
         pnPeriodPayoff.add(dcPeriodPayoff);
-        dcPeriodPayoff.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+        dcPeriodPayoff.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+
+        SpinnerModel sm = new SpinnerNumberModel(2019, 2019, 2150, 1);
+        spinnerYear.setModel(sm);
 
         addClientButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -625,8 +627,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
         deleteCategoryMeasureButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить клиента?",
-                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить клиента?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,null,
+                        new Object[]{"Да", "Нет", "Отмена"},
+                        "Да");
                 if(res==JOptionPane.YES_OPTION) {
                     TableModel tm = tableCategoryMeasure.getModel();
                     String sqlDeleteMeasure = "delete from client_measure where personalNumber='" + tm.getValueAt(selRowCatMeasure, 0) + "' and " +
@@ -650,8 +654,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         deleteClientButton1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 //                JOptionPane.setDefaultLocale(new Locale("ru","RU"));
-                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить клиента?",
-                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить клиента?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,null,
+                        new Object[]{"Да", "Нет", "Отмена"},
+                        "Да");
                 if(res==JOptionPane.YES_OPTION){
                     deleteClient = new DeleteClient(textPersNum.getText());
                     TableModel tm = tableOperatingAccount.getModel();
@@ -664,8 +670,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         });
         deleteIdDocButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить документ?",
-                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить документ?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,null,
+                        new Object[]{"Да", "Нет", "Отмена"},
+                        "Да");
                 if(res==JOptionPane.YES_OPTION){
                     deleteClient = new DeleteClient(textPersNum.getText());
                     TableModel tm = tableIdDocument.getModel();
@@ -680,8 +688,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         deleteAttDocButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 //                listenerRowTableAttDocument();
-                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить документ?",
-                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить документ?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,null,
+                        new Object[]{"Да", "Нет", "Отмена"},
+                        "Да");
                 if(res==JOptionPane.YES_OPTION) {
                     deleteClient = new DeleteClient(textPersNum.getText());
                     TableModel tm = tableAttDocument.getModel();
@@ -692,8 +702,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         });
         deleteOperAccButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить Р/С?",
-                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить Р/С?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,null,
+                        new Object[]{"Да", "Нет", "Отмена"},
+                        "Да");
                 if(res==JOptionPane.YES_OPTION) {
                     deleteClient = new DeleteClient(textPersNum.getText());
                     TableModel tm = tableOperatingAccount.getModel();
@@ -704,8 +716,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         });
         deleteRelativeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить родственника?",
-                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить родственника?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,null,
+                        new Object[]{"Да", "Нет", "Отмена"},
+                        "Да");
                 if(res==JOptionPane.YES_OPTION) {
                     deleteClient = new DeleteClient(textPersNum.getText());
                     TableModel tm = tableRelatives.getModel();
@@ -716,8 +730,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         });
         deleteRelativeIdDoc.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int res = JOptionPane.showConfirmDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить документ родственника?",
-                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION);
+                int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить документ родственника?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,null,
+                        new Object[]{"Да", "Нет", "Отмена"},
+                        "Да");
                 if(res==JOptionPane.YES_OPTION) {
                     deleteClient = new DeleteClient(textPersNum.getText());
                     TableModel tm = tableIdDocRelatives.getModel();
@@ -1438,10 +1454,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         tableCategoryMeasure.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
                 if (listSelectionEvent.getValueIsAdjusting() == false) {
-//                    addRequestButton.setEnabled(true);
+                    addRequestButton.setEnabled(true);
                     deleteCategoryMeasureButton.setEnabled(true);
-                    addRequestButton.setVisible(true);
-                    deleteRequestButton.setVisible(true);
                     selRowCatMeasure = tableCategoryMeasure.getSelectedRow();
                 }
             }
@@ -1516,7 +1530,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     }
 
     String [] columnsPersAcc = new String []
-            {"Период", "Входное сальдо", "Начислено", "Выплачено", "Исходящее сальдо"};
+            {"Период", "Входное сальдо", "Начислено", "Оплачено", "Исходящее сальдо"};
     final Class[] columnClassPersAcc = new Class[]
             {String.class, Double.class, Double.class, Double.class, Double.class};
     String sqlQueryPersAcc = "select DISTINCTROW DATE_FORMAT(pa.periodPayoff, '%m.%Y'), pa.inputBalance, pa.accrued, pa.paid, pa.outputBalance " +
@@ -1638,7 +1652,23 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 //            "inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
 //            "where sc.personalNumber = pa.numberPersonalAccount;";
 
+    String dateStart="";
+    String dateEnd="";
+    private void getPeriodOSV(int mouth){
+        String year=spinnerYear.getValue().toString();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DATE, 1);
+        calendar.set(Calendar.YEAR, Integer.parseInt(year));
+        calendar.set(Calendar.MONTH, mouth);
+        dateStart=formatForSql.format(calendar.getTime());
+        calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+        dateEnd=formatForSql.format(calendar.getTime());
+    }
+
     public void initModelSaldoReport() {
+        int numMounth=periodCombox.getSelectedIndex()+1;
+        getPeriodOSV(numMounth);
+
         String[] columnsSaldoReport = new String[]
                 {"Личный счет","Фамилия","Имя","Отчество", "Входное сальдо", "Начислено"};
         final Class[] columnClassSaldoReport =  new Class[] {
@@ -1646,12 +1676,12 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         };
 
         String sqlQueryFirst = "select cm.personalNumber from client_measure cm where codeClientCategory=?";
-        String sqlQuerySaldoReport ="select pa.numberPersonalAccount, sc.surname, sc.name,sc.patronymic, pa.inputBalance, pa.accrued\n" +
+        String sqlQuerySaldoReport ="select DISTINCT(sc.personalNumber), sc.surname, sc.name,sc.patronymic, pa.inputBalance, pa.accrued\n" +
                 "from personal_account pa inner join payoff p on pa.numberPersonalAccount = p.numberPersonalAccount\n" +
                 "inner join request_for_cash_settlement rfcs on p.numberPayoff = rfcs.numberPayoff\n" +
                 "inner join operating_account oa on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
                 "inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
-                "where pa.numberPersonalAccount in (?";
+                "where pa.periodPayoff between '"+dateStart+"' and '"+dateEnd+"' and sc.personalNumber in (?";
 
         int categoryCode = categoryCombox.getSelectedIndex()+1;
         mdtmSocialClient.columnsSalRep = columnsSaldoReport;
@@ -1815,10 +1845,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             initModelPayoffClient(persNum);
             initModelPersAcc(persNum);
 
-            addRequestButton.setVisible(false);
-            deleteRequestButton.setVisible(false);
-            addRelativeIdDoc.setVisible(false);
-            deleteRelativeIdDoc.setVisible(false);
+            addRequestButton.setEnabled(false);
+            deleteRequestButton.setEnabled(false);
+            addRelativeIdDoc.setEnabled(false);
+            deleteRelativeIdDoc.setEnabled(false);
             deleteIdDocButton.setEnabled(false);
             deleteAttDocButton.setEnabled(false);
             deleteOperAccButton.setEnabled(false);
@@ -1828,7 +1858,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             deleteRelativeButton.setEnabled(false);
             addRelativeIdDoc.setVisible(false);
             deleteRelativeIdDoc.setVisible(false);
-            deleteRelativeIdDoc.setEnabled(false);
 
 //        deleteCategoryMeasureButton.setVisible(false);
             selRowCatMeasure = -2;

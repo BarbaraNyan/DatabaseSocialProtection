@@ -39,7 +39,9 @@ public class AddOperatingAcc extends JFrame {
         });
         canselButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                int rezult = JOptionPane.showConfirmDialog(AddOperatingAcc.this, "Вы уверены, что хотите отменить добавление расчетного счета?", "Отмена добавления расчетного счета", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                int rezult = JOptionPane.showOptionDialog(AddOperatingAcc.this, "Вы уверены, что хотите отменить добавление расчетного счета?", "Отмена добавления расчетного счета", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,
+                        new Object[]{"Да", "Нет"},
+                        "Да");
                 if(rezult==JOptionPane.YES_OPTION)
                     setVisible(false);
             }

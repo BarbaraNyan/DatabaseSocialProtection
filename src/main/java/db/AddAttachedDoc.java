@@ -43,7 +43,9 @@ public class AddAttachedDoc extends JFrame{
         });
         canselButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                int rezult = JOptionPane.showConfirmDialog(AddAttachedDoc.this, "Вы уверены, что хотите отменить добавление документа?", "Отмена добавления документа", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                int rezult = JOptionPane.showOptionDialog(AddAttachedDoc.this, "Вы уверены, что хотите отменить добавление документа?", "Отмена добавления документа", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,
+                        new Object[]{"Да", "Нет"},
+                        "Да");
                 if(rezult==JOptionPane.YES_OPTION)
                     setVisible(false);
             }

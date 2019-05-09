@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import static com.sun.glass.ui.Cursor.setVisible;
 
@@ -29,8 +30,10 @@ public class AddCategoryMeasure extends JFrame{
 
     AddCategoryMeasure(final String persNum, final TableModel[] handbook){
         setContentPane(rootPanel);
+        setPreferredSize(new Dimension(1250,150));
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
+        setLocation(100,dimension.height/2-this.getSize().height/2);
+
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -42,7 +45,9 @@ public class AddCategoryMeasure extends JFrame{
 
         canselButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                int rezult = JOptionPane.showConfirmDialog(AddCategoryMeasure.this, "Вы уверены, что хотите отменить добавление новой меры социальной поддержки?", "Отмена добавления меры социальной поддержки", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                int rezult = JOptionPane.showOptionDialog(AddCategoryMeasure.this, "Вы уверены, что хотите отменить добавление новой меры социальной поддержки?", "Отмена добавления меры социальной поддержки", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,
+                        new Object[]{"Да", "Нет"},
+                        "Да");
                 if(rezult==JOptionPane.YES_OPTION)
                     setVisible(false);
             }
@@ -72,6 +77,7 @@ public class AddCategoryMeasure extends JFrame{
             cb.addItem(item);
         }
     }
+
 
     private void insertClientMeasure(String persNum, final TableModel[] handbook){
         String codeCategory="";

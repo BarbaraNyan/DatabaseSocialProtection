@@ -110,7 +110,9 @@ public class FilterClient extends JFrame{
 
         buttonCansel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int rezult = JOptionPane.showConfirmDialog(FilterClient.this, "Вы уверены, что хотите отменить поиск клиентов?", "Отмена поиска клиентов", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                int rezult = JOptionPane.showOptionDialog(FilterClient.this, "Вы уверены, что хотите отменить поиск клиентов?", "Отмена поиска клиентов", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,
+                        new Object[]{"Да", "Нет"},
+                        "Да");
                 if(rezult==JOptionPane.YES_OPTION)
                     setVisible(false);
             }

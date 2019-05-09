@@ -136,7 +136,9 @@ public class InsertNewClientForm extends JFrame{
 
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                int result = JOptionPane.showConfirmDialog(InsertNewClientForm.this, "Вы уверены, что хотите отменить добавление клиента?", "Отмена добавления клиента", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                int result = JOptionPane.showOptionDialog(InsertNewClientForm.this, "Вы уверены, что хотите отменить добавление клиента?", "Отмена добавления клиента", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,
+                        new Object[]{"Да", "Нет"},
+                        "Да");
                 if(result==JOptionPane.YES_OPTION)
                     setVisible(false);
             }
