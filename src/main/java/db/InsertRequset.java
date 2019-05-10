@@ -128,8 +128,8 @@ public class InsertRequset extends JFrame{
                 ResultSet rs=stmt.executeQuery(sqlQueryNumOA);
                 if(rs.next()) {
                     String numOA=rs.getString(1);
-                    String sqlRequest = "insert into request_for_cash_settlement(dateOfPreparation, periodFrom, periodTo, totalAmount, stateRequest, numberOperatingAccount, personnelNumberEmployee) values\n" +
-                            "('" + datePrep + "', '" + perFrom + "', '" + perTo + "', '" + amount + "', '" + state + "', '" + numOA + "', '" + numEmp + "')";
+                    String sqlRequest = "insert into request_for_cash_settlement(dateOfPreparation, periodFrom, periodTo, totalAmount, stateRequest, numberOperatingAccount, personnelNumberEmployee, codeClientCategory, codeSocialMeasure) values\n" +
+                            "('" + datePrep + "', '" + perFrom + "', '" + perTo + "', '" + amount + "', '" + state + "', '" + numOA + "', '" + numEmp + "', '"+codeCategory+"', '"+codeMeasure+"')";
                     stmt.executeUpdate(sqlRequest);
                     if(status.equals("1")) {
                         String sqlUpdateStatus="update client_measure set statusMeasure='Закончено' where personalNumber='"+persNum+"' and codeSocialMeasure='"+codeMeasure+"' and codeClientCategory='"+codeCategory+"'";

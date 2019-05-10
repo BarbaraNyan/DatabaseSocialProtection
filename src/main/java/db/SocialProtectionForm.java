@@ -1675,18 +1675,19 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 Integer.class, String.class,String.class,String.class, Integer.class, Integer.class
         };
 
-        String sqlQueryFirst = "select cm.personalNumber from client_measure cm where codeClientCategory=?";
-        String sqlQuerySaldoReport ="select DISTINCT(sc.personalNumber), sc.surname, sc.name,sc.patronymic, pa.inputBalance, pa.accrued\n" +
+        //String sqlQueryFirst = "select cm.personalNumber from client_measure cm where codeClientCategory=?";
+        String sqlQuerySaldoReport ="select sc.personalNumber, sc.surname, sc.name,sc.patronymic, pa.inputBalance, rfcs.totalAmount\n" +
                 "from personal_account pa inner join payoff p on pa.numberPersonalAccount = p.numberPersonalAccount\n" +
                 "inner join request_for_cash_settlement rfcs on p.numberPayoff = rfcs.numberPayoff\n" +
                 "inner join operating_account oa on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
                 "inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
-                "where pa.periodPayoff between '"+dateStart+"' and '"+dateEnd+"' and sc.personalNumber in (?";
+                "where pa.periodPayoff between '"+dateStart+"' and '"+dateEnd+"' and rfcs.codeClientCategory=? " +
+                "order by sc.personalNumber";
 
-        int categoryCode = categoryCombox.getSelectedIndex()+1;
+        int categoryCode = Integer.parseInt(tableSCCategory.getModel().getValueAt(categoryCombox.getSelectedIndex(), 0).toString());
         mdtmSocialClient.columnsSalRep = columnsSaldoReport;
         mdtmSocialClient.columnClassSalRep = columnClassSaldoReport;
-        mdtmSocialClient.sqlQuery = sqlQueryFirst;
+        //mdtmSocialClient.sqlQuery = sqlQueryFirst;
         mdtmSocialClient.sqlPreparedStatement=sqlQuerySaldoReport;
         dtmSaldoReport = mdtmSocialClient.MyTableModelReports(categoryCode);
         tableSaldoReport.setModel(dtmSaldoReport);

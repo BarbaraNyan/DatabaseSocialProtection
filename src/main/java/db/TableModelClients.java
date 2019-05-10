@@ -245,12 +245,14 @@ import javax.swing.table.DefaultTableModel;
             inSaldo.clear();
             accrued.clear();
             try {
-                sqlArray = createIndexArray(catCode);
+                /*sqlArray = createIndexArray(catCode);
                 String cheatSql = cheatCode(index.size());
                 ps = conn.prepareStatement(cheatSql);
                 for(int i=0; i<index.size();i++ ){
                     ps.setInt(i+1, index.get(i));
-                }
+                }*/
+                ps = conn.prepareStatement(sqlPreparedStatement);
+                ps.setInt(1, catCode);
                 rs = ps.executeQuery();
                 createTable(rs, columnsSalRep, columnClassSalRep);
 
@@ -266,7 +268,7 @@ import javax.swing.table.DefaultTableModel;
                     accrued.add(rs.getInt(6));
                 }
 
-                sqlArray.clear();
+                //sqlArray.clear();
 
             } catch (SQLException e) {
                 e.printStackTrace();
