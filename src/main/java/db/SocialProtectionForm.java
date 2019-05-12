@@ -13,6 +13,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.MaskFormatter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -49,8 +51,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTextField textName;
     private JTextField textPatronymic;
     private JTextField textDateBirth;
-    private JTextField textSNILS;
-    private JTextField textTelephone;
     private JTextField textEmail;
     private JTextField textDistrict;
     private JTextField textInhabitedLocality;
@@ -191,6 +191,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JPanel panelAttDocDateStart;
     private JPanel panelOperAccDateStart;
     private JPanel panelRelDateStart;
+    private JFormattedTextField textTelephone;
+    private JFormattedTextField textSNILS;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -512,11 +514,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 editClient.update(sqlUpdateOperAcc,paramsOperatingAcc);
 
                 //Документ родственника
-                    Object[] paramsRelIdDoc = {textRelGivenBy.getText(), dateFormat.format(dcRelDateStart.getDate()), getRelativeDocStatus(),
-                            textRelSeries.getText(), textRelNumber.getText()};
-                    String sqlUpdateRelIdDoc = "update identification_document set givenBy=?, dateStartIdDocument=?," +
+                Object[] paramsRelIdDoc = {textRelGivenBy.getText(), dateFormat.format(dcRelDateStart.getDate()), getRelativeDocStatus(),
+                        textRelSeries.getText(), textRelNumber.getText()};
+                String sqlUpdateRelIdDoc = "update identification_document set givenBy=?, dateStartIdDocument=?," +
                             "statusIdDocument=? where docSeries=? && docNumber=?";
-                    editClient.update(sqlUpdateRelIdDoc, paramsRelIdDoc);
+                editClient.update(sqlUpdateRelIdDoc, paramsRelIdDoc);
 
 //                //Документ родственника
 //                int colRowSC_Relative = tableRelatives.getRowCount();
@@ -795,6 +797,28 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 item = tableMeasure.getModel().getValueAt(i, 2).toString();
                 comboBoxMeasure.addItem(item);
             }
+        }
+    }
+
+    private void setMask(JFormattedTextField text,int type){
+        try {
+            switch(type){
+                case 1:  //Маска для телефона
+                    MaskFormatter phoneFormatter = new MaskFormatter("+7-###-###-##-##");
+                    phoneFormatter.setPlaceholderCharacter('0');
+                    DefaultFormatterFactory phoneFactory = new DefaultFormatterFactory(phoneFormatter);
+                    text.setFormatterFactory(phoneFactory);
+                    break;
+                case 2:
+                    MaskFormatter snilsFormatter = new MaskFormatter("###-###-### ##");
+                    snilsFormatter.setPlaceholderCharacter('*');
+                    DefaultFormatterFactory snilsFactory = new DefaultFormatterFactory(snilsFormatter);
+                    text.setFormatterFactory(snilsFactory);
+                    break;
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 
@@ -1907,8 +1931,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             dcDateBirth.setDate(newDateBirth);
 
             snils = tableSocialClients.getModel().getValueAt(selRowSC, 6).toString();
+            setMask(textSNILS,2);
             textSNILS.setText(snils);
             telephone = tableSocialClients.getModel().getValueAt(selRowSC, 7).toString();
+            setMask(textTelephone,1);
             textTelephone.setText(telephone);
             email = tableSocialClients.getModel().getValueAt(selRowSC, 8).toString();
             textEmail.setText(email);
