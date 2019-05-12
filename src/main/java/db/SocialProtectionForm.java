@@ -193,6 +193,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JPanel panelRelDateStart;
     private JFormattedTextField textTelephone;
     private JFormattedTextField textSNILS;
+    private JButton addIncomeButton;
+    private JButton deleteIncomeButton;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -292,6 +294,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         JLabel labelRequestPlus = new JLabel();
         JLabel labelCategoryMeasureMinus = new JLabel();
         JLabel labelRequestMinus = new JLabel();
+        JLabel labelIncomePlus = new JLabel();
+        JLabel labelIncomeMinus = new JLabel();
         JLabel labelSearch = new JLabel();
 //Установить плюсик на Button
         ImageIcon iconPlus = new ImageIcon("src\\plus.png");
@@ -316,6 +320,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         labelRelativeIdDocPlus.setIcon(iconPlus);
         labelCategoryMeasurePlus.setIcon(iconPlus);
         labelRequestPlus.setIcon(iconPlus);
+        labelIncomePlus.setIcon(iconPlus);
         addIdDocButton.add(labelIdDocPlus);
         addAttDocButton.add(labelAttDocPlus);
         addOperAccButton.add(labelOperAccPlus);
@@ -323,6 +328,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         addRelativeIdDoc.add(labelRelativeIdDocPlus);
         addCategoryMeasureButton.add(labelCategoryMeasurePlus);
         addRequestButton.add(labelRequestPlus);
+        addIncomeButton.add(labelIncomePlus);
 
         labelIdDocMinus.setIcon(iconMinus);
         labelAttDocMinus.setIcon(iconMinus);
@@ -331,6 +337,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         labelRelativeIdDocMinus.setIcon(iconMinus);
         labelCategoryMeasureMinus.setIcon(iconMinus);
         labelRequestMinus.setIcon(iconMinus);
+        labelIncomeMinus.setIcon(iconMinus);
         deleteAttDocButton.add(labelAttDocMinus);
         deleteIdDocButton.add(labelIdDocMinus);
         deleteOperAccButton.add(labelOperAccMinus);
@@ -338,6 +345,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         deleteRelativeIdDoc.add(labelRelativeIdDocMinus);
         deleteCategoryMeasureButton.add(labelCategoryMeasureMinus);
         deleteRequestButton.add(labelRequestMinus);
+        deleteIncomeButton.add(labelIncomeMinus);
 
         labelSearch.setIcon(iconSearch);
         buttonFind.add(labelSearch);
@@ -2255,7 +2263,5 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             tableHandbook.setModel(tableDoc.getModel());
         }else
             tableHandbook.setModel(new DefaultTableModel());
-
     }
-
 }
