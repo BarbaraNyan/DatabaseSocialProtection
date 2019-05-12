@@ -95,7 +95,7 @@ public class InsertNewClientForm extends JFrame{
 
     InsertNewClientForm(JTable [] t){
         setContentPane(rootPanel);
-        setPreferredSize(new Dimension(1000,600));
+        setPreferredSize(new Dimension(1100,600));
 //        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 //        setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
         //передача данных из справочников в списки
@@ -395,7 +395,7 @@ public class InsertNewClientForm extends JFrame{
             snilsFormatter.setPlaceholderCharacter('*');
             DefaultFormatterFactory snilsFactory = new DefaultFormatterFactory(snilsFormatter);
 
-            MaskFormatter seriesDocFormatter = new MaskFormatter("####");
+            MaskFormatter seriesDocFormatter = new MaskFormatter("****");
             seriesDocFormatter.setPlaceholderCharacter('*');
             DefaultFormatterFactory seriesDocFactory = new DefaultFormatterFactory(seriesDocFormatter);
 
