@@ -24,6 +24,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.*;
 import javax.swing.JComboBox;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -184,6 +186,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JButton deleteRelativeIdDoc;
     private JButton buttonFind;
     private JSpinner spinnerYear;
+    private JPanel panelDateBirth;
+    private JPanel panelIdDocDateStart;
+    private JPanel panelAttDocDateStart;
+    private JPanel panelOperAccDateStart;
+    private JPanel panelRelDateStart;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -213,7 +220,12 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private DeleteClient deleteClient;
     private EditClient editClient = new EditClient();
     private com.toedter.calendar.JDateChooser dcPeriodPayoff = new com.toedter.calendar.JDateChooser();
-
+    private com.toedter.calendar.JDateChooser dcDateBirth = new com.toedter.calendar.JDateChooser();
+    private com.toedter.calendar.JDateChooser dcIdDocDateStart= new com.toedter.calendar.JDateChooser();
+    private com.toedter.calendar.JDateChooser dcAttDocDateStart= new com.toedter.calendar.JDateChooser();
+    private com.toedter.calendar.JDateChooser dcOperAccDateStart= new com.toedter.calendar.JDateChooser();
+    private com.toedter.calendar.JDateChooser dcRelDateStart= new com.toedter.calendar.JDateChooser();
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
     private DatabaseConnection mdbc;
@@ -352,6 +364,17 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         pnPeriodPayoff.add(dcPeriodPayoff);
         dcPeriodPayoff.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
 
+        panelDateBirth.add(dcDateBirth);
+        dcDateBirth.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+        panelIdDocDateStart.add(dcIdDocDateStart);
+        dcIdDocDateStart.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+        panelAttDocDateStart.add(dcAttDocDateStart);
+        dcAttDocDateStart.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+        panelOperAccDateStart.add(dcOperAccDateStart);
+        dcOperAccDateStart.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+        panelRelDateStart.add(dcRelDateStart);
+        dcRelDateStart.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+
         SpinnerModel sm = new SpinnerNumberModel(2019, 2019, 2150, 1);
         spinnerYear.setModel(sm);
 
@@ -455,7 +478,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         buttonSave.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //Перс.данные
-                String [] paramsPersInf = {textSurname.getText(),textName.getText(), textPatronymic.getText(),textDateBirth.getText(),textSNILS.getText(),
+                String [] paramsPersInf = {textSurname.getText(),textName.getText(), textPatronymic.getText(),dateFormat.format(dcDateBirth.getDate()),textSNILS.getText(),
                         textTelephone.getText(),textEmail.getText(),getGender(),textPersNum.getText()};
                 String sqlUpdatePersInf = "update social_client set surname = ?, name = ?, patronymic = ?, dateBirth=?, snils = ?,\n" +
                         "  telephone = ?, email = ?, numberGender = ? where personalNumber = ?";
@@ -470,33 +493,40 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 editClient.update(sqlUpdateAddress,paramsAddress);
 
                 //Уд.личности
-                Object [] paramsIdDoc = {textIdDocGivenBy.getText(), textIdDocDateStart.getText(),getIdDocStatus(),getTypeIdDoc(),
+                Object [] paramsIdDoc = {textIdDocGivenBy.getText(), dateFormat.format(dcIdDocDateStart.getDate()),getIdDocStatus(),getTypeIdDoc(),
                         Integer.parseInt(textIdDocSeries.getText()), Integer.parseInt(textIdDocNumber.getText()),textPersNum.getText()};
                 String sqlUpdateIdDoc = "update identification_document set givenBy=?, dateStartIdDocument=?," +
                         "statusIdDocument=?,numberTypeIdDocument=? where docSeries=? && docNumber=? && personalNumber=?";
                 editClient.update(sqlUpdateIdDoc,paramsIdDoc);
 
                 //Доп.документы
-                Object [] paramsAttDoc = {textAttDocName.getText(),textAttDocDateStart.getText(),getAttDocStatus(),
+                Object [] paramsAttDoc = {textAttDocName.getText(),dateFormat.format(dcAttDocDateStart.getDate()),getAttDocStatus(),
                         getTypeAttDoc(), textAttDocNumber.getText(), textPersNum.getText()}; //вставить поля attDoc
                 String sqlUpdateAttDoc = "update attached_document set nameAttachedDocument=?, dateStartAttachedDocument=?,"+
                         "statusAttachedDocument=?,numberTypeAttachedDocument=? where numberAttachedDocument = ? && personalNumber=?";
                 editClient.update(sqlUpdateAttDoc,paramsAttDoc);
 
                 //Расчётный счёт
-                String[] paramsOperatingAcc = {textDateStartAccount.getText(),getOperAccStatus(),textPersNum.getText()};
+                String[] paramsOperatingAcc = {dateFormat.format(dcOperAccDateStart.getDate()),getOperAccStatus(),textPersNum.getText()};
                 String sqlUpdateOperAcc = "update operating_account set dateStartAccount=?, statusOperaingAccount=? where personalNumber=?";
                 editClient.update(sqlUpdateOperAcc,paramsOperatingAcc);
 
                 //Документ родственника
-                int colRowSC_Relative = tableRelatives.getRowCount();
-                if(colRowSC_Relative!=0) {
-                    selRowSC_RelativePersNum = tableRelatives.getSelectedRow();
-                    String relativePersNum = tableRelatives.getModel().getValueAt(selRowSC_RelativePersNum, 0).toString();
-                    String[] paramsRelativeDoc = {getRelativeDocStatus(), textPersNum.getText(), relativePersNum};
-                    String sqlUpdateRelativeDoc = "update identification_document set statusIdDocument=? where personalNumber=? and relativePersonalNumber=?";
-                    editClient.update(sqlUpdateRelativeDoc, paramsRelativeDoc);
-                }
+                    Object[] paramsRelIdDoc = {textRelGivenBy.getText(), dateFormat.format(dcRelDateStart.getDate()), getRelativeDocStatus(),
+                            textRelSeries.getText(), textRelNumber.getText()};
+                    String sqlUpdateRelIdDoc = "update identification_document set givenBy=?, dateStartIdDocument=?," +
+                            "statusIdDocument=? where docSeries=? && docNumber=?";
+                    editClient.update(sqlUpdateRelIdDoc, paramsRelIdDoc);
+
+//                //Документ родственника
+//                int colRowSC_Relative = tableRelatives.getRowCount();
+//                if(colRowSC_Relative!=0) {
+//                    selRowSC_RelativePersNum = tableRelatives.getSelectedRow();
+//                    String relativePersNum = tableRelatives.getModel().getValueAt(selRowSC_RelativePersNum, 0).toString();
+//                    String[] paramsRelativeDoc = {getRelativeDocStatus(), textPersNum.getText(), relativePersNum};
+//                    String sqlUpdateRelativeDoc = "update identification_document set statusIdDocument=? where personalNumber=? and relativePersonalNumber=?";
+//                    editClient.update(sqlUpdateRelativeDoc, paramsRelativeDoc);
+//                }
 //                openFieldsForEdit(false);
                 initModelSocialClient(sqlQuery1);
                 initModelIdDocument(textPersNum.getText());
@@ -893,7 +923,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         textPatronymic.setEditable(yes);
         radioButtonF.setVisible(yes);
         radioButtonM.setVisible(yes);
-        textDateBirth.setEditable(yes);
+        //textDateBirth.setEditable(yes);
+        //panelDateBirth.setEnabled(yes);
         textSNILS.setEditable(yes);
         textTelephone.setEditable(yes);
         textEmail.setEditable(yes);
@@ -916,12 +947,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         labelIdDocNumber.setVisible(yes);
         labelIdDocGivenBy.setVisible(yes);
         labelIdDocDateStart.setVisible(yes);
+        //panelIdDocDateStart.setEnabled(yes);
         labelIdDocStatus.setVisible(yes);
         textIdDocTypeComboBox.setVisible(yes);
         textIdDocSeries.setVisible(yes);
         textIdDocNumber.setVisible(yes);
         textIdDocGivenBy.setVisible(yes);
-        textIdDocDateStart.setVisible(yes);
+//        textIdDocDateStart.setVisible(yes);
         textIdDocStatusComboBox.setVisible(yes);
 
         labelAttDocDateStart.setVisible(yes);
@@ -929,18 +961,20 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         labelAttDocStatus.setVisible(yes);
         labelAttDocType.setVisible(yes);
         labelAttDocNumber.setVisible(yes);
-        textAttDocDateStart.setVisible(yes);
+//        textAttDocDateStart.setVisible(yes);
+        //panelAttDocDateStart.setEnabled(yes);
         textAttDocName.setVisible(yes);
         textAttDocStatusComboBox.setVisible(yes);
         textAttDocTypeComboBox.setVisible(yes);
         textAttDocNumber.setVisible(yes);
 
         //Р/C
-        textDateStartAccount.setEditable(yes);
+//        textDateStartAccount.setEditable(yes);
+        //panelOperAccDateStart.setEnabled(yes);
         rbStatusFalse.setEnabled(yes);
         rbStatusTrue.setEnabled(yes);
 
-        //Родственник документ +остальные поля там
+        //Родственник документ +остальные поля
         lbRelNumber.setVisible(yes);
         lbRelSeries.setVisible(yes);
         lbRelStatus.setVisible(yes);
@@ -950,7 +984,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         textRelNumber.setVisible(yes);
         textRelSeries.setVisible(yes);
         textRelTypeDoc.setVisible(yes);
-        textRelDateStart.setVisible(yes);
+//        textRelDateStart.setVisible(yes);
+        //panelRelDateStart.setEnabled(yes);
         textRelGivenBy.setVisible(yes);
         rbRelativeDocStatus1.setEnabled(yes);
         rbRelativeDocStatus2.setEnabled(yes);
@@ -964,6 +999,22 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         textIndex.setVisible(!yes);
         textDistrict.setVisible(!yes);
         textInhabitedLocality.setVisible(!yes);
+
+        dcDateBirth.setEnabled(yes);
+        dcIdDocDateStart.setVisible(yes);
+        dcAttDocDateStart.setVisible(yes);
+        dcOperAccDateStart.setEnabled(yes);
+        dcRelDateStart.setVisible(yes);
+//        panelDateBirth.setEnabled(yes);
+//        panelIdDocDateStart.setEnabled(yes);
+//        panelAttDocDateStart.setEnabled(yes);
+//        panelOperAccDateStart.setEnabled(yes);
+//        panelRelDateStart.setEnabled(yes);
+//        textDateBirth.setVisible(!yes);
+//        textIdDocDateStart.setVisible(!yes);
+//        textAttDocDateStart.setVisible(!yes);
+//        textDateStartAccount.setVisible(!yes);
+//        textRelDateStart.setVisible(!yes);
     }
 
     private void fillComboBox(){
@@ -1074,6 +1125,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String idDocGivenBy;
     String idDocDateStart;
     String idDocStatus;
+    java.util.Date newIdDocDateStart;
+
     private void getRowTableSC_IdDoc(){
         int selRow = tableIdDocument.getSelectedRow();
         if(selRow>=0) {
@@ -1088,7 +1141,15 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             idDocGivenBy = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc, 3).toString();
             textIdDocGivenBy.setText(idDocGivenBy);
             idDocDateStart = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc, 4).toString();
-            textIdDocDateStart.setText(idDocDateStart);
+            //textIdDocDateStart.setText(idDocDateStart);
+            //новая дата
+            try {
+                newIdDocDateStart = new SimpleDateFormat("dd-MM-yyyy").parse(idDocDateStart.replace(".","-"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            dcIdDocDateStart.setDate(newIdDocDateStart);
+
             idDocStatus = tableIdDocument.getModel().getValueAt(selRowSC_IdDoc, 5).toString();
             setSelectedValue(idDocStatus, textIdDocStatusComboBox);
         }
@@ -1099,6 +1160,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String attDocName;
     String attDocDateStart;
     String attDocStatus;
+    java.util.Date newAttDocDateStart;
+
     private void getRowTableSC_AttDoc(){
         int selRow = tableAttDocument.getSelectedRow();
         if(selRow>=0) {
@@ -1110,7 +1173,15 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             attDocName = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc, 2).toString();
             textAttDocName.setText(attDocName);
             attDocDateStart = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc, 3).toString();
-            textAttDocDateStart.setText(attDocDateStart);
+            //textAttDocDateStart.setText(attDocDateStart);
+            //новая дата
+            try {
+                newAttDocDateStart = new SimpleDateFormat("dd-MM-yyyy").parse(attDocDateStart.replace(".","-"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            dcAttDocDateStart.setDate(newAttDocDateStart);
+
             attDocStatus = tableAttDocument.getModel().getValueAt(selRowSC_AttDoc, 4).toString();
             setSelectedValue(attDocStatus, textAttDocStatusComboBox);
         }
@@ -1122,6 +1193,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String relativeNumber;
     String relativeGivenBy;
     String relativeDateStart;
+    java.util.Date newRelDateStart;
+
     private void getRowTableSC_RelativeDocStatus(){
         int selRow = tableIdDocRelatives.getSelectedRow();
         if(selRow>=0) {
@@ -1134,7 +1207,15 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             relativeGivenBy = tableIdDocRelatives.getModel().getValueAt(0, 3).toString();
             textRelGivenBy.setText(relativeGivenBy);
             relativeDateStart = tableIdDocRelatives.getModel().getValueAt(0, 4).toString();
-            textRelDateStart.setText(relativeDateStart);
+            //textRelDateStart.setText(relativeDateStart);
+            //новая дата
+            try {
+                newRelDateStart = new SimpleDateFormat("dd-MM-yyyy").parse(relativeDateStart.replace(".","-"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            dcRelDateStart.setDate(newRelDateStart);
+
 //        selRowSC_RelativeDoc = tableIdDocRelatives.getSelectedRow();
             relativeDocStatus = tableIdDocRelatives.getModel().getValueAt(0, 5).toString();
             if (relativeDocStatus.equals("Действителен")) {
@@ -1251,7 +1332,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         lbNumOA.setVisible(false);
         textNumOperatingAccount.setVisible(false);
         lbDateOA.setVisible(false);
-        textDateStartAccount.setVisible(false);
+//        textDateStartAccount.setVisible(false);
+        dcOperAccDateStart.setVisible(false);
         lbStOA.setVisible(false);
         rbStatusFalse.setVisible(false);
         rbStatusTrue.setVisible(false);
@@ -1285,7 +1367,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String nameAcc;
     String adrAcc;
     String tinAcc;
-
+    java.util.Date newOperAccDateStart;
 
     public void setOrganization(){
         String sqlAm="select bo.bic, bo.nameBank, bo.addressBank, bo.tinBank from bank_organization bo " +
@@ -1352,14 +1434,23 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                         lbNumOA.setVisible(true);
                         textNumOperatingAccount.setVisible(true);
                         lbDateOA.setVisible(true);
-                        textDateStartAccount.setVisible(true);
+//                        textDateStartAccount.setVisible(true);
                         lbStOA.setVisible(true);
                         rbStatusFalse.setVisible(true);
                         rbStatusTrue.setVisible(true);
+                        dcOperAccDateStart.setVisible(true);
                         numAcc = tableOperatingAccount.getModel().getValueAt(selRow, 0).toString();
                         textNumOperatingAccount.setText(numAcc);
                         dateAcc = tableOperatingAccount.getModel().getValueAt(selRow, 1).toString();
-                        textDateStartAccount.setText(dateAcc);
+                        //textDateStartAccount.setText(dateAcc);
+                        //новая дата
+                        try {
+                            newOperAccDateStart = new SimpleDateFormat("dd-MM-yyyy").parse(dateAcc.replace(".","-"));
+                        } catch (ParseException ep) {
+                            ep.printStackTrace();
+                        }
+                        dcOperAccDateStart.setDate(newOperAccDateStart);
+
                         statAcc = tableOperatingAccount.getModel().getValueAt(selRow, 2).toString();
                         if (statAcc.equals("Действителен"))
                             rbStatusTrue.setSelected(true);
@@ -1779,6 +1870,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String snils;
     String telephone;
     String email;
+    java.util.Date newDateBirth;
 
     String region;
     String district;
@@ -1805,7 +1897,15 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             textGender.setText(gender);
             setSelectedGender(gender);
             dateBirth = tableSocialClients.getModel().getValueAt(selRowSC, 5).toString();
-            textDateBirth.setText(dateBirth);
+//            textDateBirth.setText(dateBirth);
+            //новая дата
+            try {
+                newDateBirth = new SimpleDateFormat("dd-MM-yyyy").parse(dateBirth.replace(".","-"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            dcDateBirth.setDate(newDateBirth);
+
             snils = tableSocialClients.getModel().getValueAt(selRowSC, 6).toString();
             textSNILS.setText(snils);
             telephone = tableSocialClients.getModel().getValueAt(selRowSC, 7).toString();
