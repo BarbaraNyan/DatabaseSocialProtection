@@ -548,6 +548,15 @@ import javax.swing.table.DefaultTableModel;
             }
         }
 
+        public void addItemInHandbook(String sqlItem){
+            try {
+                stmt= conn.createStatement();
+                stmt.executeUpdate(sqlItem);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
         private void createTable(ResultSet rs, String [] columns, final Class [] columnClass){
             try {
                 ResultSetMetaData meta = rs.getMetaData();

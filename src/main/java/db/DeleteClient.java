@@ -8,6 +8,7 @@ import java.sql.SQLException;
 public class DeleteClient {
     private DatabaseConnection mdbc;
     private Connection conn;
+    private java.sql.Statement stmt;
     private String personalNumber;
     String sqlDeleteOperAcc;
     String sqlDeleteIdDoc;
@@ -24,6 +25,15 @@ public class DeleteClient {
     String checkPostOperAcc;
     String checkCashOperAcc;
     String [] params;
+
+    public DeleteClient(){
+        try {
+            mdbc=new DatabaseConnection();
+            conn=mdbc.getMyConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public DeleteClient(String persNum){
         try {
@@ -155,9 +165,17 @@ public class DeleteClient {
         params = new String[]{personalNumber,relPersNum};
         deleteOnce(2,sqlDelRel,params);
     }
-//    public void deleteRelIdDoc(String relNum){
-//        String sqlDelRelIdDoc = "delete from identification_document where personalNumber=? and relativePersonalNumber=?";
-//        params = new String [] {personalNumber,relNum};
-//        deleteOnce(2,sqlDelRelIdDoc,params);
-//    }
+    public void deleteItemInGlossary(String sqlItem,String item){
+        try {
+            PreparedStatement ps = conn.prepareStatement(sqlItem);
+            ps.setString(1,item);
+            ps.executeUpdate();
+//
+//            stmt= conn.createStatement();
+//            stmt.executeUpdate(sqlItem);
+//            mdbc.close(stmt);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

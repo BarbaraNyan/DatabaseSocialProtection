@@ -195,6 +195,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JFormattedTextField textSNILS;
     private JButton addIncomeButton;
     private JButton deleteIncomeButton;
+    private JButton addItemButton;
+    private JButton deleteItemButton;
+    private JTextField textNewItemInHandbook;
+    private JButton addNewItemButton;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -254,6 +258,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private int selRowRel;
     private int selRowRelIdDoc;
     private int selRowOperAcc;
+    private int selRowItemInHandbook;
 
     // это для отчета в Эксель
     private ArrayList<Integer> persAc;
@@ -296,6 +301,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         JLabel labelRequestMinus = new JLabel();
         JLabel labelIncomePlus = new JLabel();
         JLabel labelIncomeMinus = new JLabel();
+        JLabel labelNewItemPlus = new JLabel();
+        JLabel labelNewItemMinus = new JLabel();
         JLabel labelSearch = new JLabel();
 //Установить плюсик на Button
         ImageIcon iconPlus = new ImageIcon("src\\plus.png");
@@ -321,6 +328,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         labelCategoryMeasurePlus.setIcon(iconPlus);
         labelRequestPlus.setIcon(iconPlus);
         labelIncomePlus.setIcon(iconPlus);
+        labelNewItemPlus.setIcon(iconPlus);
         addIdDocButton.add(labelIdDocPlus);
         addAttDocButton.add(labelAttDocPlus);
         addOperAccButton.add(labelOperAccPlus);
@@ -329,6 +337,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         addCategoryMeasureButton.add(labelCategoryMeasurePlus);
         addRequestButton.add(labelRequestPlus);
         addIncomeButton.add(labelIncomePlus);
+        addItemButton.add(labelNewItemPlus);
 
         labelIdDocMinus.setIcon(iconMinus);
         labelAttDocMinus.setIcon(iconMinus);
@@ -338,6 +347,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         labelCategoryMeasureMinus.setIcon(iconMinus);
         labelRequestMinus.setIcon(iconMinus);
         labelIncomeMinus.setIcon(iconMinus);
+        labelNewItemMinus.setIcon(iconMinus);
         deleteAttDocButton.add(labelAttDocMinus);
         deleteIdDocButton.add(labelIdDocMinus);
         deleteOperAccButton.add(labelOperAccMinus);
@@ -346,6 +356,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         deleteCategoryMeasureButton.add(labelCategoryMeasureMinus);
         deleteRequestButton.add(labelRequestMinus);
         deleteIncomeButton.add(labelIncomeMinus);
+        deleteItemButton.add(labelNewItemMinus);
 
         labelSearch.setIcon(iconSearch);
         buttonFind.add(labelSearch);
@@ -792,6 +803,35 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 findClient.setTitle("Поиск клиента");
                 findClient.pack();
                 findClient.setVisible(true);
+            }
+        });
+        addNewItemButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                addItemInGlossary();
+                textNewItemInHandbook.setVisible(false);
+                addNewItemButton.setVisible(false);
+            }
+        });
+        addItemButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                textNewItemInHandbook.setVisible(true);
+                addNewItemButton.setVisible(true);
+            }
+        });
+        deleteItemButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, " +
+                                "что хотите удалить этот элемент из справочника?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,null,
+                        new Object[]{"Да", "Нет", "Отмена"},
+                        "Да");
+                if(res==JOptionPane.YES_OPTION){
+                    listenerRowTableHandbook();
+                    String [] params = deleteItemInGlossary();
+                    deleteClient = new DeleteClient();
+                    deleteClient.deleteItemInGlossary(params[0],params[1]);
+//                    initModelIdDocument(textPersNum.getText());
+                }
             }
         });
     }
@@ -1584,6 +1624,19 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             }
         });
     }
+    private void listenerRowTableHandbook(){
+        tableHandbook.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() == false) {
+                    int selRow = tableOperatingAccount.getSelectedRow();
+                    if(selRow>=0) {
+                        deleteItemButton.setEnabled(true);
+                        selRowItemInHandbook = tableHandbook.getSelectedRow();
+                    }
+                }
+            }
+        });
+    }
 
     //Соц.выплаты (Вкладка "Личные дела")
     String [] columnsCategoryMeasure = new String []
@@ -2263,5 +2316,119 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             tableHandbook.setModel(tableDoc.getModel());
         }else
             tableHandbook.setModel(new DefaultTableModel());
+    }
+    public String quotate(String content){
+        return "'"+content+"'";
+    }
+    private void addItemInGlossary(){
+        String item = textNewItemInHandbook.getText();
+        String sqlItem = "";
+
+        TreePath[] paths=glossaryJTree.getSelectionPaths();
+        treeSelect=paths[0].getLastPathComponent().toString();
+
+        if ("Категории гражданина".equals(treeSelect)) {
+            sqlItem = "insert into social_client_category(nameClientCategory) values ("+quotate(item)+")";
+        }else
+        if ("Меры социальной поддержки".equals(treeSelect)) {
+
+        }else
+        if ("Законы".equals(treeSelect)) {
+
+        }else
+        if ("Статьи".equals(treeSelect)) {
+
+        }else
+        if ("Индексы".equals(treeSelect)) {
+            sqlItem = "insert into index_address(numberIndex) values ("+quotate(item)+")";
+        }else
+        if ("Регионы".equals(treeSelect)) {
+            sqlItem = "insert into region_address(nameRegion) values ("+quotate(item)+")";
+        }else
+        if ("Районы".equals(treeSelect)) {
+            sqlItem = "insert into district_address(nameDistrict) values ("+quotate(item)+")";
+        }else
+        if ("Населённые пункты".equals(treeSelect)) {
+            sqlItem = "insert into inhabited_locality_address(nameInhabitedLocality) values ("+quotate(item)+")";
+        }else
+        if ("Улицы".equals(treeSelect)) {
+            sqlItem = "insert into street_address(nameStreet) values ("+quotate(item)+")";
+        }else
+        if ("Родственные отношения".equals(treeSelect)) {
+            sqlItem = "insert into relation_degree(nameRelationDegree) values ("+quotate(item)+")";
+        }else
+        if ("Виды доходов".equals(treeSelect)) {
+            sqlItem = "insert into type_income(nameTypeIncone) values ("+quotate(item)+")";
+        }else
+        if ("Документы удостоверения".equals(treeSelect)) {
+            sqlItem = "insert into type_identification_document(nameTypeIdDocument) values ("+quotate(item)+")";
+        }else
+        if ("Документы".equals(treeSelect)) {
+            sqlItem = "insert into type_attached_document(nameTypeAttachedDocument) values ("+quotate(item)+")";
+        }else
+            tableHandbook.setModel(new DefaultTableModel());
+
+        mdtmSocialClient.addItemInHandbook(sqlItem);
+
+    }
+
+    private String [] deleteItemInGlossary(){
+        TreePath[] paths=glossaryJTree.getSelectionPaths();
+        treeSelect=paths[0].getLastPathComponent().toString();
+
+        TableModel tm = tableHandbook.getModel();
+        String item = "";
+        String sqlItem = "";
+
+        //Добавить для других случаев
+        if ("Индексы".equals(treeSelect)) {
+            item = tm.getValueAt(selRowItemInHandbook,0).toString();
+        }
+        else
+            item = tm.getValueAt(selRowItemInHandbook,1).toString();
+
+        if ("Категории гражданина".equals(treeSelect)) {
+            sqlItem = "delete from social_client_category where nameClientCategory = ?";
+        }else
+        if ("Меры социальной поддержки".equals(treeSelect)) {
+
+        }else
+        if ("Законы".equals(treeSelect)) {
+
+        }else
+        if ("Статьи".equals(treeSelect)) {
+
+        }else
+        if ("Индексы".equals(treeSelect)) {
+            sqlItem = "delete from index_address where numberIndex = ?";
+        }else
+        if ("Регионы".equals(treeSelect)) {
+            sqlItem = "delete from region_address where nameRegion = ?";
+        }else
+        if ("Районы".equals(treeSelect)) {
+            sqlItem = "delete from district_address where nameDistrict = ?";
+        }else
+        if ("Населённые пункты".equals(treeSelect)) {
+            sqlItem = "delete from inhabited_locality_address where nameInhabitedLocality = ?";
+        }else
+        if ("Улицы".equals(treeSelect)) {
+            sqlItem = "delete from street_address where nameStreet = ?";
+        }else
+        if ("Родственные отношения".equals(treeSelect)) {
+            sqlItem = "delete from relation_degree where nameRelationDegree = ?";
+        }else
+        if ("Виды доходов".equals(treeSelect)) {
+            sqlItem = "delete from type_income where nameTypeIncone = ?";
+        }else
+        if ("Документы удостоверения".equals(treeSelect)) {
+            sqlItem = "delete from type_identification_document where nameTypeIdDocument = ?";
+        }else
+        if ("Документы".equals(treeSelect)) {
+            sqlItem = "delete from type_attached_document where nameTypeAttachedDocument = ?";
+        }else
+            tableHandbook.setModel(new DefaultTableModel());
+
+        String [] param = {sqlItem,item};
+        return param;
     }
 }
