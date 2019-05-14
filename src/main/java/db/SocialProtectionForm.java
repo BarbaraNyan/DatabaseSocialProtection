@@ -1,5 +1,10 @@
 package db;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -7,6 +12,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import javax.swing.*;
@@ -19,20 +25,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.sql.*;
 import javax.swing.JComboBox;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.*;
 import java.util.Date;
-import java.util.Locale;
 
 public class SocialProtectionForm extends JFrame implements TreeSelectionListener{
     private JTabbedPane tabbedPane1;
@@ -1020,6 +1023,87 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            FileInputStream input_doc = new FileInputStream(
+                    new File("C:/test repos/Оборотная ведомость-"+date+"-"+category+".xls"));
+            HSSFWorkbook my_xls_workbook = new HSSFWorkbook(input_doc);
+            HSSFSheet my_worksheet = my_xls_workbook.getSheetAt(0);
+
+            // my_worksheet.rowIterator();
+            Document iText_xlstopdf = new Document();
+            String fileName = "C:/test repos/Оборотная ведомость за "+date+".pdf";
+            PdfWriter.getInstance(iText_xlstopdf, new FileOutputStream(fileName));
+            iText_xlstopdf.open();
+            BaseFont bf_russian = BaseFont.createFont("C:/Users/Екатерина/Downloads/FreeSans.ttf", "CP1251", BaseFont.EMBEDDED);
+            com.itextpdf.text.Font russian;
+            russian = new com.itextpdf.text.Font(bf_russian, 11);
+            PdfPTable my_table = new PdfPTable(6);
+            Paragraph p = new Paragraph();
+            Chunk chunk = new Chunk("ГБУ РК \"Центр по предоставению" +
+                    " государственных услуг в сфере социальной защиты населения города Ухты\"\n", russian);
+            p.add(chunk);
+            chunk = new Chunk("ОБОРОТНАЯ ВЕДОМОСТЬ по проводкам за период: " + date+"\n", russian);
+            p.add(chunk);
+            chunk = new Chunk("Соц.выплата: "+category+"\n", russian);
+            p.add(chunk);
+            chunk = new Chunk("Составлено сотрудником: "+employee+"\n\n", russian);
+            p.add(chunk);
+            iText_xlstopdf.add(p);
+            PdfPCell table_cell;
+            double value;
+            String string_value;
+            int start = 4;
+            int end = my_worksheet.getLastRowNum();
+            //Iterator<Row> rowIterator = my_worksheet.iterator();
+            for(int i = start; i<end; i++){
+                Row row_it = my_worksheet.getRow(i);
+                Iterator<Cell> cellIterator = row_it.cellIterator();
+
+                while(cellIterator.hasNext()) {
+                    //привязываем клетку из xls
+                    Cell cell1 = cellIterator.next();
+                    CellType type = cell1.getCellType();
+                    switch(type) {
+                        case STRING:
+                            chunk = new Chunk(cell1.getStringCellValue(),russian);
+                            table_cell = new PdfPCell(new Phrase(chunk));
+                            my_table.addCell(table_cell);
+                            break;
+                        case NUMERIC:
+                            value = cell1.getNumericCellValue();
+                            string_value = String.valueOf(value);
+                            chunk = new Chunk(string_value);
+                            table_cell = new PdfPCell(new Phrase(chunk));
+                            my_table.addCell(table_cell);
+                            break;
+                        case FORMULA:
+                            value = cell1.getNumericCellValue();
+                            string_value = String.valueOf(value);
+                            chunk = new Chunk(string_value);
+                            table_cell = new PdfPCell(new Phrase(chunk));
+                            my_table.addCell(table_cell);
+                            break;
+                    }
+                }
+            }
+
+            iText_xlstopdf.add(my_table);
+            iText_xlstopdf.close(); // закрываем документ
+            input_doc.close(); //закрываем xls
+
+            // открываем файл pdf в отдельном окне
+            File output_file = new File(fileName);
+            Desktop desk = Desktop.getDesktop();
+            desk.open(output_file);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (DocumentException e) {
             e.printStackTrace();
         }
 
