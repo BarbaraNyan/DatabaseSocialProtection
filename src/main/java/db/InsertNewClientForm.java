@@ -92,7 +92,7 @@ public class InsertNewClientForm extends JFrame{
 
     private DatabaseConnection mdbc;
     private Statement stmt;
-
+    private JTable tb[];
     InsertNewClientForm(JTable [] t){
         setContentPane(rootPanel);
         setPreferredSize(new Dimension(1100,600));
@@ -109,6 +109,7 @@ public class InsertNewClientForm extends JFrame{
         getComboBox(textAttDocTypeComboBox2,t[6]);
         getComboBox(textAttDocTypeComboBox3,t[6]);
         getComboBox(textCategoryClientComboBox,t[7]);
+        tb=t;
 
         setButtonGroup();
         setMasks();
@@ -435,28 +436,28 @@ public class InsertNewClientForm extends JFrame{
         return comboBoxIndex.getSelectedItem().toString();
     }
     private int getRegion(){
-        return comboBoxRegion.getSelectedIndex()+1;
+        return Integer.parseInt(tb[1].getModel().getValueAt(comboBoxRegion.getSelectedIndex(), 0).toString());
     }
     private int getDistrict(){
-        return comboBoxDistrict.getSelectedIndex()+1;
+        return Integer.parseInt(tb[2].getModel().getValueAt(comboBoxDistrict.getSelectedIndex(), 0).toString());
     }
     private int getInhabitedLoc(){
-        return comboBoxInhabitedLoc.getSelectedIndex()+1;
+        return Integer.parseInt(tb[3].getModel().getValueAt(comboBoxInhabitedLoc.getSelectedIndex(), 0).toString());
     }
     private int getStreet(){
-        return comboBoxStreet.getSelectedIndex()+1;
+        return Integer.parseInt(tb[4].getModel().getValueAt(comboBoxStreet.getSelectedIndex(), 0).toString());
     }
     private int getTypeIdDoc() {
-        return comboBoxTypeIdDoc.getSelectedIndex()+1;
+        return Integer.parseInt(tb[5].getModel().getValueAt(comboBoxTypeIdDoc.getSelectedIndex(), 0).toString());
     }
     private int getTypeAttDoc(){
-        return textAttDocTypeComboBox1.getSelectedIndex()+1;
+        return Integer.parseInt(tb[6].getModel().getValueAt(textAttDocTypeComboBox1.getSelectedIndex(), 0).toString());
     }
     private int getOperAccOrg(){
         return textOperAccOrgComboBox.getSelectedIndex()+1;
     }
     private int getCategoryClient(){
-        return textCategoryClientComboBox.getSelectedIndex()+1;
+        return Integer.parseInt(tb[7].getModel().getValueAt(textCategoryClientComboBox.getSelectedIndex(), 0).toString());
     }
 
     private String getCategoryMeasure(){

@@ -233,42 +233,17 @@ public class FilterClient extends JFrame{
             if(indexCheckBox.isSelected())
                 indexCode=comboBoxIndex.getSelectedItem().toString();
             if(regionCheckBox.isSelected())
-                for (int i = 0;i<handbook[1].getRowCount();i++){
-                    if(handbook[1].getValueAt(i, 1).toString().equals(comboBoxRegion.getSelectedItem().toString())) {
-                        regionCode = handbook[1].getValueAt(i, 0).toString();
-                        break;
-                    }
-                }
+                regionCode=handbook[1].getValueAt(comboBoxRegion.getSelectedIndex(), 0).toString();
             if(districtCheckBox.isSelected())
-                for (int i = 0;i<handbook[2].getRowCount();i++){
-                    if(handbook[2].getValueAt(i, 1).toString().equals(comboBoxDistrict.getSelectedItem().toString())) {
-                        districtCode = handbook[2].getValueAt(i, 0).toString();
-                        break;
-                    }
-                }
+                districtCode=handbook[2].getValueAt(comboBoxDistrict.getSelectedIndex(), 0).toString();
             if(localityCheckBox.isSelected())
-                for (int i = 0;i<handbook[3].getRowCount();i++){
-                    if(handbook[3].getValueAt(i, 1).toString().equals(comboBoxLocality.getSelectedItem().toString())) {
-                        localCode = handbook[3].getValueAt(i, 0).toString();
-                        break;
-                    }
-                }
+                localCode=handbook[3].getValueAt(comboBoxLocality.getSelectedIndex(), 0).toString();
             if(streetCheckBox.isSelected())
-                for (int i = 0;i<handbook[4].getRowCount();i++){
-                    if(handbook[4].getValueAt(i, 1).toString().equals(comboBoxStreet.getSelectedItem().toString())) {
-                        streetCode = handbook[4].getValueAt(i, 0).toString();
-                        break;
-                    }
-                }
+                streetCode=handbook[4].getValueAt(comboBoxStreet.getSelectedIndex(), 0).toString();
         }
         if(categoryCheckBox.isSelected()){
             if(categoryClientCheckBox.isSelected())
-                for (int i = 0;i<handbook[5].getRowCount();i++){
-                    if(handbook[5].getValueAt(i, 1).toString().equals(comboBoxCategory.getSelectedItem().toString())) {
-                        categoryCode = handbook[5].getValueAt(i, 0).toString();
-                        break;
-                    }
-                }
+                categoryCode=handbook[5].getValueAt(comboBoxCategory.getSelectedIndex(), 0).toString();
             if(measureCheckBox.isSelected())
                 for (int i = 0;i<handbook[6].getRowCount();i++){
                     if(handbook[6].getValueAt(i, 2).toString().equals(comboBoxMeasure.getSelectedItem().toString())) {

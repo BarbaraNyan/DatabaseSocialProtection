@@ -557,6 +557,16 @@ import javax.swing.table.DefaultTableModel;
             }
         }
 
+        public void updateStatusMeasure(String dat){
+            String findStatus="update client_measure set statusMeasure='Закончено' where dateEndMeasure<'"+dat+"' and statusMeasure='Назначено'";
+            try {
+                stmt= conn.createStatement();
+                stmt.executeUpdate(findStatus);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
         private void createTable(ResultSet rs, String [] columns, final Class [] columnClass){
             try {
                 ResultSetMetaData meta = rs.getMetaData();

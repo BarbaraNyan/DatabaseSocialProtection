@@ -80,22 +80,10 @@ public class AddCategoryMeasure extends JFrame{
 
 
     private void insertClientMeasure(String persNum, final TableModel[] handbook){
-        String codeCategory="";
-        String codeMeasure="";
+        String codeCategory=handbook[0].getValueAt(comboBoxCategory.getSelectedIndex(), 0).toString();
+        String codeMeasure=handbook[1].getValueAt(comboBoxMeasure.getSelectedIndex(), 0).toString();
         String period="";
-        for (int i = 0;i<handbook[0].getRowCount();i++){
-            if(handbook[0].getValueAt(i, 1).toString().equals(comboBoxCategory.getSelectedItem().toString())) {
-                codeCategory = handbook[0].getValueAt(i, 0).toString();
-                break;
-            }
-        }
-        for (int i = 0;i<handbook[1].getRowCount();i++){
-            if(handbook[1].getValueAt(i, 2).toString().equals(comboBoxMeasure.getSelectedItem().toString())) {
-                codeMeasure = handbook[1].getValueAt(i, 0).toString();
-                period = handbook[1].getValueAt(i, 4).toString();
-                break;
-            }
-        }
+
         String dateNow=formatForSql.format(new Date());
         String dateEnd="";
         SimpleDateFormat formatForMounth= new SimpleDateFormat("MM");

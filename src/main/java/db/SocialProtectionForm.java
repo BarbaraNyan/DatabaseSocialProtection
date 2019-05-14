@@ -284,6 +284,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         glossaryJTree.addTreeSelectionListener(this);
         listenerRowTableSC();
         initModelHandbook();
+        Date dt=new Date();
+        mdtmSocialClient.updateStatusMeasure(formatForSql.format(dt));
 
         JLabel labelIdDocPlus = new JLabel();
         JLabel labelAttDocPlus = new JLabel();
@@ -678,7 +680,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
         deleteCategoryMeasureButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить клиента?",
+                int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить меру?",
                         "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,null,
                         new Object[]{"Да", "Нет", "Отмена"},
                         "Да");
@@ -695,11 +697,17 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
         deleteRequestButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                TableModel tm=tableRequest.getModel();
-                String sqlDeleteMeasure="delete from request_for_cash_settlement where requestNumber='"+tm.getValueAt(selRowRequest, 0)+"'";
-                mdtmSocialClient.sqlQuery=sqlDeleteMeasure;
-                mdtmSocialClient.deleteRow();
-                initModelRequest(textPersNum.getText());
+                int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить заявку?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,null,
+                        new Object[]{"Да", "Нет", "Отмена"},
+                        "Да");
+                if(res==JOptionPane.YES_OPTION) {
+                    TableModel tm = tableRequest.getModel();
+                    String sqlDeleteMeasure = "delete from request_for_cash_settlement where requestNumber='" + tm.getValueAt(selRowRequest, 0) + "'";
+                    mdtmSocialClient.sqlQuery = sqlDeleteMeasure;
+                    mdtmSocialClient.deleteRow();
+                    initModelRequest(textPersNum.getText());
+                }
             }
         });
         deleteClientButton1.addActionListener(new ActionListener() {
@@ -1114,28 +1122,28 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         return textIndexComboBox.getSelectedItem().toString();
     }
     private int getRegion(){
-        return textRegionComboBox.getSelectedIndex()+1;
+        return Integer.parseInt(tableRegion.getModel().getValueAt(textRegionComboBox.getSelectedIndex(), 0).toString());
     }
     private int getDistrict(){
-        return textDistrictComboBox.getSelectedIndex()+1;
+        return Integer.parseInt(tableDistrict.getModel().getValueAt(textDistrictComboBox.getSelectedIndex(), 0).toString());
     }
     private int getInhabitedLoc(){
-        return textInhabitedLocalityComboBox.getSelectedIndex()+1;
+        return Integer.parseInt(tableLocality.getModel().getValueAt(textInhabitedLocalityComboBox.getSelectedIndex(), 0).toString());
     }
     private int getStreet(){
-        return textStreetComboBox.getSelectedIndex()+1;
+        return Integer.parseInt(tableStreet.getModel().getValueAt(textStreetComboBox.getSelectedIndex(), 0).toString());
     }
     private String getIdDocStatus(){
         return textIdDocStatusComboBox.getSelectedItem().toString();
     }
     private int getTypeIdDoc(){
-        return textIdDocTypeComboBox.getSelectedIndex()+1;
+        return Integer.parseInt(tableIndDoc.getModel().getValueAt(textIdDocTypeComboBox.getSelectedIndex(), 0).toString());
     }
     private String getAttDocStatus(){
         return textAttDocStatusComboBox.getSelectedItem().toString();
     }
     private int getTypeAttDoc(){
-        return textAttDocTypeComboBox.getSelectedIndex()+1;
+        return Integer.parseInt(tableDoc.getModel().getValueAt(textAttDocTypeComboBox.getSelectedIndex(), 0).toString());
     }
     private String getOperAccStatus(){
         if(rbStatusTrue.isSelected())
@@ -1616,8 +1624,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private void listenerRowTableCategoryMeasure() {
         tableCategoryMeasure.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
-                if (listSelectionEvent.getValueIsAdjusting() == false) {
-                    addRequestButton.setEnabled(true);
+                if (listSelectionEvent.getValueIsAdjusting() == false ) {
+                    if(tableCategoryMeasure.getSelectedRow()>=0)
+                    if(tableCategoryMeasure.getModel().getValueAt(tableCategoryMeasure.getSelectedRow(), 7).toString().equalsIgnoreCase("Назначено"))
+                        addRequestButton.setEnabled(true);
                     deleteCategoryMeasureButton.setEnabled(true);
                     selRowCatMeasure = tableCategoryMeasure.getSelectedRow();
                 }
@@ -1859,6 +1869,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 "inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
                 "where pa.periodPayoff between '"+dateStart+"' and '"+dateEnd+"' and rfcs.codeClientCategory=? " +
                 "order by sc.personalNumber";
+        //или sum(rfcs.totalAmount) и group by sc.personalNumber, если клиент должен показываться только 1 раз с итоговой суммой за месяц
 
         int categoryCode = Integer.parseInt(tableSCCategory.getModel().getValueAt(categoryCombox.getSelectedIndex(), 0).toString());
         mdtmSocialClient.columnsSalRep = columnsSaldoReport;

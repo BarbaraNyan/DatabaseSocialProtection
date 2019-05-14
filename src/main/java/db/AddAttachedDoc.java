@@ -23,9 +23,9 @@ public class AddAttachedDoc extends JFrame{
     private JPanel panelDateStart;
     private JButton canselButton;
     private com.toedter.calendar.JDateChooser dcDateStart = new com.toedter.calendar.JDateChooser();
-
     private DatabaseConnection mdbc;
     private Statement stmt;
+    private JTable tb;
 
     AddAttachedDoc(final String persNum, JTable [] handbook){
         setContentPane(rootPanel);
@@ -33,6 +33,7 @@ public class AddAttachedDoc extends JFrame{
         setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
         panelDateStart.add(dcDateStart);
         getComboBox(textTypeDocComboBox,handbook[6]);
+        tb=handbook[6];
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 addAttDoc(persNum);
@@ -87,6 +88,6 @@ public class AddAttachedDoc extends JFrame{
         }
     }
     private int getTypeAttDoc() {
-        return textTypeDocComboBox.getSelectedIndex()+1;
+        return Integer.parseInt(tb.getModel().getValueAt(textTypeDocComboBox.getSelectedIndex(), 0).toString());
     }
 }

@@ -24,6 +24,7 @@ public class AddIdDoc extends JFrame{
     private JButton saveButton;
     private JPanel panelDateStart;
     private JButton canselButton;
+    private JTable tb;
 
     private DatabaseConnection mdbc;
     private Statement stmt;
@@ -36,6 +37,7 @@ public class AddIdDoc extends JFrame{
         panelDateStart.add(dcDateStart);
         setMasks();
         getComboBox(typeDocComboBox,handbook[5]);
+        tb=handbook[5];
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 addIdDoc(persNum,relPersNum);
@@ -118,6 +120,6 @@ public class AddIdDoc extends JFrame{
         }
     }
     private int getTypeIdDoc() {
-        return typeDocComboBox.getSelectedIndex()+1;
+        return Integer.parseInt(tb.getValueAt(typeDocComboBox.getSelectedIndex(), 0).toString());
     }
 }

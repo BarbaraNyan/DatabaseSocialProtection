@@ -22,6 +22,7 @@ public class AddRelative extends JFrame{
     private JButton canselButton;
     private com.toedter.calendar.JDateChooser dcDateBirth = new com.toedter.calendar.JDateChooser();
 
+    private JTable tb;
     private DatabaseConnection mdbc;
     private Statement stmt;
 
@@ -31,6 +32,7 @@ public class AddRelative extends JFrame{
         setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
         panelDateBirth.add(dcDateBirth);
         getComboBox(textRelDegreeComboBox,handbook[8]);
+        tb=handbook[8];
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 addRelative(persNum);
@@ -75,7 +77,7 @@ public class AddRelative extends JFrame{
     }
 
     private int relationDegree(){
-        return textRelDegreeComboBox.getSelectedIndex()+1;
+        return Integer.parseInt(tb.getValueAt(textRelDegreeComboBox.getSelectedIndex(), 0).toString());
     }
     private String quotate(String content){
         return "'"+content+"'";
