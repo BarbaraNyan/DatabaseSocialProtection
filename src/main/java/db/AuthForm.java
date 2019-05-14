@@ -22,6 +22,7 @@ public class AuthForm extends JFrame{
 
     public AuthForm(){
         super("Окно авторизации");
+
         setContentPane(rootPanel);
         pack();
         setVisible(true);
@@ -36,6 +37,15 @@ public class AuthForm extends JFrame{
                 if(auth.containsKey(login)) {
                     if (auth.get(login).equals(password)) {
                         JFrame socialProtection = new SocialProtectionForm();
+//
+//                        JMenuBar menuBar = new JMenuBar();
+//                        JMenu fileMenuHelp = new JMenu("Помощь");
+//                        JMenu fileMenuAbout = new JMenu("Справка");
+//                        fileMenuHelp.add(fileMenuAbout);
+//                        menuBar.add(fileMenuHelp);
+//
+//                        socialProtection.setJMenuBar(menuBar);
+
                         socialProtection.setVisible(true);
                         setVisible(false);
 

@@ -199,6 +199,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JButton deleteItemButton;
     private JTextField textNewItemInHandbook;
     private JButton addNewItemButton;
+    private JLabel labelNewItem;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -274,6 +275,35 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     SocialProtectionForm(){
         super("АИС 'Социальная защита населения'");
+
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menuHelp = new JMenu("Помощь");
+        JMenu menuWindow = new JMenu("Окно");
+        JMenuItem menuItemAbout = new JMenuItem("Справка");
+        JMenuItem menuItemClose = new JMenuItem("Закрыть");
+
+        menuItemClose.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        menuItemAbout.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFrame menuItemAbout = new MenuItemAbout();
+
+                menuItemAbout.setTitle("Справка");
+                menuItemAbout.pack();
+                menuItemAbout.setVisible(true);
+            }
+        });
+
+        menuWindow.add(menuItemClose);
+        menuHelp.add(menuItemAbout);
+        menuBar.add(menuWindow);
+        menuBar.add(menuHelp);
+        menuBar.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+        this.setJMenuBar(menuBar);
+
         setContentPane(rootPanel);
         setExtendedState(MAXIMIZED_BOTH);
         setResizable(false);
@@ -293,7 +323,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         JLabel labelRelativePlus = new JLabel();
         JLabel labelRelativeIdDocPlus = new JLabel();
         JLabel labelIdDocMinus= new JLabel();
-        JLabel labelAttDocMinus = new JLabel();
+        final JLabel labelAttDocMinus = new JLabel();
         JLabel labelOperAccMinus = new JLabel();
         JLabel labelRelativeMinus = new JLabel();
         JLabel labelRelativeIdDocMinus = new JLabel();
@@ -380,6 +410,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         listenerRowTableRel();
         listenerRowTableRelIdDoc();
         listenerRowTableOperAcc();
+        listenerRowTableHandbook();
 //        listenerRowTableIdDocument();
 
         listenerRowTableRelatives();
@@ -816,12 +847,14 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         addNewItemButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 addItemInGlossary();
+                labelNewItem.setVisible(false);
                 textNewItemInHandbook.setVisible(false);
                 addNewItemButton.setVisible(false);
             }
         });
         addItemButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                labelNewItem.setVisible(true);
                 textNewItemInHandbook.setVisible(true);
                 addNewItemButton.setVisible(true);
             }
@@ -834,7 +867,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                         new Object[]{"Да", "Нет", "Отмена"},
                         "Да");
                 if(res==JOptionPane.YES_OPTION){
-                    listenerRowTableHandbook();
+//                    listenerRowTableHandbook();
                     String [] params = deleteItemInGlossary();
                     deleteClient = new DeleteClient();
                     deleteClient.deleteItemInGlossary(params[0],params[1]);
@@ -842,6 +875,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 }
             }
         });
+
     }
 
     private void setCBMeasure(){
@@ -2396,7 +2430,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             item = tm.getValueAt(selRowItemInHandbook,0).toString();
         }
         else
-            item = tm.getValueAt(selRowItemInHandbook,1).toString();
+            item = tm.getValueAt(selRowItemInHandbook,0).toString();
 
         if ("Категории гражданина".equals(treeSelect)) {
             sqlItem = "delete from social_client_category where nameClientCategory = ?";
@@ -2423,7 +2457,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             sqlItem = "delete from inhabited_locality_address where nameInhabitedLocality = ?";
         }else
         if ("Улицы".equals(treeSelect)) {
-            sqlItem = "delete from street_address where nameStreet = ?";
+            sqlItem = "delete from street_address where numberStreet = ?";
         }else
         if ("Родственные отношения".equals(treeSelect)) {
             sqlItem = "delete from relation_degree where nameRelationDegree = ?";

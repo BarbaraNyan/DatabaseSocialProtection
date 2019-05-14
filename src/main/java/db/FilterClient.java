@@ -180,7 +180,7 @@ public class FilterClient extends JFrame{
 
     private void setMasks(){
         try {
-            MaskFormatter seriesDocFormatter = new MaskFormatter("####");
+            MaskFormatter seriesDocFormatter = new MaskFormatter("****");
             seriesDocFormatter.setPlaceholderCharacter('*');
             DefaultFormatterFactory seriesDocFactory = new DefaultFormatterFactory(seriesDocFormatter);
 
