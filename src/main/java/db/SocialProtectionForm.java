@@ -1018,7 +1018,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         try {
             FileOutputStream fos = new FileOutputStream(file);
             workbook.write(fos);
-            System.out.println("Created file: "+file.getAbsolutePath());
+           // System.out.println("Created file: "+file.getAbsolutePath());
             fos.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -1031,7 +1031,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     new File("C:/test repos/Оборотная ведомость-"+date+"-"+category+".xls"));
             HSSFWorkbook my_xls_workbook = new HSSFWorkbook(input_doc);
             HSSFSheet my_worksheet = my_xls_workbook.getSheetAt(0);
-
             // my_worksheet.rowIterator();
             Document iText_xlstopdf = new Document();
             String fileName = "C:/test repos/Оборотная ведомость за "+date+".pdf";
@@ -1057,7 +1056,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             String string_value;
             int start = 4;
             int end = my_worksheet.getLastRowNum();
-            //Iterator<Row> rowIterator = my_worksheet.iterator();
             for(int i = start; i<end; i++){
                 Row row_it = my_worksheet.getRow(i);
                 Iterator<Cell> cellIterator = row_it.cellIterator();
@@ -1089,8 +1087,17 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     }
                 }
             }
-
             iText_xlstopdf.add(my_table);
+
+            iText_xlstopdf.add( Chunk.NEWLINE );
+            iText_xlstopdf.add( Chunk.NEWLINE );
+
+            p.clear();
+            chunk = new Chunk("Директор          _____________________Толстой А.К.\n", russian);
+            p.add(chunk);
+            chunk = new Chunk("Главный бухгалтер _____________________Белозерская Л.Е.\n\n", russian);
+            p.add(chunk);
+            iText_xlstopdf.add(p);
             iText_xlstopdf.close(); // закрываем документ
             input_doc.close(); //закрываем xls
 
