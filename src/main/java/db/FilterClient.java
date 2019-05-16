@@ -263,7 +263,8 @@ public class FilterClient extends JFrame{
                 "sc.dateBirth like '"+dateBirth+"' and sc.numberGender like '"+genderCode+"' and a.numberIndex like '"+indexCode+"' and " +
                 "a.numberRegion like '"+regionCode+"' and a.numberDistrict like '"+districtCode+"' and a.numberInhabitedLocality like '"+localCode+"' and " +
                 "a.numberStreet like '"+streetCode+"' and id.docSeries like '"+series+"' and id.docNumber like '"+number+"' and " +
-                "cm.codeSocialMeasure like '"+measureCode+"' and cm.codeClientCategory like '"+categoryCode+"'";
+                "cm.codeSocialMeasure like '"+measureCode+"' and cm.codeClientCategory like '"+categoryCode+"' " +
+                "order by sc.personalNumber";
 
         sf.initModelSocialClient(sqlQuery);
 

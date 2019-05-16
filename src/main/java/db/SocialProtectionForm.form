@@ -1984,8 +1984,9 @@
                             <item value="июль"/>
                             <item value="август"/>
                             <item value="сентябрь"/>
-                            <item value="октябпь"/>
+                            <item value="октябрь"/>
                             <item value="ноябрь"/>
+                            <item value="декабрь"/>
                           </model>
                         </properties>
                       </component>

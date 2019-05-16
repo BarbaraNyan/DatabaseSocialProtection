@@ -34,7 +34,7 @@ public class InsertRequset extends JFrame{
         Date dateNow = new Date();
         SimpleDateFormat formatForMounth= new SimpleDateFormat("MM");
 
-        dcDateOfPreparation.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+        dcDateOfPreparation.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
         dcDateOfPreparation.setDate(dateNow);
         pnDate.add(dcDateOfPreparation);
         if(rowNum==-1)
@@ -47,12 +47,12 @@ public class InsertRequset extends JFrame{
         calendar.setTime(dateNow);
         calendar.set(Calendar.DATE, 1);
         calendar.set(Calendar.MONTH, Integer.parseInt(formatForMounth.format(calendar.getTime())));
-        dcPeriodFrom.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+        dcPeriodFrom.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
         dcPeriodFrom.setDate(calendar.getTime());
         pnPeriodFrom.add(dcPeriodFrom);
 
         calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
-        dcPeriodTo.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+        dcPeriodTo.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
         dcPeriodTo.setDate(calendar.getTime());
         pnPeriodTo.add(dcPeriodTo);
 

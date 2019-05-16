@@ -17,6 +17,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.DefaultFormatterFactory;
@@ -263,6 +264,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private int selRowRelIdDoc;
     private int selRowOperAcc;
     private int selRowItemInHandbook;
+    private int selRowIncome;
 
     // это для отчета в Эксель
     private ArrayList<Integer> persAc;
@@ -712,6 +714,26 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
         listenerRowTableRequest();
 
+        addIncomeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                String client [] = {textPersNum.getText(), textSurname.getText(), textName.getText(), textPatronymic.getText()};
+                JTable [] table={tableRelatives, tableTypeIncome};
+                JFrame addIncome = new AddIncome(client, table);
+                addIncome.setTitle("Добавление нового дохода");
+                addIncome.pack();
+                addIncome.setVisible(true);
+                addIncome.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        super.windowClosed(e);
+                        initModelIncome(textPersNum.getText());
+                    }
+                });
+            }
+        });
+
+        listenerRowTableIncome();
+
         deleteCategoryMeasureButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить меру?",
@@ -725,6 +747,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     mdtmSocialClient.sqlQuery = sqlDeleteMeasure;
                     mdtmSocialClient.deleteRow();
                     initModelCategoryMeasure(textPersNum.getText());
+                    deleteCategoryMeasureButton.setEnabled(false);
                 }
             }
         });
@@ -741,9 +764,28 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     mdtmSocialClient.sqlQuery = sqlDeleteMeasure;
                     mdtmSocialClient.deleteRow();
                     initModelRequest(textPersNum.getText());
+                    deleteRequestButton.setEnabled(false);
                 }
             }
         });
+
+        deleteIncomeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                int res = JOptionPane.showOptionDialog(SocialProtectionForm.this, "Вы уверены, что хотите удалить доход?",
+                        "Подтверждение удаления",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,null,
+                        new Object[]{"Да", "Нет", "Отмена"},
+                        "Да");
+                if(res==JOptionPane.YES_OPTION) {
+                    TableModel tm = tableIncome.getModel();
+                    String sqlDeleteMeasure = "delete from income where IdIncome='" + tm.getValueAt(selRowIncome, 0) + "'";
+                    mdtmSocialClient.sqlQuery = sqlDeleteMeasure;
+                    mdtmSocialClient.deleteRow();
+                    initModelIncome(textPersNum.getText());
+                    deleteIncomeButton.setEnabled(false);
+                }
+            }
+        });
+
         deleteClientButton1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 //                JOptionPane.setDefaultLocale(new Locale("ru","RU"));
@@ -773,6 +815,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     deleteClient.deleteIdDoc(tm.getValueAt(selRowIdDoc,1).toString(),
                             tm.getValueAt(selRowIdDoc,2).toString());
                     initModelIdDocument(textPersNum.getText());
+                    deleteIdDocButton.setEnabled(false);
                 }
 //                listenerRowTableIdDocument();
 //                TableModel tm = tableIdDocument.getModel();
@@ -790,6 +833,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     TableModel tm = tableAttDocument.getModel();
                     deleteClient.deleteAttDoc(tm.getValueAt(selRowAttDoc, 0).toString());
                     initModelAttDocument(textPersNum.getText());
+                    deleteAttDocButton.setEnabled(false);
                 }
             }
         });
@@ -804,6 +848,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     TableModel tm = tableOperatingAccount.getModel();
                     deleteClient.deleteOperAcc(tm.getValueAt(selRowOperAcc,0).toString());
                     initModelOperAcc(textPersNum.getText());
+                    deleteOperAccButton.setEnabled(false);
                 }
             }
         });
@@ -818,6 +863,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     TableModel tm = tableRelatives.getModel();
                     deleteClient.deleteRelative(tm.getValueAt(selRowRel, 0).toString());
                     initModelRelatives(textPersNum.getText());
+                    deleteRelativeButton.setEnabled(false);
                 }
             }
         });
@@ -833,6 +879,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     deleteClient.deleteIdDoc(tm.getValueAt(selRowRelIdDoc,1).toString(),
                             tm.getValueAt(selRowRelIdDoc,2).toString());
                     initModelIdDocRelatives(textRelNumber.getText());
+                    deleteRelativeIdDoc.setEnabled(false);
                 }
             }
         });
@@ -879,6 +926,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             }
         });
 
+        tableCategoryMeasure.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setToolTipText(getText());
+                return this;
+            }
+        });
     }
 
     private void setCBMeasure(){
@@ -1032,6 +1086,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             HSSFWorkbook my_xls_workbook = new HSSFWorkbook(input_doc);
             HSSFSheet my_worksheet = my_xls_workbook.getSheetAt(0);
             // my_worksheet.rowIterator();
+
             Document iText_xlstopdf = new Document();
             String fileName = "C:/test repos/Оборотная ведомость за "+date+".pdf";
             PdfWriter.getInstance(iText_xlstopdf, new FileOutputStream(fileName));
@@ -1746,6 +1801,17 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         });
     }
 
+    private void listenerRowTableIncome() {
+        tableIncome.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                if (listSelectionEvent.getValueIsAdjusting() == false) {
+                    deleteIncomeButton.setEnabled(true);
+                    selRowIncome = tableIncome.getSelectedRow();
+                }
+            }
+        });
+    }
+
     private void listenerRowTableCategoryMeasure() {
         tableCategoryMeasure.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
@@ -1917,11 +1983,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     //Доход (Вкладка "Личные дела")
     String[] columnsIncome = new String[]
-            {"Период","Вид","Сумма"};
+            {"Номер","Период","Вид","Сумма"};
     final Class[] columnClassIncome = new Class[]{
-            String.class, String.class, Double.class};
+           Integer.class, String.class, String.class, Double.class};
 
-    String sqlQueryIncome = "select DATE_FORMAT(i.periodIncome,'%m.%Y'), ti.nameTypeIncone, i.amount " +
+    String sqlQueryIncome = "select i.IdIncome, DATE_FORMAT(i.periodIncome,'%m.%Y'), ti.nameTypeIncone, i.amount " +
             "from income i inner join type_income ti on i.numberTypeIncone = ti.numberTypeIncone \n" +
             "inner join social_client sc on i.personalNumber = sc.personalNumber\n" +
             "where sc.personalNumber=?";
@@ -1933,6 +1999,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         mdtmSocialClient.sqlPreparedStatement=sqlQueryIncome;
         dtmIncome=mdtmSocialClient.MyTableModelDocument(6);
         tableIncome.setModel(dtmIncome);
+        tableIncome.removeColumn(tableIncome.getColumnModel().getColumn(0));
         dtmIncome.fireTableDataChanged();
         String sqlQueryCount = "select count(DISTINCT i.periodIncome)\n" +
                 "from income i inner join social_client sc on i.personalNumber=sc.personalNumber\n" +
@@ -1940,7 +2007,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         int row=mdtmSocialClient.getMonthIncome(sqlQueryCount);
         double sum=0;
         for (int i=0; i<tableIncome.getRowCount(); i++){
-            sum+=Double.valueOf(tableIncome.getModel().getValueAt(i,2).toString());
+            sum+=Double.valueOf(tableIncome.getModel().getValueAt(i,3).toString());
         }
         if(row!=0)
             lbSum.setText(String.valueOf(sum/row/(tableRelatives.getRowCount()+1)));
@@ -1981,18 +2048,19 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         getPeriodOSV(numMounth);
 
         String[] columnsSaldoReport = new String[]
-                {"Личный счет","Фамилия","Имя","Отчество", "Входное сальдо", "Начислено"};
+                {"Личный счет","Фамилия","Имя","Отчество", "Входное сальдо", "Начислено", "Оплачено", "Исходящее сальдо"};
         final Class[] columnClassSaldoReport =  new Class[] {
-                Integer.class, String.class,String.class,String.class, Integer.class, Integer.class
+                Integer.class, String.class,String.class,String.class, Double.class, Double.class, Double.class, Double.class
         };
 
         //String sqlQueryFirst = "select cm.personalNumber from client_measure cm where codeClientCategory=?";
-        String sqlQuerySaldoReport ="select sc.personalNumber, sc.surname, sc.name,sc.patronymic, pa.inputBalance, rfcs.totalAmount\n" +
+        String sqlQuerySaldoReport ="select sc.personalNumber, sc.surname, sc.name,sc.patronymic, pa.inputBalance, sum(rfcs.totalAmount), sum(rfcs.totalAmount), pa.outputBalance\n" +
                 "from personal_account pa inner join payoff p on pa.numberPersonalAccount = p.numberPersonalAccount\n" +
                 "inner join request_for_cash_settlement rfcs on p.numberPayoff = rfcs.numberPayoff\n" +
                 "inner join operating_account oa on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
                 "inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
                 "where pa.periodPayoff between '"+dateStart+"' and '"+dateEnd+"' and rfcs.codeClientCategory=? " +
+                "group by sc.personalNumber " +
                 "order by sc.personalNumber";
         //или sum(rfcs.totalAmount) и group by sc.personalNumber, если клиент должен показываться только 1 раз с итоговой суммой за месяц
 
@@ -2162,12 +2230,12 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             initModelAttDocument(persNum);
             initModelOperAcc(persNum);
             hideOperAcc();
-            initModelIncome(persNum);
             initModelRelatives(persNum);
             initModelCategoryMeasure(persNum);
             initModelRequest(persNum);
             initModelPayoffClient(persNum);
             initModelPersAcc(persNum);
+            initModelIncome(persNum);
 
             addRequestButton.setEnabled(false);
             deleteRequestButton.setEnabled(false);
