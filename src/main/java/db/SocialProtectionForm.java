@@ -39,6 +39,8 @@ import java.util.*;
 import java.util.Date;
 
 public class SocialProtectionForm extends JFrame implements TreeSelectionListener{
+
+    // объявление элементов формы
     private JTabbedPane tabbedPane1;
     private JPanel rootPanel;
     private JTabbedPane tabbedPane2;
@@ -117,6 +119,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private ButtonGroup radioButtonGender;
     private ButtonGroup radioButtonStatusAccount;
 
+
+    // инициализация таблиц
     private JTable tableSCCategory=new JTable();
     private JTable tableMeasure=new JTable();
     private JTable tableLaw=new JTable();
@@ -131,6 +135,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableEmployee=new JTable();
     private JTable tableDepartament=new JTable();
     private JTable tableJob=new JTable();
+
+    // объявление элементов формы
     private JTable tableCategoryMeasure;
     private JTabbedPane tabbedPane4;
     private JTable tableRequest;
@@ -207,7 +213,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
-
     private JTable []box={tableIndex, tableRegion, tableDistrict, tableLocality, tableStreet,tableIndDoc,tableDoc,tableSCCategory,tableRelation};
     private DefaultTableModel dtmSocialClient;
     private DefaultTableModel dtmIdDocument;
@@ -273,6 +278,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private ArrayList<String> p_mic;
     private ArrayList<Integer> in_saldo;
     private ArrayList<Integer> acc;
+    private ArrayList<Integer> paid;
+    private ArrayList<Integer> out_saldo;
+
 //    private Object [] namedJOptionPane = {"Да","Нет","Отмена"};
 
 
@@ -987,9 +995,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         cell.setCellValue("ОБОРОТНАЯ ВЕДОМОСТЬ по проводкам за период: " + date);
         // HSSFCellStyle styleForReport = createStyleForReport(workbook);
         CellRangeAddress region;
-        region = new CellRangeAddress(0, 0, 0, 5);
+        region = new CellRangeAddress(0, 0, 0, 7);
         sheet.addMergedRegion(region);
-        region = new CellRangeAddress(1, 1, 0, 5);
+        region = new CellRangeAddress(1, 1, 0, 7);
         sheet.addMergedRegion(region);
 
         row++; // row = 2
@@ -998,7 +1006,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         cell.setCellValue("Соц.выплата: ");
         cell = newRow.createCell(column + 1, CellType.STRING);
         cell.setCellValue(category);
-        region = new CellRangeAddress(2, 2, 1, 5);
+        region = new CellRangeAddress(2, 2, 1, 7);
         sheet.addMergedRegion(region);
 
         row++; // row = 3
@@ -1007,7 +1015,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         cell.setCellValue("Составлено сотрудником: ");
         cell = newRow.createCell(column + 1, CellType.STRING);
         cell.setCellValue(employee);
-        region = new CellRangeAddress(3, 3, 1, 5);
+        region = new CellRangeAddress(3, 3, 1, 7);
         sheet.addMergedRegion(region);
 
 
@@ -1022,9 +1030,14 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         cell = newRow.createCell(column + 3, CellType.STRING);
         cell.setCellValue("Отчество");
         cell = newRow.createCell(column + 4, CellType.STRING);
-        cell.setCellValue("Вх.сальдо");
+        cell.setCellValue("Входное сальдо");
         cell = newRow.createCell(column + 5, CellType.STRING);
         cell.setCellValue("Начислено");
+        cell = newRow.createCell(column + 6, CellType.STRING);
+        cell.setCellValue("Оплачено");
+        cell = newRow.createCell(column + 7, CellType.STRING);
+        cell.setCellValue("Исходящее сальдо");
+
 
 //        System.out.println(persAc);
 //        System.out.println(s_name);
@@ -1048,6 +1061,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             cell.setCellValue(in_saldo.get(i)); // Вх.сальдо
             cell = newRow.createCell(column + 5, CellType.STRING);
             cell.setCellValue(acc.get(i)); // Начислено
+            cell = newRow.createCell(column + 6, CellType.STRING);
+            cell.setCellValue(acc.get(i)); // Оплачено
+            cell = newRow.createCell(column + 7, CellType.STRING);
+            cell.setCellValue(acc.get(i)); // Исх сальдо
         }
         region = new CellRangeAddress(row+1, row+1, 0,3);
         sheet.addMergedRegion(region);
@@ -1094,7 +1111,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             BaseFont bf_russian = BaseFont.createFont("C:/Users/Екатерина/Downloads/FreeSans.ttf", "CP1251", BaseFont.EMBEDDED);
             com.itextpdf.text.Font russian;
             russian = new com.itextpdf.text.Font(bf_russian, 11);
-            PdfPTable my_table = new PdfPTable(6);
+            PdfPTable my_table = new PdfPTable(8);
             Paragraph p = new Paragraph();
             Chunk chunk = new Chunk("ГБУ РК \"Центр по предоставению" +
                     " государственных услуг в сфере социальной защиты населения города Ухты\"\n", russian);
@@ -1800,7 +1817,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             }
         });
     }
-
     private void listenerRowTableIncome() {
         tableIncome.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
@@ -1811,7 +1827,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             }
         });
     }
-
     private void listenerRowTableCategoryMeasure() {
         tableCategoryMeasure.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent listSelectionEvent) {
@@ -2081,6 +2096,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         p_mic = mdtmSocialClient.patronimyc;
         in_saldo = mdtmSocialClient.inSaldo;
         acc = mdtmSocialClient.accrued;
+        paid = mdtmSocialClient.paidOff;
+        out_saldo = mdtmSocialClient.outSaldo;
     }
 
     // Начисления (Вкладка 'Начисления и выплаты')

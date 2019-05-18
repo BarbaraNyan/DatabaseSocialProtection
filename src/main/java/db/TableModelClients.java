@@ -159,6 +159,9 @@ import javax.swing.table.DefaultTableModel;
         ArrayList<String> patronimyc = new ArrayList<String>();
         ArrayList<Integer> inSaldo = new ArrayList<Integer>();
         ArrayList<Integer> accrued = new ArrayList<Integer>();
+        ArrayList<Integer> paidOff = new ArrayList<Integer>();
+        ArrayList<Integer> outSaldo = new ArrayList<Integer>();
+
 
         public TableModelClients(){
             try {
@@ -258,7 +261,7 @@ import javax.swing.table.DefaultTableModel;
 
                 rs = ps.executeQuery();
                 ResultSetMetaData meta = ps.getMetaData();
-                int numOfCol = meta.getColumnCount();
+               // int numOfCol = meta.getColumnCount();
                 while(rs.next()) {
                     persAcc.add(rs.getInt(1));
                     surname.add(rs.getString(2));
@@ -266,6 +269,8 @@ import javax.swing.table.DefaultTableModel;
                     patronimyc.add(rs.getString(4));
                     inSaldo.add(rs.getInt(5));
                     accrued.add(rs.getInt(6));
+                    paidOff.add(rs.getInt(7));
+                    outSaldo.add(rs.getInt(8));
                 }
 
                 //sqlArray.clear();
