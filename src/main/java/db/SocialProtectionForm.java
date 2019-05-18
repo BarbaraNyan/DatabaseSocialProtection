@@ -210,6 +210,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTextField textNewItemInHandbook;
     private JButton addNewItemButton;
     private JLabel labelNewItem;
+    private JComboBox organizationCombox;
+    private JComboBox mspCombox;
+    private JTable reestrTable;
+    private JButton createReestrButton;
+    private JButton saveReestrButton;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -280,6 +285,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private ArrayList<Integer> acc;
     private ArrayList<Integer> paid;
     private ArrayList<Integer> out_saldo;
+
+   // для реестра
+    private ArrayList<String> rasAcc;
+    private ArrayList<Double> summa;
+
 
 //    private Object [] namedJOptionPane = {"Да","Нет","Отмена"};
 
@@ -479,6 +489,21 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 saveReportToExcel();
             }
         });
+
+        createReestrButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                initModelReestrReport();
+            }
+        });
+
+        saveReestrButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveReestrToExcel();
+            }
+        });
+
+
+
 
         findClientButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
@@ -1038,14 +1063,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         cell = newRow.createCell(column + 7, CellType.STRING);
         cell.setCellValue("Исходящее сальдо");
 
-
-//        System.out.println(persAc);
-//        System.out.println(s_name);
-//        System.out.println(my_name);
-//        System.out.println(p_mic);
-//        System.out.println(in_saldo);
-//        System.out.println(acc);
-
         for (int i = 0; i < persAc.size(); i++) {
             row++;
             newRow = sheet.createRow(row);
@@ -1165,7 +1182,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             iText_xlstopdf.add( Chunk.NEWLINE );
 
             p.clear();
-            chunk = new Chunk("Директор          _____________________Толстой А.К.\n", russian);
+            chunk = new Chunk("Директор          _____________________Толстой А.К.\n\n", russian);
             p.add(chunk);
             chunk = new Chunk("Главный бухгалтер _____________________Белозерская Л.Е.\n\n", russian);
             p.add(chunk);
@@ -1186,6 +1203,160 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             e.printStackTrace();
         }
 
+
+    }
+
+    private void saveReestrToExcel(){
+        String date = (String) periodCombox.getSelectedItem();
+        String category = (String) mspCombox.getSelectedItem();
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("Заявка на оплату расходов");
+        int column = 0; // текущий столбец
+        int row = 0;// текущая строка
+        CellRangeAddress region;
+        HSSFRow newRow = sheet.createRow(row);
+        Cell cell = newRow.createCell(column, CellType.STRING);
+        cell.setCellValue("Заявка на оплату расходов");
+        region = new CellRangeAddress(0,0,0,1);
+        sheet.addMergedRegion(region);
+
+        row++; // row = 1
+        newRow = sheet.createRow(row);
+        cell = newRow.createCell(column, CellType.STRING);
+        String orgz = (String)organizationCombox.getSelectedItem();
+        cell.setCellValue("Организация " + orgz);
+        region = new CellRangeAddress(1, 1, 0, 1);
+        sheet.addMergedRegion(region);
+
+        row++; // row = 2
+        newRow = sheet.createRow(row);
+        cell = newRow.createCell(column, CellType.STRING);
+        cell.setCellValue("Соц.выплата: ");
+        cell = newRow.createCell(column + 1, CellType.STRING);
+        cell.setCellValue(category);
+
+        row++; // row = 3
+        newRow = sheet.createRow(row);
+        cell = newRow.createCell(column, CellType.STRING);
+        cell.setCellValue("Р/с");
+        cell = newRow.createCell(column + 1, CellType.NUMERIC);
+        cell.setCellValue("Сумма");
+
+
+        for (int i = 0; i < persAc.size(); i++) {
+            row++;
+            newRow = sheet.createRow(row);
+            cell = newRow.createCell(column, CellType.STRING); // расчетный счет
+            cell.setCellValue(rasAcc.get(i));
+            cell = newRow.createCell(column + 1, CellType.NUMERIC);
+            cell.setCellValue(summa.get(i)); //
+
+        }
+        row++;
+        newRow = sheet.createRow(row);
+        cell = newRow.createCell(column, CellType.STRING);
+        HSSFCellStyle style = workbook.createCellStyle();
+        style.setAlignment(HorizontalAlignment.RIGHT);
+        cell.setCellStyle(style);
+        cell.setCellValue("ИТОГО: ");
+        cell = newRow.createCell(column+4, CellType.FORMULA);
+        String sumFormula1 = "SUM(B5:B"+row+")";
+        cell.setCellFormula(sumFormula1);
+
+        String file_path_xls = "C:/test repos/Реестр для организации-"+orgz+".xls";
+        File file = new File(file_path_xls);
+        if(file.exists()) file.delete();
+        file.getParentFile().mkdirs();
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            workbook.write(fos);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            FileInputStream input_doc = new FileInputStream(
+                    new File(file_path_xls));
+            HSSFWorkbook my_xls_workbook = new HSSFWorkbook(input_doc);
+            HSSFSheet my_worksheet = my_xls_workbook.getSheetAt(0);
+            Document iText_xlstopdf = new Document();
+
+            String file_name_pdf = "C:/test repos/Реестр для организации "+orgz+".pdf";
+            PdfWriter.getInstance(iText_xlstopdf, new FileOutputStream(file_name_pdf));
+            iText_xlstopdf.open();
+            BaseFont bf_russian = BaseFont.createFont("C:/Users/Екатерина/Downloads/FreeSans.ttf",
+                    "CP1251", BaseFont.EMBEDDED);
+            com.itextpdf.text.Font russian;
+            russian = new com.itextpdf.text.Font(bf_russian, 11);
+            PdfPTable my_table = new PdfPTable(2);
+            Paragraph p = new Paragraph();
+            Chunk chunk = new Chunk("Заявка на оплату расходов", russian);
+            p.add(chunk);
+            chunk = new Chunk("Организация: " +orgz+"\n", russian);
+            p.add(chunk);
+            chunk = new Chunk("Соц.выплата: "+category+"\n", russian);
+            p.add(chunk);
+            p.add(chunk);
+            iText_xlstopdf.add(p);
+            PdfPCell table_cell;
+            double value;
+            String string_value;
+            int start = 3;
+            int end = my_worksheet.getLastRowNum();
+            for(int i = start; i<end; i++){
+                Row row_it = my_worksheet.getRow(i);
+                Iterator<Cell> cellIterator = row_it.cellIterator();
+
+                while(cellIterator.hasNext()) {
+                    //привязываем клетку из xls
+                    Cell cell1 = cellIterator.next();
+                    CellType type = cell1.getCellType();
+                    switch(type) {
+                        case STRING:
+                            chunk = new Chunk(cell1.getStringCellValue(),russian);
+                            table_cell = new PdfPCell(new Phrase(chunk));
+                            my_table.addCell(table_cell);
+                            break;
+                        case NUMERIC:
+                            value = cell1.getNumericCellValue();
+                            string_value = String.valueOf(value);
+                            chunk = new Chunk(string_value);
+                            table_cell = new PdfPCell(new Phrase(chunk));
+                            my_table.addCell(table_cell);
+                            break;
+                        case FORMULA:
+                            value = cell1.getNumericCellValue();
+                            string_value = String.valueOf(value);
+                            chunk = new Chunk(string_value);
+                            table_cell = new PdfPCell(new Phrase(chunk));
+                            my_table.addCell(table_cell);
+                            break;
+                    }
+                }
+            }
+            iText_xlstopdf.add(my_table);
+
+            iText_xlstopdf.add( Chunk.NEWLINE );
+            iText_xlstopdf.add( Chunk.NEWLINE );
+            iText_xlstopdf.add(p);
+            iText_xlstopdf.close(); // закрываем документ
+            input_doc.close(); //закрываем xls
+
+            // открываем файл pdf в отдельном окне
+            File output_file = new File(file_name_pdf);
+            Desktop desk = Desktop.getDesktop();
+            desk.open(output_file);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -2038,13 +2209,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             Integer.class, String.class,String.class,String.class, Integer.class, Integer.class
     };
 
-//    String sqlQuerySaldoReport ="select pa.numberPersonalAccount, sc.surname, sc.name,sc.patronymic, pa.inputBalance, pa.accrued\n" +
-//            "from personal_account pa inner join payoff p on pa.numberPersonalAccount = p.numberPersonalAccount\n" +
-//            "inner join request_for_cash_settlement rfcs on p.numberPayoff = rfcs.numberPayoff\n" +
-//            "inner join operating_account oa on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
-//            "inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
-//            "where sc.personalNumber = pa.numberPersonalAccount;";
-
     String dateStart="";
     String dateEnd="";
     private void getPeriodOSV(int mouth){
@@ -2098,6 +2262,43 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         acc = mdtmSocialClient.accrued;
         paid = mdtmSocialClient.paidOff;
         out_saldo = mdtmSocialClient.outSaldo;
+    }
+
+    public void initModelReestrReport() {
+
+        int orgType = organizationCombox.getSelectedIndex()+1;
+        int mspType = mspCombox.getSelectedIndex()+1;
+
+        String[] columnsReestr = new String[]{"Расчетный счет","Сумма"};
+        final Class[] columnClassReestr =  new Class[]{String.class, Double.class};
+
+        //String sqlQueryFirst = "select cm.personalNumber from client_measure cm where codeClientCategory=?";
+//        String sqlQueryReestr ="select sc.personalNumber, sc.surname, sc.name,sc.patronymic, pa.inputBalance, sum(rfcs.totalAmount), sum(rfcs.totalAmount), pa.outputBalance\n" +
+//                "from personal_account pa inner join payoff p on pa.numberPersonalAccount = p.numberPersonalAccount\n" +
+//                "inner join request_for_cash_settlement rfcs on p.numberPayoff = rfcs.numberPayoff\n" +
+//                "inner join operating_account oa on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
+//                "inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
+//                "where pa.periodPayoff between '"+dateStart+"' and '"+dateEnd+"' and rfcs.codeClientCategory=? " +
+//                "group by sc.personalNumber " +
+//                "order by sc.personalNumber";
+        //или sum(rfcs.totalAmount) и group by sc.personalNumber, если клиент должен показываться только 1 раз с итоговой суммой за месяц
+
+        int categoryCode = Integer.parseInt(tableSCCategory.getModel().getValueAt(categoryCombox.getSelectedIndex(), 0).toString());
+        mdtmSocialClient.columnsReestr = columnsReestr;
+        mdtmSocialClient.columnClassReestr = columnClassReestr;
+        //mdtmSocialClient.sqlQuery = sqlQueryFirst;
+       // mdtmSocialClient.sqlPreparedStatement=sqlQueryReestr;
+        dtmSaldoReport = mdtmSocialClient.MyTableModelReestr(categoryCode);
+        reestrTable.setModel(dtmSaldoReport);
+        dtmSocialClient.fireTableDataChanged();
+        rowTableSC = tableSocialClients.getRowCount();
+
+
+
+        // для отправки данных в эксель
+        rasAcc = mdtmSocialClient.rasAcc;
+        summa = mdtmSocialClient.summa;
+
     }
 
     // Начисления (Вкладка 'Начисления и выплаты')

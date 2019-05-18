@@ -144,9 +144,15 @@ import javax.swing.table.DefaultTableModel;
         public String[] columnsFindRequest;
         public Class[] columnClassFindRequest;
 
+        //для таблицы реестр
+        public String[] columnsReestr;
+        public Class[] columnClassReestr;
+
+
         public String sqlQuery;
         public String sqlPreparedStatement;
         public int persNum;
+
 
 
         // для оборотной ведомости
@@ -161,6 +167,9 @@ import javax.swing.table.DefaultTableModel;
         ArrayList<Integer> accrued = new ArrayList<Integer>();
         ArrayList<Integer> paidOff = new ArrayList<Integer>();
         ArrayList<Integer> outSaldo = new ArrayList<Integer>();
+
+        ArrayList<String> rasAcc = new ArrayList<String>();
+        ArrayList<Double> summa = new ArrayList<Double>();
 
 
         public TableModelClients(){
@@ -189,6 +198,39 @@ import javax.swing.table.DefaultTableModel;
             catch(SQLException e){
                 return null;
             }
+        }
+
+        public DefaultTableModel MyTableModelReestr(int catCode) {
+            rasAcc.clear();
+            summa.clear();
+
+            try {
+                /*sqlArray = createIndexArray(catCode);
+                String cheatSql = cheatCode(index.size());
+                ps = conn.prepareStatement(cheatSql);
+                for(int i=0; i<index.size();i++ ){
+                    ps.setInt(i+1, index.get(i));
+                }*/
+                ps = conn.prepareStatement(sqlPreparedStatement);
+                ps.setInt(1, catCode);
+                rs = ps.executeQuery();
+                createTable(rs, columnsReestr, columnClassReestr);
+
+                rs = ps.executeQuery();
+                ResultSetMetaData meta = ps.getMetaData();
+                while(rs.next()) {
+                    rasAcc.add(rs.getString(1));
+                    summa.add(rs.getDouble(2));
+
+                }
+
+                //sqlArray.clear();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            mdbc.close(stmt);
+            return dtm;
         }
 
         public DefaultTableModel deleteRow() {
@@ -247,6 +289,9 @@ import javax.swing.table.DefaultTableModel;
             patronimyc.clear();
             inSaldo.clear();
             accrued.clear();
+            paidOff.clear();
+            outSaldo.clear();
+
             try {
                 /*sqlArray = createIndexArray(catCode);
                 String cheatSql = cheatCode(index.size());
