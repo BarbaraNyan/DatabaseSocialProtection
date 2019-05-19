@@ -1272,7 +1272,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     }
 
     private void saveReestrToExcel(){
-        String date = (String) periodCombox.getSelectedItem();
+        SimpleDateFormat formatForReestr= new SimpleDateFormat("dd.MM.yyyy");
+        String date = formatForReestr.format(dcPeriodReestr.getDate());
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("Заявка на оплату расходов");
         int column = 0; // текущий столбец
@@ -1292,11 +1293,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         region = new CellRangeAddress(1, 1, 0, 1);
         sheet.addMergedRegion(region);
 
-        row++; // row = 3
+        row++; // row = 2
         newRow = sheet.createRow(row);
         cell = newRow.createCell(column, CellType.STRING);
         cell.setCellValue("Р/с");
-        cell = newRow.createCell(column + 1, CellType.NUMERIC);
+        cell = newRow.createCell(column + 1, CellType.STRING);
         cell.setCellValue("Сумма");
 
         for (int i = 0; i < rasAcc.size(); i++) {
@@ -1339,7 +1340,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             HSSFWorkbook my_xls_workbook = new HSSFWorkbook(input_doc);
             HSSFSheet my_worksheet = my_xls_workbook.getSheetAt(0);
             Document iText_xlstopdf = new Document();
-
             String file_name_pdf = "C:/test repos/Реестр для организации.pdf";
             PdfWriter.getInstance(iText_xlstopdf, new FileOutputStream(file_name_pdf));
             iText_xlstopdf.open();
@@ -1347,18 +1347,18 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     "CP1251", BaseFont.EMBEDDED);
             com.itextpdf.text.Font russian;
             russian = new com.itextpdf.text.Font(bf_russian, 11);
-            PdfPTable my_table = new PdfPTable(2);
             Paragraph p = new Paragraph();
-            Chunk chunk = new Chunk("Заявка на оплату расходов\n\n", russian);
+            Chunk chunk = new Chunk("Заявка на оплату расходов "+date+"\n\n", russian);
             p.add(chunk);
-            chunk = new Chunk("Организация: " +orgz+"\n\n", russian);
+            chunk = new Chunk("Организация: " +orgz, russian);
             p.add(chunk);
-            iText_xlstopdf.add( Chunk.NEWLINE );
             iText_xlstopdf.add(p);
+            PdfPTable my_table = new PdfPTable(2);
+            iText_xlstopdf.add( Chunk.NEWLINE );
             PdfPCell table_cell;
             double value;
             String string_value;
-            int start = 3;
+            int start = 2;
             int end = my_worksheet.getLastRowNum();
             for(int i = start; i<end; i++){
                 Row row_it = my_worksheet.getRow(i);
@@ -1391,8 +1391,12 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     }
                 }
             }
-            iText_xlstopdf.add( Chunk.NEWLINE );
+            p.clear();
             iText_xlstopdf.add(my_table);
+            iText_xlstopdf.add( Chunk.NEWLINE );
+            chunk = new Chunk("Главный бухгалтер ____________________Белозерская Л.Е.\n\n", russian);
+            p.add(chunk);
+            iText_xlstopdf.add(p);
             iText_xlstopdf.close(); // закрываем документ
             input_doc.close(); //закрываем xls
 
