@@ -135,6 +135,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableEmployee=new JTable();
     private JTable tableDepartament=new JTable();
     private JTable tableJob=new JTable();
+    private JTable tableBank=new JTable();
+    private JTable tablePost=new JTable();
+    private JTable tableCash=new JTable();
 
     // объявление элементов формы
     private JTable tableCategoryMeasure;
@@ -215,6 +218,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable reestrTable;
     private JButton createReestrButton;
     private JButton saveReestrButton;
+    private JPanel pnPeriodReestr;
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
@@ -243,6 +247,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private DeleteClient deleteClient;
     private EditClient editClient = new EditClient();
     private com.toedter.calendar.JDateChooser dcPeriodPayoff = new com.toedter.calendar.JDateChooser();
+    private com.toedter.calendar.JDateChooser dcPeriodReestr = new com.toedter.calendar.JDateChooser();
     private com.toedter.calendar.JDateChooser dcDateBirth = new com.toedter.calendar.JDateChooser();
     private com.toedter.calendar.JDateChooser dcIdDocDateStart= new com.toedter.calendar.JDateChooser();
     private com.toedter.calendar.JDateChooser dcAttDocDateStart= new com.toedter.calendar.JDateChooser();
@@ -275,6 +280,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private int selRowOperAcc;
     private int selRowItemInHandbook;
     private int selRowIncome;
+    private int numHand;
 
     // это для отчета в Эксель
     private ArrayList<Integer> persAc;
@@ -289,10 +295,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
    // для реестра
     private ArrayList<String> rasAcc;
     private ArrayList<Double> summa;
-
-
-//    private Object [] namedJOptionPane = {"Да","Нет","Отмена"};
-
 
     SimpleDateFormat formatForSql= new SimpleDateFormat("yyyy-MM-dd");
 
@@ -416,14 +418,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         labelSearch.setIcon(iconSearch);
         buttonFind.add(labelSearch);
 
-        getComboBox(comboBoxSCCategory, tableSCCategory);
-        setCBMeasure();
 
         openFieldsForEdit(false);
         editClientButton.setEnabled(false);
         deleteClientButton1.setEnabled(false);
         fillComboBox();
         setButtonGroup();
+        setCBMeasure();
 
         hideOperAcc();
         setButtonGroupStatus();
@@ -440,6 +441,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         dcPeriodPayoff.setDate(new Date());
         pnPeriodPayoff.add(dcPeriodPayoff);
         dcPeriodPayoff.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+
+        dcPeriodReestr.setDate(new Date());
+        pnPeriodReestr.add(dcPeriodReestr);
+        dcPeriodReestr.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
 
         panelDateBirth.add(dcDateBirth);
         dcDateBirth.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
@@ -502,9 +507,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             }
         });
 
-
-
-
         findClientButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 initModelClientCategoryMeasure();
@@ -540,13 +542,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                 setPayoff();
             }
         });
-//        tabbedPane2.addChangeListener(new ChangeListener() {
-//            public void stateChanged(ChangeEvent e) {
-//                if(tabbedPane2.getSelectedIndex()==1)
-//                    initModelIdDocument(persNum);
-//            }
-//        });
-
 
     //Вкладка "Личные дела", кнопка "Редактирование"
         editClientButton.addActionListener(new ActionListener() {
@@ -929,7 +924,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         });
         addNewItemButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                addItemInGlossary();
+                //addItemInGlossary();
                 labelNewItem.setVisible(false);
                 textNewItemInHandbook.setVisible(false);
                 addNewItemButton.setVisible(false);
@@ -937,9 +932,22 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         });
         addItemButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                labelNewItem.setVisible(true);
+                JTable [] tb={tableSCCategory, tableArticle, tableLaw, tableDepartament, tableJob};
+                JFrame addHand = new AddHandbook(numHand, tb);
+                addHand.setTitle("Добавление элемента справочника");
+                addHand.pack();
+                addHand.setVisible(true);
+                addHand.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        super.windowClosed(e);
+                        initModelHandbook();
+                        updateHandbook();
+                    }
+                });
+                /*labelNewItem.setVisible(true);
                 textNewItemInHandbook.setVisible(true);
-                addNewItemButton.setVisible(true);
+                addNewItemButton.setVisible(true);*/
             }
         });
         deleteItemButton.addActionListener(new ActionListener() {
@@ -951,15 +959,72 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                         "Да");
                 if(res==JOptionPane.YES_OPTION){
 //                    listenerRowTableHandbook();
-                    String [] params = deleteItemInGlossary();
+                    String params = deleteItemInGlossary();
                     deleteClient = new DeleteClient();
-                    deleteClient.deleteItemInGlossary(params[0],params[1]);
+                    int rez=deleteClient.deleteItemInGlossary(params);
+                    if(rez==1) {
+                        initModelHandbook();
+                        updateHandbook();
+                        deleteItemButton.setEnabled(false);
+                        switch (numHand){
+                            case 1:
+                                getComboBox(comboBoxSCCategory, tableSCCategory);
+                                break;
+                            case 5:
+                                getComboBox(textIndexComboBox,tableIndex);
+                                break;
+                            case 6:
+                                getComboBox(textRegionComboBox,tableRegion);
+                                break;
+                            case 7:
+                                getComboBox(textDistrictComboBox,tableDistrict);
+                                break;
+                            case 8:
+                                getComboBox(textInhabitedLocalityComboBox,tableLocality);
+                                break;
+                            case 9:
+                                getComboBox(textStreetComboBox,tableStreet);
+                                break;
+                            case 12:
+                                getComboBox(textIdDocTypeComboBox,tableIndDoc);
+                                break;
+                            case 13:
+                                getComboBox(textAttDocTypeComboBox,tableDoc);
+                                break;
+                            case 17:
+                            case 18:
+                            case 19:
+                                getComboBoxOrganization(organizationCombox,tableBank, tablePost, tableCash);
+                                break;
+                        }
+                    }
+                    else
+                        JOptionPane.showMessageDialog(SocialProtectionForm.this,"Невозможно удалить используемый элемент справочника","Удаление",JOptionPane.WARNING_MESSAGE);
 //                    initModelIdDocument(textPersNum.getText());
                 }
             }
         });
 
-        tableCategoryMeasure.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+        setToolText(tableSocialClients);
+        setToolText(tableIdDocument);
+        setToolText(tableAttDocument);
+        setToolText(tableOperatingAccount);
+        setToolText(tableCategoryMeasure);
+        setToolText(tableRequest);
+        setToolText(tablePayoffClient);
+        setToolText(tablePA);
+        setToolText(tableRelatives);
+        setToolText(tableIdDocRelatives);
+        setToolText(tableIncome);
+        setToolText(tableChargeRequest);
+        setToolText(tableFindRequest);
+        setToolText(tableHandbook);
+        setToolText(tableSaldoReport);
+        setToolText(reestrTable);
+    }
+
+    private void setToolText(JTable tb){
+        tb.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setToolTipText(getText());
@@ -971,9 +1036,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private void setCBMeasure(){
         comboBoxMeasure.removeAllItems();
         String item;
-        int k=tableMeasure.getColumnCount()-1;
+        int k=comboBoxSCCategory.getSelectedIndex();
         for (int i = 0;i<tableMeasure.getRowCount();i++){
-            if(Integer.valueOf(tableMeasure.getValueAt(i, 1).toString())==comboBoxSCCategory.getSelectedIndex()+1) {
+            if(Integer.valueOf(tableMeasure.getValueAt(i, 1).toString())==tableSCCategory.getModel().getValueAt(k,0)) {
                 item = tableMeasure.getModel().getValueAt(i, 2).toString();
                 comboBoxMeasure.addItem(item);
             }
@@ -1473,6 +1538,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         getComboBox(textInhabitedLocalityComboBox,tableLocality);
         getComboBox(textIdDocTypeComboBox,tableIndDoc);
         getComboBox(textAttDocTypeComboBox,tableDoc);
+        getComboBox(comboBoxSCCategory, tableSCCategory);
+        getComboBoxOrganization(organizationCombox,tableBank, tablePost, tableCash);
+
     }
 
     private void setButtonGroup(){
@@ -2015,7 +2083,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         tableHandbook.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting() == false) {
-                    int selRow = tableOperatingAccount.getSelectedRow();
+                    int selRow = tableHandbook.getSelectedRow();
                     if(selRow>=0) {
                         deleteItemButton.setEnabled(true);
                         selRowItemInHandbook = tableHandbook.getSelectedRow();
@@ -2264,36 +2332,49 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         out_saldo = mdtmSocialClient.outSaldo;
     }
 
-    public void initModelReestrReport() {
+    private void getPeriodReestr(Date dateReestr){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dateReestr);
+        calendar.set(Calendar.DATE, 1);
+        dateStart=formatForSql.format(calendar.getTime());
+        calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+        dateEnd=formatForSql.format(calendar.getTime());
+    }
 
-        int orgType = organizationCombox.getSelectedIndex()+1;
-        int mspType = mspCombox.getSelectedIndex()+1;
+    public void initModelReestrReport() {
+        getPeriodReestr(dcPeriodReestr.getDate());
+        String org = organizationCombox.getItemAt(organizationCombox.getSelectedIndex()).toString();
+        int numLine = org.indexOf("|");
+        String numOrg=org.substring(0, numLine-1);
 
         String[] columnsReestr = new String[]{"Расчетный счет","Сумма"};
         final Class[] columnClassReestr =  new Class[]{String.class, Double.class};
 
-        //String sqlQueryFirst = "select cm.personalNumber from client_measure cm where codeClientCategory=?";
-//        String sqlQueryReestr ="select sc.personalNumber, sc.surname, sc.name,sc.patronymic, pa.inputBalance, sum(rfcs.totalAmount), sum(rfcs.totalAmount), pa.outputBalance\n" +
-//                "from personal_account pa inner join payoff p on pa.numberPersonalAccount = p.numberPersonalAccount\n" +
-//                "inner join request_for_cash_settlement rfcs on p.numberPayoff = rfcs.numberPayoff\n" +
-//                "inner join operating_account oa on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
-//                "inner join social_client sc on oa.personalNumber = sc.personalNumber\n" +
-//                "where pa.periodPayoff between '"+dateStart+"' and '"+dateEnd+"' and rfcs.codeClientCategory=? " +
-//                "group by sc.personalNumber " +
-//                "order by sc.personalNumber";
-        //или sum(rfcs.totalAmount) и group by sc.personalNumber, если клиент должен показываться только 1 раз с итоговой суммой за месяц
+        String sqlQueryReestr1 ="select distinct(oa.numberOperatingAccount), sum(rfcs.totalAmount)\n" +
+                "from operating_account oa inner join bank_operating_account boa on oa.numberOperatingAccount = boa.numberOperatingAccount\n" +
+                "inner join request_for_cash_settlement rfcs on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
+                "inner join payoff p on rfcs.numberPayoff = p.numberPayoff\n" +
+                "where p.datePayoff between '"+dateStart+"' and '"+dateEnd+"' and boa.bic='"+numOrg+"'" +
+                "group by oa.numberOperatingAccount";
+        String sqlQueryReestr2 ="select distinct(oa.numberOperatingAccount), sum(rfcs.totalAmount)\n" +
+                "from operating_account oa inner join post_operating_account poa on oa.numberOperatingAccount = poa.numberOperatingAccount\n" +
+                "inner join request_for_cash_settlement rfcs on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
+                "inner join payoff p on rfcs.numberPayoff = p.numberPayoff\n" +
+                "where p.datePayoff between '"+dateStart+"' and '"+dateEnd+"' and poa.postCode='"+numOrg+"'" +
+                "group by oa.numberOperatingAccount";
+        String sqlQueryReestr3 ="select distinct(oa.numberOperatingAccount), sum(rfcs.totalAmount)\n" +
+                "from operating_account oa inner join cash_operating_account coa on oa.numberOperatingAccount = coa.numberOperatingAccount\n" +
+                "inner join request_for_cash_settlement rfcs on rfcs.numberOperatingAccount = oa.numberOperatingAccount\n" +
+                "inner join payoff p on rfcs.numberPayoff = p.numberPayoff\n" +
+                "where p.datePayoff between '"+dateStart+"' and '"+dateEnd+"' and coa.tinCash='"+numOrg+"'" +
+                "group by oa.numberOperatingAccount";
 
-        int categoryCode = Integer.parseInt(tableSCCategory.getModel().getValueAt(categoryCombox.getSelectedIndex(), 0).toString());
         mdtmSocialClient.columnsReestr = columnsReestr;
         mdtmSocialClient.columnClassReestr = columnClassReestr;
-        //mdtmSocialClient.sqlQuery = sqlQueryFirst;
-       // mdtmSocialClient.sqlPreparedStatement=sqlQueryReestr;
-        dtmSaldoReport = mdtmSocialClient.MyTableModelReestr(categoryCode);
+        dtmSaldoReport = mdtmSocialClient.MyTableModelReestr(sqlQueryReestr1, sqlQueryReestr2, sqlQueryReestr3);
         reestrTable.setModel(dtmSaldoReport);
         dtmSocialClient.fireTableDataChanged();
         rowTableSC = tableSocialClients.getRowCount();
-
-
 
         // для отправки данных в эксель
         rasAcc = mdtmSocialClient.rasAcc;
@@ -2496,6 +2577,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     //для вкладки назначения и выплаты
     public void getComboBox(JComboBox cb, JTable tl){
+        cb.removeAllItems();
         String item;
         int k=tl.getColumnCount()-1;
         for (int i = 0;i<tl.getRowCount();i++){
@@ -2508,11 +2590,12 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private DefaultMutableTreeNode setGlossaryJTree(){
         final String ROOT  = "Справочники";
         // Массив листьев деревьев
-        final   String[]   nodes = new String[]  {"Пособия","Адреса","Личная карточка","Прочие"};
+        final   String[]   nodes = new String[]  {"Пособия","Адреса","Личная карточка","Организации","Прочие"};
         final   String[][] leafs = new String[][]{{"Категории гражданина", "Меры социальной поддержки", "Законы", "Статьи", "Правила расчёта"},
                 {"Индексы","Регионы","Районы","Населённые пункты","Улицы"},
                 {"Родственные отношения","Виды доходов"},
-                {"Документы удостоверения","Документы"}};
+                {"Банки","Почты","Кассы"},
+                {"Документы удостоверения","Документы","Сотрудники","Отдел","Должность"}};
 
         // Создание древовидной структуры
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(ROOT);
@@ -2520,11 +2603,13 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         DefaultMutableTreeNode benefit = new DefaultMutableTreeNode(nodes[0]);
         DefaultMutableTreeNode address = new DefaultMutableTreeNode(nodes[1]);
         DefaultMutableTreeNode personalCard = new DefaultMutableTreeNode(nodes[2]);
-        DefaultMutableTreeNode other = new DefaultMutableTreeNode(nodes[3]);
+        DefaultMutableTreeNode organization = new DefaultMutableTreeNode(nodes[3]);
+        DefaultMutableTreeNode other = new DefaultMutableTreeNode(nodes[4]);
         // Добавление ветвей к корневой записи
         root.add(benefit);
         root.add(address);
         root.add(personalCard);
+        root.add(organization);
         root.add(other);
         // Добавление листьев
         for ( int i = 0; i < leafs[0].length; i++)
@@ -2534,7 +2619,9 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         for ( int i = 0; i < leafs[2].length; i++)
             personalCard.add(new DefaultMutableTreeNode(leafs[2][i], false));
         for ( int i = 0; i < leafs[3].length; i++)
-            other.add(new DefaultMutableTreeNode(leafs[3][i], false));
+            organization.add(new DefaultMutableTreeNode(leafs[3][i], false));
+        for ( int i = 0; i < leafs[4].length; i++)
+            other.add(new DefaultMutableTreeNode(leafs[4][i], false));
         return root;
     }
 
@@ -2553,6 +2640,14 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String[] columnsEmployee = new String[] {"Табельный номер", "Фамилия", "Имя", "Отчество", "Код должности", "Номер отдела"};
     final Class[] columnClassEmployee = new Class[] {Integer.class, String.class, String.class, String.class, Integer.class, Integer.class};
 
+    String[] columnsBank = new String[] {"БИК", "Адрес", "Наименование", "ИНН"};
+    final Class[] columnClassBank = new Class[] {String.class, String.class, String.class, String.class};
+    String[] columnsPost = new String[] {"Индекс почты", "ИНН", "Адрес", "Наименование"};
+    final Class[] columnClassPost = new Class[] {Integer.class, String.class, String.class, String.class};
+    String[] columnsCash = new String[] {"ИНН кассы", "Адрес", "Наименование"};
+    final Class[] columnClassCash = new Class[] {String.class, String.class, String.class};
+
+
     String sqlQuerySCCat="select * from social_client_category";
     String sqlQueryMeasure="select * from measure_of_social_support";
     String sqlQueryLaw="select codeOfLaw, numberLaw, nameLaw, DATE_FORMAT(certifiedDateLaw, '%d.%m.%Y') from law";
@@ -2568,6 +2663,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     String sqlQueryInc="select * from type_income";
     String sqlQueryIdDoc="select * from type_identification_document";
     String sqlQueryDoc="select * from type_attached_document";
+
+    String sqlQueryBank="select * from bank_organization";
+    String sqlQueryPost="select * from post_organization";
+    String sqlQueryCash="select * from cash_organization";
 
     String sqlQueryEmp="select * from employee";
     String sqlQueryDep="select * from department_employee";
@@ -2687,170 +2786,214 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         tableJob.setModel(dtmHandbook);
         dtmHandbook.fireTableDataChanged();
 
+        mdtmSocialClient.columnsBank = columnsBank;
+        mdtmSocialClient.columnClassBank = columnClassBank;
+        mdtmSocialClient.sqlQuery = sqlQueryBank;
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(17);
+        tableBank.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+
+        mdtmSocialClient.columnsPost = columnsPost;
+        mdtmSocialClient.columnClassPost = columnClassPost;
+        mdtmSocialClient.sqlQuery = sqlQueryPost;
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(18);
+        tablePost.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+
+        mdtmSocialClient.columnsCash = columnsCash;
+        mdtmSocialClient.columnClassCash = columnClassCash;
+        mdtmSocialClient.sqlQuery = sqlQueryCash;
+        dtmHandbook = mdtmSocialClient.MyTableModelHandbook(19);
+        tableCash.setModel(dtmHandbook);
+        dtmHandbook.fireTableDataChanged();
+
     }
 
-    //выделение пункта дерева - новая таблица справочника
-    public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
+    private void updateHandbook(){
         TreePath[] paths=glossaryJTree.getSelectionPaths();
         treeSelect=paths[0].getLastPathComponent().toString();
 
         if ("Категории гражданина".equals(treeSelect)) {
             tableHandbook.setModel(tableSCCategory.getModel());
+            numHand=1;
         }else
         if ("Меры социальной поддержки".equals(treeSelect)) {
             tableHandbook.setModel(tableMeasure.getModel());
             tableHandbook.removeColumn(tableHandbook.getColumnModel().getColumn(5));
             tableHandbook.removeColumn(tableHandbook.getColumnModel().getColumn(4));
             tableHandbook.removeColumn(tableHandbook.getColumnModel().getColumn(1));
+            numHand=2;
         }else
         if ("Законы".equals(treeSelect)) {
             tableHandbook.setModel(tableLaw.getModel());
+            numHand=3;
         }else
         if ("Статьи".equals(treeSelect)) {
             tableHandbook.setModel(tableArticle.getModel());
             tableHandbook.removeColumn(tableHandbook.getColumnModel().getColumn(1));
+            numHand=4;
         }else
         if ("Индексы".equals(treeSelect)) {
             tableHandbook.setModel(tableIndex.getModel());
+            numHand=5;
         }else
         if ("Регионы".equals(treeSelect)) {
             tableHandbook.setModel(tableRegion.getModel());
+            numHand=6;
         }else
         if ("Районы".equals(treeSelect)) {
             tableHandbook.setModel(tableDistrict.getModel());
+            numHand=7;
         }else
         if ("Населённые пункты".equals(treeSelect)) {
             tableHandbook.setModel(tableLocality.getModel());
+            numHand=8;
         }else
         if ("Улицы".equals(treeSelect)) {
             tableHandbook.setModel(tableStreet.getModel());
+            numHand=9;
         }else
         if ("Родственные отношения".equals(treeSelect)) {
             tableHandbook.setModel(tableRelation.getModel());
+            numHand=10;
         }else
         if ("Виды доходов".equals(treeSelect)) {
             tableHandbook.setModel(tableTypeIncome.getModel());
+            numHand=11;
         }else
         if ("Документы удостоверения".equals(treeSelect)) {
             tableHandbook.setModel(tableIndDoc.getModel());
+            numHand=12;
         }else
         if ("Документы".equals(treeSelect)) {
             tableHandbook.setModel(tableDoc.getModel());
+            numHand=13;
         }else
+        if ("Сотрудники".equals(treeSelect)) {
+            tableHandbook.setModel(tableEmployee.getModel());
+            numHand=14;
+        }else
+        if ("Отдел".equals(treeSelect)) {
+            tableHandbook.setModel(tableDepartament.getModel());
+            numHand=15;
+        }else
+        if ("Должность".equals(treeSelect)) {
+            tableHandbook.setModel(tableJob.getModel());
+            numHand=16;
+        }else
+        if ("Банки".equals(treeSelect)) {
+            tableHandbook.setModel(tableBank.getModel());
+            numHand=17;
+        }else
+        if ("Почты".equals(treeSelect)) {
+            tableHandbook.setModel(tablePost.getModel());
+            numHand=18;
+        }else
+        if ("Кассы".equals(treeSelect)) {
+            tableHandbook.setModel(tableCash.getModel());
+            numHand=19;
+        }else {
             tableHandbook.setModel(new DefaultTableModel());
+            numHand = 0;
+        }
+    }
+    //выделение пункта дерева - новая таблица справочника
+    public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
+        updateHandbook();
     }
     public String quotate(String content){
         return "'"+content+"'";
     }
-    private void addItemInGlossary(){
-        String item = textNewItemInHandbook.getText();
-        String sqlItem = "";
 
-        TreePath[] paths=glossaryJTree.getSelectionPaths();
-        treeSelect=paths[0].getLastPathComponent().toString();
 
-        if ("Категории гражданина".equals(treeSelect)) {
-            sqlItem = "insert into social_client_category(nameClientCategory) values ("+quotate(item)+")";
-        }else
-        if ("Меры социальной поддержки".equals(treeSelect)) {
-
-        }else
-        if ("Законы".equals(treeSelect)) {
-
-        }else
-        if ("Статьи".equals(treeSelect)) {
-
-        }else
-        if ("Индексы".equals(treeSelect)) {
-            sqlItem = "insert into index_address(numberIndex) values ("+quotate(item)+")";
-        }else
-        if ("Регионы".equals(treeSelect)) {
-            sqlItem = "insert into region_address(nameRegion) values ("+quotate(item)+")";
-        }else
-        if ("Районы".equals(treeSelect)) {
-            sqlItem = "insert into district_address(nameDistrict) values ("+quotate(item)+")";
-        }else
-        if ("Населённые пункты".equals(treeSelect)) {
-            sqlItem = "insert into inhabited_locality_address(nameInhabitedLocality) values ("+quotate(item)+")";
-        }else
-        if ("Улицы".equals(treeSelect)) {
-            sqlItem = "insert into street_address(nameStreet) values ("+quotate(item)+")";
-        }else
-        if ("Родственные отношения".equals(treeSelect)) {
-            sqlItem = "insert into relation_degree(nameRelationDegree) values ("+quotate(item)+")";
-        }else
-        if ("Виды доходов".equals(treeSelect)) {
-            sqlItem = "insert into type_income(nameTypeIncone) values ("+quotate(item)+")";
-        }else
-        if ("Документы удостоверения".equals(treeSelect)) {
-            sqlItem = "insert into type_identification_document(nameTypeIdDocument) values ("+quotate(item)+")";
-        }else
-        if ("Документы".equals(treeSelect)) {
-            sqlItem = "insert into type_attached_document(nameTypeAttachedDocument) values ("+quotate(item)+")";
-        }else
-            tableHandbook.setModel(new DefaultTableModel());
-
-        mdtmSocialClient.addItemInHandbook(sqlItem);
-
-    }
-
-    private String [] deleteItemInGlossary(){
+    private String deleteItemInGlossary(){
         TreePath[] paths=glossaryJTree.getSelectionPaths();
         treeSelect=paths[0].getLastPathComponent().toString();
 
         TableModel tm = tableHandbook.getModel();
-        String item = "";
+        String item = tm.getValueAt(selRowItemInHandbook,0).toString();
         String sqlItem = "";
 
         //Добавить для других случаев
-        if ("Индексы".equals(treeSelect)) {
-            item = tm.getValueAt(selRowItemInHandbook,0).toString();
-        }
-        else
-            item = tm.getValueAt(selRowItemInHandbook,0).toString();
-
         if ("Категории гражданина".equals(treeSelect)) {
-            sqlItem = "delete from social_client_category where nameClientCategory = ?";
+            sqlItem = "delete from social_client_category where codeClientCategory = '"+item+"'";
         }else
         if ("Меры социальной поддержки".equals(treeSelect)) {
-
+            String codCat=tm.getValueAt(selRowItemInHandbook,1).toString();
+            sqlItem = "delete from measure_of_social_support where codeSocialMeasure = '"+item+"' and codeClientCategory = '"+codCat+"'";
         }else
         if ("Законы".equals(treeSelect)) {
-
+            sqlItem = "delete from law where codeOfLaw = '"+item+"'";
         }else
         if ("Статьи".equals(treeSelect)) {
-
+            String codL=tm.getValueAt(selRowItemInHandbook,1).toString();
+            sqlItem = "delete from article where articleCode = '"+item+"' and codeOfLaw = '"+codL+"'";
         }else
         if ("Индексы".equals(treeSelect)) {
-            sqlItem = "delete from index_address where numberIndex = ?";
+            sqlItem = "delete from index_address where numberIndex = '"+item+"'";
         }else
         if ("Регионы".equals(treeSelect)) {
-            sqlItem = "delete from region_address where nameRegion = ?";
+            sqlItem = "delete from region_address where numberRegion = '"+item+"'";
         }else
         if ("Районы".equals(treeSelect)) {
-            sqlItem = "delete from district_address where nameDistrict = ?";
+            sqlItem = "delete from district_address where numberDistrict = '"+item+"'";
         }else
         if ("Населённые пункты".equals(treeSelect)) {
-            sqlItem = "delete from inhabited_locality_address where nameInhabitedLocality = ?";
+            sqlItem = "delete from inhabited_locality_address where numberInhabitedLocality = '"+item+"'";
         }else
         if ("Улицы".equals(treeSelect)) {
-            sqlItem = "delete from street_address where numberStreet = ?";
+            sqlItem = "delete from street_address where numberStreet = '"+item+"'";
         }else
         if ("Родственные отношения".equals(treeSelect)) {
-            sqlItem = "delete from relation_degree where nameRelationDegree = ?";
+            sqlItem = "delete from relation_degree where numberRelationDegree = '"+item+"'";
         }else
         if ("Виды доходов".equals(treeSelect)) {
-            sqlItem = "delete from type_income where nameTypeIncone = ?";
+            sqlItem = "delete from type_income where numberTypeIncone = '"+item+"'";
         }else
         if ("Документы удостоверения".equals(treeSelect)) {
-            sqlItem = "delete from type_identification_document where nameTypeIdDocument = ?";
+            sqlItem = "delete from type_identification_document where numberTypeIdDocument = '"+item+"'";
         }else
         if ("Документы".equals(treeSelect)) {
-            sqlItem = "delete from type_attached_document where nameTypeAttachedDocument = ?";
+            sqlItem = "delete from type_attached_document where numberTypeAttachedDocument = '"+item+"'";
+        }else
+        if ("Сотрудники".equals(treeSelect)) {
+            sqlItem = "delete from employee where personnelNumberEmployee = '"+item+"'";
+        }else
+        if ("Отдел".equals(treeSelect)) {
+            sqlItem = "delete from department_employee where numberDepartament = '"+item+"'";
+        }else
+        if ("Должность".equals(treeSelect)) {
+            sqlItem = "delete from job_position_employee where codeJob = '"+item+"'";
+        }else
+        if ("Банки".equals(treeSelect)) {
+            sqlItem = "delete from bank_organization where bic = '"+item+"'";
+        }else
+        if ("Почты".equals(treeSelect)) {
+            sqlItem = "delete from post_organization where postCode = '"+item+"'";
+        }else
+        if ("Кассы".equals(treeSelect)) {
+            sqlItem = "delete from cash_organization where tinCash = '"+item+"'";
         }else
             tableHandbook.setModel(new DefaultTableModel());
 
-        String [] param = {sqlItem,item};
-        return param;
+        //String [] param = {sqlItem,item};
+        return sqlItem;
+    }
+
+    private void getComboBoxOrganization(JComboBox cb, JTable b, JTable p, JTable c){
+        cb.removeAllItems();
+        String item;
+        for (int i = 0;i<b.getRowCount();i++){
+            item = b.getModel().getValueAt(i, 0).toString()+" | "+b.getModel().getValueAt(i,2).toString();
+            cb.addItem(item);
+        }
+        for (int i = 0;i<p.getRowCount();i++){
+            item = p.getModel().getValueAt(i, 0).toString()+" | "+p.getModel().getValueAt(i,3).toString();
+            cb.addItem(item);
+        }
+        for (int i = 0;i<c.getRowCount();i++){
+            item = c.getModel().getValueAt(i, 0).toString()+" | "+c.getModel().getValueAt(i,2).toString();
+            cb.addItem(item);
+        }
     }
 }

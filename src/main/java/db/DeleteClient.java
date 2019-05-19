@@ -165,17 +165,15 @@ public class DeleteClient {
         params = new String[]{personalNumber,relPersNum};
         deleteOnce(2,sqlDelRel,params);
     }
-    public void deleteItemInGlossary(String sqlItem,String item){
+    public int deleteItemInGlossary(String sqlItem){
         try {
-            PreparedStatement ps = conn.prepareStatement(sqlItem);
-            ps.setString(1,item);
-            ps.executeUpdate();
-//
-//            stmt= conn.createStatement();
-//            stmt.executeUpdate(sqlItem);
-//            mdbc.close(stmt);
+            stmt= conn.createStatement();
+            stmt.executeUpdate(sqlItem);
+            mdbc.close(stmt);
+            return 1;
         } catch (SQLException e) {
             e.printStackTrace();
+            return -1;
         }
     }
 }

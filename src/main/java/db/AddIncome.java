@@ -42,7 +42,7 @@ public class AddIncome extends JFrame{
         });
         canselButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                int rezult = JOptionPane.showOptionDialog(AddIncome.this, "Вы уверены, что хотите отменить добавление дохода?", "Отмена добавления члена семьи", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,
+                int rezult = JOptionPane.showOptionDialog(AddIncome.this, "Вы уверены, что хотите отменить добавление дохода?", "Отмена добавления дохода", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null,
                         new Object[]{"Да", "Нет"},
                         "Да");
                 if(rezult==JOptionPane.YES_OPTION)

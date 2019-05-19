@@ -140,6 +140,18 @@ import javax.swing.table.DefaultTableModel;
         public String[] columnsJob;
         public Class[] columnClassJob;
 
+        //для таблицы(справочнка) банки
+        public String[] columnsBank;
+        public Class[] columnClassBank;
+
+        //для таблицы(справочнка) кассы
+        public String[] columnsCash;
+        public Class[] columnClassCash;
+
+        //для таблицы(справочнка) почты
+        public String[] columnsPost;
+        public Class[] columnClassPost;
+
         //для таблицы поиска выплат
         public String[] columnsFindRequest;
         public Class[] columnClassFindRequest;
@@ -200,29 +212,31 @@ import javax.swing.table.DefaultTableModel;
             }
         }
 
-        public DefaultTableModel MyTableModelReestr(int catCode) {
+        public DefaultTableModel MyTableModelReestr(String sql1, String sql2, String sql3) {
             rasAcc.clear();
             summa.clear();
 
             try {
-                /*sqlArray = createIndexArray(catCode);
-                String cheatSql = cheatCode(index.size());
-                ps = conn.prepareStatement(cheatSql);
-                for(int i=0; i<index.size();i++ ){
-                    ps.setInt(i+1, index.get(i));
-                }*/
-                ps = conn.prepareStatement(sqlPreparedStatement);
-                ps.setInt(1, catCode);
+                ps = conn.prepareStatement(sql1);
                 rs = ps.executeQuery();
                 createTable(rs, columnsReestr, columnClassReestr);
-
-                rs = ps.executeQuery();
-                ResultSetMetaData meta = ps.getMetaData();
-                while(rs.next()) {
-                    rasAcc.add(rs.getString(1));
-                    summa.add(rs.getDouble(2));
-
+                if(dtm.getRowCount()==0){
+                    ps = conn.prepareStatement(sql2);
+                    rs = ps.executeQuery();
+                    createTable(rs, columnsReestr, columnClassReestr);
+                    if(dtm.getRowCount()==0){
+                        ps = conn.prepareStatement(sql3);
+                        rs = ps.executeQuery();
+                        createTable(rs, columnsReestr, columnClassReestr);
+                    }
                 }
+
+
+                for(int i=0; i<dtm.getRowCount(); i++){
+                   rasAcc.add(dtm.getValueAt(i,0).toString());
+                   summa.add(Double.parseDouble(dtm.getValueAt(i,1).toString()));
+                }
+
 
                 //sqlArray.clear();
 
@@ -391,6 +405,7 @@ import javax.swing.table.DefaultTableModel;
         }
 
         public int setClientPayoff(String [] queryPayoff){
+            int go=-1;
             try{
                 String[] columnsPayoff = new String[] {"Номер личного счета", "Сумма", "Дата начала", "Дата окончания"};
                 Class[] columnClassPayoff = new Class[] {Integer.class, Double.class, String.class, String.class};
@@ -399,18 +414,21 @@ import javax.swing.table.DefaultTableModel;
                 createTable(rs, columnsPayoff, columnClassPayoff);
                 String numP="";
                 int numPA=-1;
+                double amount=0;
 
                 for(int i=0; i<dtm.getRowCount(); i++){
                     String amountPayoff=dtm.getValueAt(i, 1).toString();
+                    amount=Double.valueOf(amountPayoff);
                     ps=conn.prepareStatement(queryPayoff[1]);
                     ps.setString(1, dtm.getValueAt(i, 0).toString());
                     ps.setString(2, dtm.getValueAt(i, 2).toString());
                     ps.setString(3, dtm.getValueAt(i, 3).toString());
                     rs = ps.executeQuery();
-                    if(rs.next()){
-                        double amount=Double.valueOf(rs.getString("amountPayoff"))+Double.valueOf(amountPayoff);
+                    while(rs.next()){
+                        amount+=Double.valueOf(rs.getString("amountPayoff"));
                         numPA=rs.getInt("numberPersonalAccount");
-
+                    }
+                    if(amount!=Double.valueOf(amountPayoff)){
                         ps=conn.prepareStatement(queryPayoff[2]);
                         ps.setDouble(1, amount);
                         ps.setDouble(2, amount);
@@ -510,6 +528,15 @@ import javax.swing.table.DefaultTableModel;
                         break;
                     case 16: // Должность
                         createTable(rs,columnsJob,columnClassJob);
+                        break;
+                    case 17: // Банки
+                        createTable(rs,columnsBank,columnClassBank);
+                        break;
+                    case 18: // Почта
+                        createTable(rs,columnsPost,columnClassPost);
+                        break;
+                    case 19: // Касса
+                        createTable(rs,columnsCash,columnClassCash);
                         break;
                 }
 

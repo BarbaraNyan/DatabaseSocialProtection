@@ -99,8 +99,9 @@ public class FilterClient extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 comboBoxMeasure.removeAllItems();
                 String item;
+                int k=comboBoxCategory.getSelectedIndex();
                 for (int i = 0;i<tm[6].getRowCount();i++){
-                    if(Integer.valueOf(tm[6].getValueAt(i, 1).toString())==comboBoxCategory.getSelectedIndex()+1) {
+                    if(Integer.valueOf(tm[6].getValueAt(i, 1).toString())==tm[5].getValueAt(k,0)) {
                         item = tm[6].getValueAt(i, 2).toString();
                         comboBoxMeasure.addItem(item);
                     }

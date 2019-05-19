@@ -59,8 +59,9 @@ public class AddCategoryMeasure extends JFrame{
             public void itemStateChanged(ItemEvent e) {
                 comboBoxMeasure.removeAllItems();
                 String item;
+                int k=comboBoxCategory.getSelectedIndex();
                 for (int i = 0;i<handbook[1].getRowCount();i++){
-                    if(Integer.valueOf(handbook[1].getValueAt(i, 1).toString())==comboBoxCategory.getSelectedIndex()+1) {
+                    if(Integer.valueOf(handbook[1].getValueAt(i, 1).toString())==handbook[0].getValueAt(k,0)) {
                         item = handbook[1].getValueAt(i, 2).toString();
                         comboBoxMeasure.addItem(item);
                     }
