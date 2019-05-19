@@ -50,6 +50,7 @@
         <properties>
           <font name="Microsoft Sans Serif" size="18"/>
           <text value="Добавить"/>
+          <toolTipText value="Добавить меру социальной поддержки"/>
         </properties>
       </component>
       <component id="4784f" class="javax.swing.JButton" binding="canselButton">
@@ -59,6 +60,7 @@
         <properties>
           <font name="Microsoft Sans Serif" size="18"/>
           <text value="Отменить"/>
+          <toolTipText value="Отменить добавление"/>
         </properties>
       </component>
     </children>

@@ -35,15 +35,35 @@ public class AddIdDoc extends JFrame{
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
         panelDateStart.add(dcDateStart);
+        dcDateStart.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
         setMasks();
         getComboBox(typeDocComboBox,handbook[5]);
         tb=handbook[5];
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                addIdDoc(persNum,relPersNum);
-                JOptionPane.showMessageDialog(AddIdDoc.this,"Успешно добавлено!","Добавление",JOptionPane.INFORMATION_MESSAGE);
-                setVisible(false);
-                dispose();
+                setNullBorder();
+                if(textSeries.getText().equals("****")){
+                    textSeries.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else if(textNumber.getText().equals("******")) {
+                    textNumber.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else if(textGivenBy.getText().equals("")) {
+                    textGivenBy.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else if(dcDateStart.getDate()==null) {
+                    dcDateStart.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else {
+                    int rez = addIdDoc(persNum, relPersNum);
+                    if (rez == 1)
+                        JOptionPane.showMessageDialog(AddIdDoc.this, "Успешно добавлено!", "Добавление", JOptionPane.INFORMATION_MESSAGE);
+                    else
+                        JOptionPane.showMessageDialog(AddIdDoc.this, "Ошибка при добавлении", "Добавление", JOptionPane.WARNING_MESSAGE);
+
+                    setVisible(false);
+                    dispose();
+                }
 //                dispatchEvent(new WindowEvent(AddIdDoc.this,WindowEvent.WINDOW_CLOSING));
             }
         });
@@ -59,7 +79,18 @@ public class AddIdDoc extends JFrame{
         });
     }
 
-    private void addIdDoc(String personalNumber,String relPersonalNumber) {
+    private void showMess(){
+        JOptionPane.showMessageDialog(AddIdDoc.this, "Должны быть введены все поля", "Добавление", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void setNullBorder(){
+        textSeries.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textNumber.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textGivenBy.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        dcDateStart.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+    }
+
+    private int addIdDoc(String personalNumber,String relPersonalNumber) {
         String typeDoc = String.valueOf(getTypeIdDoc());
         String series = textSeries.getText();
         String number = textNumber.getText();
@@ -87,9 +118,12 @@ public class AddIdDoc extends JFrame{
                         "," + quotate(typeDoc) + "," + quotate(personalNumber) + ")";
             }
             stmt.executeUpdate(sqlQuery);
+            mdbc.close(stmt);
+            return 1;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return -1;
         }
     }
     private void setMasks(){

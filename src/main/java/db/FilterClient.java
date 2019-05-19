@@ -56,7 +56,7 @@ public class FilterClient extends JFrame{
     FilterClient(final TableModel[] tm, SocialProtectionForm spf){
         sf=spf;
         setContentPane(rootPanel);
-        setPreferredSize(new Dimension(1200,700));
+        setPreferredSize(new Dimension(1250,750));
         pnDateBirth.add(dcDateBirth);
 
         JCheckBox []b1={surnameCheckBox, nameCheckBox, patronymicCheckBox, dateBirthChecBox, genderCheckBox};

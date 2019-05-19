@@ -37,7 +37,11 @@ public class AddCategoryMeasure extends JFrame{
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                insertClientMeasure(persNum, handbook);
+                int rez=insertClientMeasure(persNum, handbook);
+                if(rez==1)
+                    JOptionPane.showMessageDialog(AddCategoryMeasure.this,"Успешно добавлено!","Добавление",JOptionPane.INFORMATION_MESSAGE);
+                else
+                    JOptionPane.showMessageDialog(AddCategoryMeasure.this,"Ошибка при добавлении","Добавление",JOptionPane.WARNING_MESSAGE);
                 setVisible(false);
                 dispose();
             }
@@ -80,7 +84,7 @@ public class AddCategoryMeasure extends JFrame{
     }
 
 
-    private void insertClientMeasure(String persNum, final TableModel[] handbook){
+    private int insertClientMeasure(String persNum, final TableModel[] handbook){
         String codeCategory=handbook[0].getValueAt(comboBoxCategory.getSelectedIndex(), 0).toString();
         String codeMeasure=handbook[1].getValueAt(comboBoxMeasure.getSelectedIndex(), 0).toString();
         String period="";
@@ -115,8 +119,11 @@ public class AddCategoryMeasure extends JFrame{
                     "VALUES ('"+persNum+"', '"+codeMeasure+"', '"+codeCategory+"', '"+dateNow+"', " +
                     "'"+dateEnd+"', 'Назначено')";
             stmt.executeUpdate(sqlQuery);
+            mdbc.close(stmt);
+            return 1;
         } catch (SQLException e) {
             e.printStackTrace();
+            return -1;
         }
 
     }

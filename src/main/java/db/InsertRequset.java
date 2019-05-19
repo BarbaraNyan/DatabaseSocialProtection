@@ -1,6 +1,7 @@
 package db;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
@@ -70,10 +71,42 @@ public class InsertRequset extends JFrame{
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                insertNewRequest(tm, rowNum);
-                setVisible(false);
+                setNullBorder();
+                if(dcDateOfPreparation.getDate()==null){
+                    dcDateOfPreparation.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else if(textTotalAmount.getText().equals("")) {
+                    textTotalAmount.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else if(dcPeriodFrom.getDate()==null) {
+                    dcPeriodFrom.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else if(dcPeriodTo.getDate()==null) {
+                    dcPeriodTo.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else {
+                    int rez=insertNewRequest(tm, rowNum);
+                    if(rez==1)
+                        JOptionPane.showMessageDialog(InsertRequset.this,"Успешно добавлено!","Добавление",JOptionPane.INFORMATION_MESSAGE);
+                    else
+                        JOptionPane.showMessageDialog(InsertRequset.this,"Ошибка при добавлении","Добавление",JOptionPane.WARNING_MESSAGE);
+
+                    dispose();
+                    setVisible(false);
+                }
             }
         });
+    }
+
+    private void showMess(){
+        JOptionPane.showMessageDialog(InsertRequset.this, "Должны быть введены все поля", "Добавление", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void setNullBorder(){
+        dcDateOfPreparation.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textTotalAmount.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        dcPeriodFrom.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        dcPeriodTo.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
     }
 
     public void getComboBox(JComboBox cb, TableModel tl){
@@ -86,7 +119,7 @@ public class InsertRequset extends JFrame{
         }
     }
 
-    public void insertNewRequest(TableModel []dtm, int row){
+    public int insertNewRequest(TableModel []dtm, int row){
         int rowCount;
         int rowStart;
         String status;
@@ -137,12 +170,13 @@ public class InsertRequset extends JFrame{
                     }
                 }
             }
-            JOptionPane.showMessageDialog(InsertRequset.this, "Выплаты назначены", "Окно сообщения", JOptionPane.INFORMATION_MESSAGE);
-            mdbc.close(stmt);
+           mdbc.close(stmt);
+            return 1;
         }
         catch(Exception e){
             System.out.println("Failed to insert data");
             mdbc.close(stmt);
+            return -1;
         }
     }
 }

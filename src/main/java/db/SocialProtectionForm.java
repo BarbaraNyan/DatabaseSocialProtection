@@ -222,7 +222,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
     private JTable tableIndDoc=new JTable();
     private JTable tableDoc=new JTable();
 
-    private JTable []box={tableIndex, tableRegion, tableDistrict, tableLocality, tableStreet,tableIndDoc,tableDoc,tableSCCategory,tableRelation};
+    private JTable []box={tableIndex, tableRegion, tableDistrict, tableLocality, tableStreet,tableIndDoc,tableDoc,tableSCCategory,tableRelation, tableBank, tablePost, tableCash};
     private DefaultTableModel dtmSocialClient;
     private DefaultTableModel dtmIdDocument;
     private DefaultTableModel dtmAttDocument;
@@ -657,7 +657,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         });
         addOperAccButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFrame addOperAcc = new AddOperatingAcc(textPersNum.getText());
+                JFrame addOperAcc = new AddOperatingAcc(textPersNum.getText(), tableBank, tablePost, tableCash);
                 addOperAcc.setTitle("Добавление нового расчетного счета");
                 addOperAcc.pack();
                 addOperAcc.setVisible(true);
@@ -1190,7 +1190,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             String fileName = "C:/test repos/Оборотная ведомость за "+date+".pdf";
             PdfWriter.getInstance(iText_xlstopdf, new FileOutputStream(fileName));
             iText_xlstopdf.open();
-            BaseFont bf_russian = BaseFont.createFont("C:/Users/Екатерина/Downloads/FreeSans.ttf", "CP1251", BaseFont.EMBEDDED);
+            BaseFont bf_russian = BaseFont.createFont("src\\FreeSans.ttf", "CP1251", BaseFont.EMBEDDED);
             com.itextpdf.text.Font russian;
             russian = new com.itextpdf.text.Font(bf_russian, 11);
             PdfPTable my_table = new PdfPTable(8);
@@ -1343,7 +1343,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             String file_name_pdf = "C:/test repos/Реестр для организации.pdf";
             PdfWriter.getInstance(iText_xlstopdf, new FileOutputStream(file_name_pdf));
             iText_xlstopdf.open();
-            BaseFont bf_russian = BaseFont.createFont("C:/Users/Екатерина/Downloads/FreeSans.ttf",
+            BaseFont bf_russian = BaseFont.createFont("src\\FreeSans.ttf",
                     "CP1251", BaseFont.EMBEDDED);
             com.itextpdf.text.Font russian;
             russian = new com.itextpdf.text.Font(bf_russian, 11);
@@ -2218,6 +2218,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     int selRow = tableRelatives.getSelectedRow();
                     if(selRow>=0) {
                         String idRel=tableRelatives.getModel().getValueAt(selRow,0).toString();
+                        addRelativeIdDoc.setEnabled(true);
                         initModelIdDocRelatives(idRel);
                     }
                 }

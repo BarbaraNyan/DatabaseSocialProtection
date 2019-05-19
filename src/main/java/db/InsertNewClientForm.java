@@ -51,7 +51,7 @@ public class InsertNewClientForm extends JFrame{
     private JFormattedTextField textAttDocDateStart;
     private JComboBox textOperAccOrgComboBox;
     private JFormattedTextField textOperAccDateStart;
-    private JTextField textOperAccNumber;
+    private JFormattedTextField textOperAccNumber;
     private JComboBox textCategoryClientComboBox;
     private JComboBox textCategoryMeasureComboBox;
     private JTable tableCategoryMeasure;
@@ -109,6 +109,7 @@ public class InsertNewClientForm extends JFrame{
         getComboBox(textAttDocTypeComboBox2,t[6]);
         getComboBox(textAttDocTypeComboBox3,t[6]);
         getComboBox(textCategoryClientComboBox,t[7]);
+        getComboBoxOrganization(textOperAccOrgComboBox, t[9],t[10],t[11]);
         tb=t;
 
         setButtonGroup();
@@ -119,6 +120,14 @@ public class InsertNewClientForm extends JFrame{
         panelAttDocDateStart2.add(dcAttDocDateStart2);
         panelAttDocDateStart3.add(dcAttDocDateStart3);
         panelOperAccDateStart.add(dcOperAccDateStart);
+
+        dcDateBirth.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+        dcIdDocDateStart.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+        dcAttDocDateStart1.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+        dcAttDocDateStart2.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+        dcAttDocDateStart3.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+        dcOperAccDateStart.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
+
         tabbedPane2.setEnabledAt(1,false);
         tabbedPane2.setEnabledAt(2,false);
         icon = new ImageIcon(newimg);
@@ -129,9 +138,71 @@ public class InsertNewClientForm extends JFrame{
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                insertClientTable();
-                setVisible(false);
+                setNullBorder();
+                if(textSurname.getText().equals("")) {
+                    textSurname.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textName.getText().equals("")) {
+                    textName.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textPatronymic.getText().equals("")) {
+                    textPatronymic.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if (dcDateBirth.getDate()==null) {
+                    dcDateBirth.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textSNILS.getText().equals("***-***-*** **")){
+                    textSNILS.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textTelephone.getText().equals("+7-000-000-00-00")){
+                    textTelephone.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textEmail.getText().equals("")){
+                    textEmail.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textHouse.getText().equals("")){
+                    textHouse.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textFlat.getText().equals("")){
+                    textFlat.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textIdDocSeries.getText().equals("****")){
+                    textIdDocSeries.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textIdDocNumber.getText().equals("******")){
+                    textIdDocNumber.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textIdDocGivenBy.getText().equals("")){
+                    textIdDocGivenBy.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if (dcIdDocDateStart.getDate()==null) {
+                    dcIdDocDateStart.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textAttDocNumber1.getText().equals("")){
+                    textAttDocNumber1.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textAttDocName1.getText().equals("")){
+                    textAttDocName1.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if (dcAttDocDateStart1.getDate()==null) {
+                    dcAttDocDateStart1.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if(textOperAccNumber.getText().equals("********************")){
+                    textOperAccNumber.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if (dcOperAccDateStart.getDate()==null) {
+                    dcOperAccDateStart.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else {
+                    int rez = insertClientTable();
+                    if (rez == 1)
+                        JOptionPane.showMessageDialog(InsertNewClientForm.this, "Успешно добавлено!", "Добавление", JOptionPane.INFORMATION_MESSAGE);
+                    else
+                        JOptionPane.showMessageDialog(InsertNewClientForm.this, "Ошибка при добавлении", "Добавление", JOptionPane.WARNING_MESSAGE);
 
+                    setVisible(false);
+                    dispose();
+                }
             }
         });
 
@@ -172,7 +243,32 @@ public class InsertNewClientForm extends JFrame{
         });
     }
 
-    public void insertClientTable(){
+    private void showMess(){
+        JOptionPane.showMessageDialog(InsertNewClientForm.this, "Должны быть введены все поля", "Добавление", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void setNullBorder(){
+        textSurname.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textName.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textPatronymic.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        dcDateBirth.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textSNILS.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textTelephone.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textEmail.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textHouse.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textFlat.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textIdDocSeries.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textIdDocNumber.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textIdDocGivenBy.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        dcIdDocDateStart.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textAttDocNumber1.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textAttDocName1.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        dcAttDocDateStart1.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textOperAccNumber.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        dcOperAccDateStart.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+    }
+
+    public int insertClientTable(){
         String surname;
         String name;
         String patronymic;
@@ -271,6 +367,10 @@ public class InsertNewClientForm extends JFrame{
         String addressId ="1";
         String persNum = "1";
 
+        String org = textOperAccOrgComboBox.getItemAt(textOperAccOrgComboBox.getSelectedIndex()).toString();
+        int numLine = org.indexOf("|");
+        String numOrg=org.substring(0, numLine-1);
+
         try {
             mdbc=new DatabaseConnection();
             Connection conn=mdbc.getMyConnection();
@@ -319,7 +419,7 @@ public class InsertNewClientForm extends JFrame{
                     "("+quotate(operAccNumber)+","+quotate(operAccDateStart)+","+quotate(operAccStatus)+","+quotate(persNum)+")";
             stmt.executeUpdate(sqlQuery5);
 
-            String sqlQuery6 = operAccTypeOrg(operAccNumber);
+            String sqlQuery6 = operAccTypeOrg(operAccNumber, numOrg);
             stmt.executeUpdate(sqlQuery6);
 
             String sqlQuery7 = "select moss.codeSocialMeasure from measure_of_social_support moss where moss.nameSocialMeasure=? ";
@@ -365,10 +465,12 @@ public class InsertNewClientForm extends JFrame{
                     "," + quotate(dateStartMeasure)+","+quotate(dateEndMeasure)+","+quotate(statusMeasure)+")";
             stmt.executeUpdate(sqlQuery8);
             mdbc.close(stmt);
+            return 1;
         }
         catch(Exception e){
             System.out.println("Failed to insert data");
             mdbc.close(stmt);
+            return -1;
         }
     }
 
@@ -404,6 +506,11 @@ public class InsertNewClientForm extends JFrame{
             numberDocFormatter.setPlaceholderCharacter('*');
             DefaultFormatterFactory numberDocFactory = new DefaultFormatterFactory(numberDocFormatter);
 
+            MaskFormatter numberOpAccFormatter = new MaskFormatter("####################");
+            numberOpAccFormatter.setPlaceholderCharacter('*');
+            DefaultFormatterFactory numberOpAccFactory = new DefaultFormatterFactory(numberOpAccFormatter);
+
+            textOperAccNumber.setFormatterFactory(numberOpAccFactory);
             textTelephone.setFormatterFactory(phoneFactory);
             textIdDocSeries.setFormatterFactory(seriesDocFactory);
             textIdDocNumber.setFormatterFactory(numberDocFactory);
@@ -480,31 +587,44 @@ public class InsertNewClientForm extends JFrame{
         return b;
     }
 
-    private String operAccTypeOrg(String operAccNumber) throws SQLException {
+    private String operAccTypeOrg(String operAccNumber, String num) throws SQLException {
         String code="";
         String sqlQuery="";
-        switch (getOperAccOrg()){
-            case 1:
-                ResultSet rs1 = stmt.executeQuery("select po.postCode from post_organization po");
-                if(rs1.next()){
-                    int postCode = rs1.getInt("postCode");
-                    code = String.valueOf(postCode);
-                    sqlQuery = "insert into post_operating_account(numberOperatingAccount, postCode) VALUES ("+quotate(operAccNumber)+","+quotate(code)+")";
-                }
-            break;
-            case 2:
-                ResultSet rs2 = stmt.executeQuery("select bo.bic from bank_organization bo");
-                if(rs2.next())
-                    code = rs2.getString("bic");
-                sqlQuery = "insert into bank_operating_account(numberOperatingAccount, bic) VALUES ("+quotate(operAccNumber)+","+quotate(code)+")";
-                break;
-            case 3:
-                ResultSet rs3 = stmt.executeQuery("select co.tinCash from cash_organization co");
-                if(rs3.next())
+        ResultSet rs1 = stmt.executeQuery("select po.postCode from post_organization po where po.postCode = '"+num+"'");
+        if(rs1.next()){
+            int postCode = rs1.getInt("postCode");
+            code = String.valueOf(postCode);
+            sqlQuery = "insert into post_operating_account(numberOperatingAccount, postCode) VALUES ("+quotate(operAccNumber)+","+quotate(code)+")";
+        }else{
+            ResultSet rs2 = stmt.executeQuery("select bo.bic from bank_organization bo where bo.bic = '"+num+"'");
+            if(rs2.next()) {
+                code = rs2.getString("bic");
+                sqlQuery = "insert into bank_operating_account(numberOperatingAccount, bic) VALUES (" + quotate(operAccNumber) + "," + quotate(code) + ")";
+            }else {
+                ResultSet rs3 = stmt.executeQuery("select co.tinCash from cash_organization co where co.tinCash = '" + num + "'");
+                if (rs3.next()) {
                     code = rs3.getString("tinCash");
-                sqlQuery = "insert into cash_operating_account(numberOperatingAccount, tinCash) VALUES ("+quotate(operAccNumber)+","+quotate(code)+")";
-                break;
+                    sqlQuery = "insert into cash_operating_account(numberOperatingAccount, tinCash) VALUES (" + quotate(operAccNumber) + "," + quotate(code) + ")";
+                }
+            }
         }
         return sqlQuery;
+    }
+
+    private void getComboBoxOrganization(JComboBox cb, JTable b, JTable p, JTable c){
+        cb.removeAllItems();
+        String item;
+        for (int i = 0;i<b.getRowCount();i++){
+            item = b.getModel().getValueAt(i, 0).toString()+" | "+b.getModel().getValueAt(i,2).toString();
+            cb.addItem(item);
+        }
+        for (int i = 0;i<p.getRowCount();i++){
+            item = p.getModel().getValueAt(i, 0).toString()+" | "+p.getModel().getValueAt(i,3).toString();
+            cb.addItem(item);
+        }
+        for (int i = 0;i<c.getRowCount();i++){
+            item = c.getModel().getValueAt(i, 0).toString()+" | "+c.getModel().getValueAt(i,2).toString();
+            cb.addItem(item);
+        }
     }
 }

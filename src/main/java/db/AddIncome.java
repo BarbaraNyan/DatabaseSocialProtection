@@ -34,10 +34,20 @@ public class AddIncome extends JFrame{
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                addIncome(client[0], table);
-                JOptionPane.showMessageDialog(AddIncome.this,"Успешно добавлено!","Добавление",JOptionPane.INFORMATION_MESSAGE);
-                setVisible(false);
-                dispose();
+                textAmount.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+                if(textAmount.getText().equals("")){
+                    textAmount.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else {
+                    int rez = addIncome(client[0], table);
+                    if (rez == 1)
+                        JOptionPane.showMessageDialog(AddIncome.this, "Успешно добавлено!", "Добавление", JOptionPane.INFORMATION_MESSAGE);
+                    else
+                        JOptionPane.showMessageDialog(AddIncome.this, "Ошибка при добавлении", "Добавление", JOptionPane.WARNING_MESSAGE);
+
+                    setVisible(false);
+                    dispose();
+                }
             }
         });
         canselButton.addActionListener(new ActionListener() {
@@ -51,7 +61,11 @@ public class AddIncome extends JFrame{
         });
     }
 
-    private void addIncome(String personalNumber, JTable [] tl){
+    private void showMess(){
+        JOptionPane.showMessageDialog(AddIncome.this, "Должны быть введены все поля", "Добавление", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private int addIncome(String personalNumber, JTable [] tl){
 
         String date=spinnerYear.getValue().toString()+"-"+(periodCombox.getSelectedIndex()+1)+"-01";
         String numTypeIncome=tl[1].getModel().getValueAt(typeIncomeComboBox.getSelectedIndex(),0).toString();
@@ -72,9 +86,12 @@ public class AddIncome extends JFrame{
             }
 
             stmt.executeUpdate(sqlQuery);
+            mdbc.close(stmt);
+            return 1;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return -1;
         }
     }
 

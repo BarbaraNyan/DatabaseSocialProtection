@@ -237,13 +237,31 @@ public class AddHandbook extends JFrame{
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int rez = addItemInGlossary(var, tb);
-                if(rez==1)
-                    JOptionPane.showMessageDialog(AddHandbook.this,"Успешно добавлено!","Добавление",JOptionPane.INFORMATION_MESSAGE);
-                else
-                    JOptionPane.showMessageDialog(AddHandbook.this,"Ошибка при добавлении","Добавление",JOptionPane.WARNING_MESSAGE);
-                setVisible(false);
-                dispose();
+                setNullBorder();
+                if(textNum.getText().equals("")){
+                    textNum.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if((var==14 || var==17 || var==18) && textSurname.getText().equals("")){
+                    textSurname.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if ((var==2 || var==3 || var==4 || var==14 || var==15 || var==16 || var==17 || var==18 || var==19)&&textName.getText().equals("")){
+                    textName.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if ((var==14 || var==17 || var==18 || var==19) && textPatronymic.getText().equals("")){
+                    textPatronymic.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                }else if ((var==3 || var==4) && dcDate.getDate()==null){
+                    dcDate.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
+                    showMess();
+                } else {
+                    int rez = addItemInGlossary(var, tb);
+                    if (rez == 1)
+                        JOptionPane.showMessageDialog(AddHandbook.this, "Успешно добавлено!", "Добавление", JOptionPane.INFORMATION_MESSAGE);
+                    else
+                        JOptionPane.showMessageDialog(AddHandbook.this, "Ошибка при добавлении", "Добавление", JOptionPane.WARNING_MESSAGE);
+                    setVisible(false);
+                    dispose();
+                }
             }
         });
         canselButton.addActionListener(new ActionListener() {
@@ -255,6 +273,18 @@ public class AddHandbook extends JFrame{
                     setVisible(false);
             }
         });
+    }
+
+    private void showMess(){
+        JOptionPane.showMessageDialog(AddHandbook.this, "Должны быть введены все поля", "Добавление", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void setNullBorder(){
+        textNum.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textSurname.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textName.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textPatronymic.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        dcDate.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
     }
 
     private void hideComp(){

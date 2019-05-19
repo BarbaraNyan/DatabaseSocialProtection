@@ -32,14 +32,30 @@ public class AddAttachedDoc extends JFrame{
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
         panelDateStart.add(dcDateStart);
+        dcDateStart.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
         getComboBox(textTypeDocComboBox,handbook[6]);
         tb=handbook[6];
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                addAttDoc(persNum);
-                JOptionPane.showMessageDialog(AddAttachedDoc.this,"Успешно добавлено!","Добавление",JOptionPane.INFORMATION_MESSAGE);
-                setVisible(false);
-                dispose();
+                setNullBorder();
+                if(textNumber.getText().equals("")){
+                    textNumber.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else if(textName.getText().equals("")) {
+                    textName.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else if(dcDateStart.getDate()==null) {
+                    dcDateStart.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else {
+                    int rez=addAttDoc(persNum);
+                    if(rez==1)
+                        JOptionPane.showMessageDialog(AddAttachedDoc.this,"Успешно добавлено!","Добавление",JOptionPane.INFORMATION_MESSAGE);
+                    else
+                        JOptionPane.showMessageDialog(AddAttachedDoc.this,"Ошибка при добавлении","Добавление",JOptionPane.WARNING_MESSAGE);
+                    setVisible(false);
+                    dispose();
+                }
             }
         });
         canselButton.addActionListener(new ActionListener() {
@@ -52,7 +68,17 @@ public class AddAttachedDoc extends JFrame{
             }
         });
     }
-    private void addAttDoc(String personalNumber){
+    private void showMess(){
+        JOptionPane.showMessageDialog(AddAttachedDoc.this, "Должны быть введены все поля", "Добавление", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void setNullBorder(){
+        textNumber.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textName.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        dcDateStart.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+    }
+
+    private int addAttDoc(String personalNumber){
         String typeDoc = String.valueOf(getTypeAttDoc());
         String number = textNumber.getText();
         String name = textName.getText();
@@ -71,8 +97,11 @@ public class AddAttachedDoc extends JFrame{
                     "dateStartAttachedDocument, statusAttachedDocument, numberTypeAttachedDocument, personalNumber) VALUES " +
                     "("+quotate(number)+","+quotate(name)+","+quotate(dateStart)+","+quotate(status)+","+quotate(typeDoc)+","+quotate(personalNumber)+")";
             stmt.executeUpdate(sqlQuery);
+            mdbc.close(stmt);
+            return 1;
         } catch (SQLException e) {
             e.printStackTrace();
+            return -1;
         }
 
     }

@@ -31,14 +31,34 @@ public class AddRelative extends JFrame{
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(dimension.width/2-this.getSize().width/2,dimension.height/2-this.getSize().height/2);
         panelDateBirth.add(dcDateBirth);
+        dcDateBirth.setFont(new Font("Microsoft Sans Serif", Font.PLAIN, 18));
         getComboBox(textRelDegreeComboBox,handbook[8]);
         tb=handbook[8];
+
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                addRelative(persNum);
-                JOptionPane.showMessageDialog(AddRelative.this,"Успешно добавлено!","Добавление",JOptionPane.INFORMATION_MESSAGE);
-                setVisible(false);
-                dispose();
+                setNullBorder();
+                if(textSurname.getText().equals("")){
+                    textSurname.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else if(textName.getText().equals("")) {
+                    textName.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else if(textPatronymic.getText().equals("")) {
+                    textPatronymic.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else if(dcDateBirth.getDate()==null) {
+                    dcDateBirth.setBorder(BorderFactory.createMatteBorder(2,2,2,2, Color.RED));
+                    showMess();
+                }else {
+                    int rez = addRelative(persNum);
+                    if (rez == 1)
+                        JOptionPane.showMessageDialog(AddRelative.this, "Успешно добавлено!", "Добавление", JOptionPane.INFORMATION_MESSAGE);
+                    else
+                        JOptionPane.showMessageDialog(AddRelative.this, "Ошибка при добавлении", "Добавление", JOptionPane.WARNING_MESSAGE);
+                    setVisible(false);
+                    dispose();
+                }
             }
         });
         canselButton.addActionListener(new ActionListener() {
@@ -52,7 +72,18 @@ public class AddRelative extends JFrame{
         });
     }
 
-    private void addRelative(String personalNumber){
+    private void showMess(){
+        JOptionPane.showMessageDialog(AddRelative.this, "Должны быть введены все поля", "Добавление", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void setNullBorder(){
+        textSurname.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textName.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        textSurname.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+        dcDateBirth.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.GRAY));
+    }
+
+    private int addRelative(String personalNumber){
         String surname = textSurname.getText();
         String name = textName.getText();
         String patronymic = textPatronymic.getText();
@@ -70,9 +101,12 @@ public class AddRelative extends JFrame{
                     quotate(personalNumber)+","+quotate(surname)+","+quotate(name)+","+quotate(patronymic)+","+
                     quotate(dateBirth)+","+quotate(relDegree)+")";
             stmt.executeUpdate(sqlQuery);
+            mdbc.close(stmt);
+            return 1;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return -1;
         }
     }
 
