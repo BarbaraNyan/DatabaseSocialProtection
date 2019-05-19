@@ -84,6 +84,7 @@
         <properties>
           <font name="Microsoft Sans Serif" size="18"/>
           <text value="Добавить"/>
+          <toolTipText value="Добавить документ"/>
         </properties>
       </component>
       <component id="bb9e2" class="javax.swing.JButton" binding="canselButton">
@@ -93,6 +94,7 @@
         <properties>
           <font name="Microsoft Sans Serif" size="18"/>
           <text value="Отменить"/>
+          <toolTipText value="Отменить добавление"/>
         </properties>
       </component>
       <component id="cdb74" class="javax.swing.JTextField" binding="textNumber">

@@ -238,7 +238,8 @@
         <properties>
           <enabled value="true"/>
           <font name="Microsoft Sans Serif" size="18"/>
-          <text value="Отмена"/>
+          <text value="Отменить"/>
+          <toolTipText value="Отменить добавление элемента справочника"/>
         </properties>
       </component>
       <component id="7823a" class="javax.swing.JButton" binding="addButton">
@@ -253,6 +254,7 @@
           <enabled value="true"/>
           <font name="Microsoft Sans Serif" size="18"/>
           <text value="Добавить"/>
+          <toolTipText value="Добавить элемент справочника"/>
         </properties>
       </component>
     </children>

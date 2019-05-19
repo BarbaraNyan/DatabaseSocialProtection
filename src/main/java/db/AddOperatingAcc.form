@@ -49,11 +49,7 @@
         </constraints>
         <properties>
           <font name="Microsoft Sans Serif" size="18"/>
-          <model>
-            <item value="Почта России"/>
-            <item value="Сбербанк"/>
-            <item value="Касса-Сервис"/>
-          </model>
+          <model/>
         </properties>
       </component>
       <component id="7f9db" class="javax.swing.JLabel">
@@ -82,6 +78,7 @@
         <properties>
           <font name="Microsoft Sans Serif" size="18"/>
           <text value="Добавить"/>
+          <toolTipText value="Добавить расчетный счет"/>
         </properties>
       </component>
       <component id="bd813" class="javax.swing.JButton" binding="canselButton">
@@ -90,7 +87,8 @@
         </constraints>
         <properties>
           <font name="Microsoft Sans Serif" size="18"/>
-          <text value="Button"/>
+          <text value="Отменить"/>
+          <toolTipText value="Отменить добавление расчетного счета"/>
         </properties>
       </component>
     </children>

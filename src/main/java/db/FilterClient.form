@@ -359,7 +359,8 @@
         </constraints>
         <properties>
           <font name="Microsoft Sans Serif" size="18"/>
-          <text value="Поиск"/>
+          <text value="Искать"/>
+          <toolTipText value="Искать клиента"/>
         </properties>
       </component>
       <component id="d60fe" class="javax.swing.JRadioButton" binding="femaleRadioButton">
@@ -378,7 +379,8 @@
         </constraints>
         <properties>
           <font name="Microsoft Sans Serif" size="18"/>
-          <text value="Отмена"/>
+          <text value="Отменить"/>
+          <toolTipText value="Отменить поиск клиента"/>
         </properties>
       </component>
       <hspacer id="cb62c">

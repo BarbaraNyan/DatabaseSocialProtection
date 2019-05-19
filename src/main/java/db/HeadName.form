@@ -23,6 +23,7 @@
             <properties>
               <font name="Microsoft Sans Serif" size="20" style="1"/>
               <text value="Запустить программу"/>
+              <toolTipText value="Запустить программу"/>
             </properties>
           </component>
           <vspacer id="64437">
