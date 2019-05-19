@@ -1273,7 +1273,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
 
     private void saveReestrToExcel(){
         String date = (String) periodCombox.getSelectedItem();
-        String category = (String) mspCombox.getSelectedItem();
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("Заявка на оплату расходов");
         int column = 0; // текущий столбец
@@ -1293,13 +1292,6 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         region = new CellRangeAddress(1, 1, 0, 1);
         sheet.addMergedRegion(region);
 
-        row++; // row = 2
-        newRow = sheet.createRow(row);
-        cell = newRow.createCell(column, CellType.STRING);
-        cell.setCellValue("Соц.выплата: ");
-        cell = newRow.createCell(column + 1, CellType.STRING);
-        cell.setCellValue(category);
-
         row++; // row = 3
         newRow = sheet.createRow(row);
         cell = newRow.createCell(column, CellType.STRING);
@@ -1307,8 +1299,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         cell = newRow.createCell(column + 1, CellType.NUMERIC);
         cell.setCellValue("Сумма");
 
-
-        for (int i = 0; i < persAc.size(); i++) {
+        for (int i = 0; i < rasAcc.size(); i++) {
             row++;
             newRow = sheet.createRow(row);
             cell = newRow.createCell(column, CellType.STRING); // расчетный счет
@@ -1324,11 +1315,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
         style.setAlignment(HorizontalAlignment.RIGHT);
         cell.setCellStyle(style);
         cell.setCellValue("ИТОГО: ");
-        cell = newRow.createCell(column+4, CellType.FORMULA);
-        String sumFormula1 = "SUM(B5:B"+row+")";
+        cell = newRow.createCell(column+1, CellType.FORMULA);
+        String sumFormula1 = "SUM(B4:B"+row+")";
         cell.setCellFormula(sumFormula1);
 
-        String file_path_xls = "C:/test repos/Реестр для организации-"+orgz+".xls";
+        String file_path_xls = "C:/test repos/Реестр для организации.xls";
         File file = new File(file_path_xls);
         if(file.exists()) file.delete();
         file.getParentFile().mkdirs();
@@ -1349,7 +1340,7 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             HSSFSheet my_worksheet = my_xls_workbook.getSheetAt(0);
             Document iText_xlstopdf = new Document();
 
-            String file_name_pdf = "C:/test repos/Реестр для организации "+orgz+".pdf";
+            String file_name_pdf = "C:/test repos/Реестр для организации.pdf";
             PdfWriter.getInstance(iText_xlstopdf, new FileOutputStream(file_name_pdf));
             iText_xlstopdf.open();
             BaseFont bf_russian = BaseFont.createFont("C:/Users/Екатерина/Downloads/FreeSans.ttf",
@@ -1358,13 +1349,11 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             russian = new com.itextpdf.text.Font(bf_russian, 11);
             PdfPTable my_table = new PdfPTable(2);
             Paragraph p = new Paragraph();
-            Chunk chunk = new Chunk("Заявка на оплату расходов", russian);
+            Chunk chunk = new Chunk("Заявка на оплату расходов\n\n", russian);
             p.add(chunk);
-            chunk = new Chunk("Организация: " +orgz+"\n", russian);
+            chunk = new Chunk("Организация: " +orgz+"\n\n", russian);
             p.add(chunk);
-            chunk = new Chunk("Соц.выплата: "+category+"\n", russian);
-            p.add(chunk);
-            p.add(chunk);
+            iText_xlstopdf.add( Chunk.NEWLINE );
             iText_xlstopdf.add(p);
             PdfPCell table_cell;
             double value;
@@ -1402,11 +1391,8 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
                     }
                 }
             }
+            iText_xlstopdf.add( Chunk.NEWLINE );
             iText_xlstopdf.add(my_table);
-
-            iText_xlstopdf.add( Chunk.NEWLINE );
-            iText_xlstopdf.add( Chunk.NEWLINE );
-            iText_xlstopdf.add(p);
             iText_xlstopdf.close(); // закрываем документ
             input_doc.close(); //закрываем xls
 
