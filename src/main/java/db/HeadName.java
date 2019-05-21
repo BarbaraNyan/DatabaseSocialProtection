@@ -12,16 +12,22 @@ public class HeadName extends JFrame{
     private JButton buttonStart;
     private JPanel panelButton;
     private JLabel label;
+    private JPanel panelOneImg;
+    private JPanel panelTwoImg;
+    private JButton buttonAbout;
     ImageIcon icon;
 
     public HeadName(){
         super("Заставка");
         setContentPane(rootPanel);
-        icon = new ImageIcon("src\\headWindow.jpg");
+
+        icon = new ImageIcon("src\\headWindow2.jpg");
         Image image = icon.getImage();
-        Image newimg = image.getScaledInstance(1300,650,Image.SCALE_SMOOTH);
+        Image newimg = image.getScaledInstance(1300,500,Image.SCALE_SMOOTH);
         icon = new ImageIcon(newimg);
         label.setIcon(icon);
+
+
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(300,100);
         buttonStart.addActionListener(new ActionListener() {
@@ -37,6 +43,24 @@ public class HeadName extends JFrame{
 //                        System.exit(0);
 //                    }
 //                });
+            }
+        });
+        buttonAbout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame menuItemAbout = new MenuItemAbout();
+                menuItemAbout.setTitle("Справка");
+                menuItemAbout.pack();
+                menuItemAbout.setVisible(true);
+            }
+        });
+        buttonAbout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame menuItemAbout = new MenuItemAbout();
+                menuItemAbout.setTitle("Справка");
+                menuItemAbout.pack();
+                menuItemAbout.setVisible(true);
             }
         });
     }
