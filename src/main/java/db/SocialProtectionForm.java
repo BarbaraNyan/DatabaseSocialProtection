@@ -1348,7 +1348,10 @@ public class SocialProtectionForm extends JFrame implements TreeSelectionListene
             com.itextpdf.text.Font russian;
             russian = new com.itextpdf.text.Font(bf_russian, 11);
             Paragraph p = new Paragraph();
-            Chunk chunk = new Chunk("Заявка на оплату расходов "+date+"\n\n", russian);
+            Chunk chunk = new Chunk("ГБУ РК \"Центр по предоставению" +
+                    " государственных услуг в сфере социальной защиты населения города Ухты\"\n", russian);
+            p.add(chunk);
+            chunk = new Chunk("Заявка на оплату расходов "+date+"\n\n", russian);
             p.add(chunk);
             chunk = new Chunk("Организация: " +orgz, russian);
             p.add(chunk);
