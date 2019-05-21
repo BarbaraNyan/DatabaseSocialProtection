@@ -7,8 +7,8 @@ import java.sql.*;
 public class DatabaseConnection {
 
     public static final String URL = "jdbc:mysql://46.0.192.202:3306/social_security?autoReconnect=true&useSSL=FALSE&useLegacyDatetimeCode=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-    public static final String USERNAME = "kate";
-    public static final String PASSWORD = "fuckyakimov";
+    public static final String USERNAME = "eugenia";
+    public static final String PASSWORD = "ilovetabletennis";
     public Connection myConnection;
     public Statement statement;
     //комментарий
